@@ -131,15 +131,6 @@ h1 span {
   font-family: inherit; margin-top: 0.5rem; text-decoration: underline; transition: color 0.15s;
 }
 .pin-back-btn:hover { color: var(--text); }
-.existing-students { margin-top: 1.4rem; }
-.existing-students h4 { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.7rem; }
-.student-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
-.student-chip {
-  padding: 0.45rem 0.9rem; border-radius: 20px; border: 1.5px solid var(--card-border);
-  background: rgba(255,255,255,0.04); color: var(--text-secondary); font-size: 0.78rem; font-weight: 500;
-  cursor: pointer; font-family: inherit; transition: all 0.2s;
-}
-.student-chip:hover { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.35); color: var(--text); transform: translateY(-1px); }
 
 /* Welcome header */
 .welcome-bar {
@@ -465,7 +456,6 @@ h1 span {
   .login-card p { font-size: 0.9rem; }
   .login-input { font-size: 1.1rem; padding: 1rem 1.2rem; border-radius: 16px; }
   .pin-input { width: 180px; font-size: 1.7rem; padding: 1rem 1.2rem; }
-  .student-chip { padding: 0.5rem 1rem; font-size: 0.85rem; }
 
   /* Progress screen */
   .progress-overall { gap: 0.7rem; margin-bottom: 1.3rem; }
@@ -637,10 +627,6 @@ body.playing h1, body.playing .subtitle { display: none; }
       <input type="text" class="login-input" id="login-name" placeholder="Your name..." autocomplete="off" autocapitalize="words">
       <div class="login-error" id="login-error"></div>
       <button class="btn btn-primary btn-block" id="login-btn" onclick="handleNameSubmit()">Continue</button>
-      <div class="existing-students" id="existing-students" style="display:none;">
-        <h4>Or choose your name</h4>
-        <div class="student-chips" id="student-chips"></div>
-      </div>
     </div>
     <!-- Step 2: PIN entry (for returning students) -->
     <div id="login-step-pin" class="pin-section">
@@ -1497,24 +1483,6 @@ function slugify(name) {
 let pendingLoginName = '';
 let pendingLoginId = '';
 
-async function loadExistingStudents() {
-  try {
-    const snap = await studentsRef.get();
-    const chips = document.getElementById('student-chips');
-    const container = document.getElementById('existing-students');
-    chips.innerHTML = '';
-    if (snap.empty) { container.style.display = 'none'; return; }
-    container.style.display = '';
-    snap.forEach(doc => {
-      const data = doc.data();
-      const chip = document.createElement('button');
-      chip.className = 'student-chip';
-      chip.textContent = data.name;
-      chip.onclick = () => { document.getElementById('login-name').value = data.name; handleNameSubmit(); };
-      chips.appendChild(chip);
-    });
-  } catch (e) { console.error('Error loading students:', e); }
-}
 
 function showNameStep() {
   document.getElementById('login-step-name').style.display = '';
@@ -1746,7 +1714,6 @@ function logout() {
   document.getElementById('login-name').value = '';
   showNameStep();
   showScreen('login-screen');
-  loadExistingStudents();
 }
 
 // ===== PROGRESS HELPERS =====
@@ -2345,7 +2312,6 @@ document.addEventListener('keydown', e => {
     } catch (e) { console.error('Auto-login error:', e); }
     localStorage.removeItem('3rd-grade-vocab-student');
   }
-  loadExistingStudents();
 })();
 </script>
 </body>
