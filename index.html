@@ -119,6 +119,7 @@ h1 span {
   background: rgba(255,255,255,0.05); color: var(--text); font-size: 1.5rem;
   font-family: inherit; margin-bottom: 1rem; text-align: center; letter-spacing: 0.5em;
   transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-text-security: disc; text-security: disc;
 }
 .pin-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
 .pin-input::placeholder { color: var(--muted); letter-spacing: 0.1em; font-size: 0.9rem; }
@@ -645,7 +646,7 @@ body.playing h1, body.playing .subtitle { display: none; }
     <div id="login-step-pin" class="pin-section">
       <p>Welcome back, <span class="pin-name" id="pin-display-name"></span>!</p>
       <p>Enter your 4-digit PIN</p>
-      <input type="password" class="pin-input" id="login-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+      <input type="text" class="pin-input" id="login-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
       <div class="login-error" id="pin-error"></div>
       <button class="btn btn-primary btn-block" onclick="handlePinSubmit()">Log In</button>
       <button class="pin-back-btn" onclick="showNameStep()">← Back</button>
@@ -654,7 +655,7 @@ body.playing h1, body.playing .subtitle { display: none; }
     <div id="login-step-set-pin" class="pin-section">
       <p>Hi <span class="pin-name" id="set-pin-display-name"></span>! 👋</p>
       <p>Choose a 4-digit PIN to secure your account</p>
-      <input type="password" class="pin-input" id="set-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+      <input type="text" class="pin-input" id="set-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
       <p style="font-size:0.75rem; color: var(--muted); margin-top:-0.5rem; margin-bottom:0.8rem;">Remember this PIN — you'll need it to log in!</p>
       <div class="login-error" id="set-pin-error"></div>
       <button class="btn btn-primary btn-block" onclick="handleSetPin()">Create Account</button>
