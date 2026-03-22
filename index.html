@@ -1829,11 +1829,47 @@ function showNameStep() {
   document.getElementById('set-pin-error').style.display = 'none';
 }
 
+
+// ===== PROFANITY FILTER =====
+const _pf = (function() {
+  // Compact word list: English + German common profanity/slurs
+  const words = [
+    // English
+    'fuck','shit','ass','asshole','bitch','bastard','dick','cock','cunt',
+    'wanker','piss','damn','crap','slut','whore','nigger','nigga','fag',
+    'faggot','retard','twat','bollocks','wank','tits','boobs','penis',
+    'vagina','anus','dildo','porn','sexy','nude','naked','hentai',
+    'butthole','arsehole','jackass','dumbass','dipshit','bullshit',
+    'motherfucker','fucker','fucking','shitty','bitchy','douchebag',
+    'douche','prick','jerkoff','blowjob','handjob',
+    // German
+    'fick','ficken','ficker','scheiße','scheisse','scheiss','arsch',
+    'arschloch','fotze','hurensohn','hure','wichser','wichsen','schwanz',
+    'schwuchtel','missgeburt','spast','spasti','behindert','vollidiot',
+    'depp','trottel','idiot','drecksau','sau','schlampe','nutte',
+    'penner','pisser','kacke','kacken','wixxer','wixxen','bastard',
+    'mongo','neger','kanake','Nazi','hitler','holocaust'
+  ];
+  // Leetspeak substitutions
+  const leet = {'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','!':'i','$':'s'};
+  function normalize(s) {
+    return s.toLowerCase().replace(/[0134579@!$]/g, c => leet[c] || c).replace(/[^a-zäöüß]/g, '');
+  }
+  return function(name) {
+    const n = normalize(name);
+    for (const w of words) {
+      if (n.includes(w)) return true;
+    }
+    return false;
+  };
+})();
+
 async function handleNameSubmit() {
   const nameInput = document.getElementById('login-name');
   const name = nameInput.value.trim();
   if (!name) { showLoginError('Please enter your name'); return; }
   if (name.length < 2) { showLoginError('Name must be at least 2 characters'); return; }
+  if (_pf(name)) { showLoginError("Please use your real name"); return; }
 
   const id = slugify(name);
   pendingLoginName = name;
