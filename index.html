@@ -2233,6 +2233,24 @@ function checkAnswer() {
   document.getElementById('skip-btn').style.display = 'none';
 }
 
+function spellVariants(s) {
+  const swaps = [
+    [/ise\b/g,'ize'],[/ize\b/g,'ise'],[/ised\b/g,'ized'],[/ized\b/g,'ised'],
+    [/ising\b/g,'izing'],[/izing\b/g,'ising'],[/isation/g,'ization'],[/ization/g,'isation'],
+    [/yse\b/g,'yze'],[/yze\b/g,'yse'],
+    [/our\b/g,'or'],[/([a-z])or\b/g,'$1our'],
+    [/ogue\b/g,'og'],[/elled\b/g,'eled'],[/eled\b/g,'elled'],
+    [/elling\b/g,'eling'],[/eling\b/g,'elling'],
+    [/eller\b/g,'eler'],[/eler\b/g,'eller'],[/ellery\b/g,'elry'],[/elry\b/g,'ellery'],
+    [/ence\b/g,'ense'],[/ense\b/g,'ence'],
+    [/tre\b/g,'ter'],[/ter\b/g,'tre'],
+    [/grey/g,'gray'],[/gray/g,'grey'],
+  ];
+  const v = new Set([s]);
+  for (const [p, r] of swaps) { if (p.test(s)) v.add(s.replace(p, r)); }
+  return [...v];
+}
+
 function isCorrect(userAnswer, word) {
   const norm = normalizeAnswer(userAnswer);
   const expected = normalizeAnswer(word.w);
@@ -2240,9 +2258,12 @@ function isCorrect(userAnswer, word) {
   const candidates = [expected, cf];
   if (word.a) word.a.forEach(a => candidates.push(normalizeAnswer(a)));
   const strip = s => s.replace(/[-_.,!?'"()]/g, '').replace(/\s+/g, ' ').trim();
+  const userV = spellVariants(norm);
+  const userS = spellVariants(strip(norm));
   for (const c of candidates) {
-    if (norm === c) return true;
-    if (strip(norm) === strip(c)) return true;
+    for (const u of userV) { if (u === c) return true; }
+    const sc = strip(c);
+    for (const u of userS) { if (u === sc) return true; }
   }
   return false;
 }
