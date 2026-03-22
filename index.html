@@ -1834,21 +1834,37 @@ function showNameStep() {
 const _pf = (function() {
   // Compact word list: English + German common profanity/slurs
   const words = [
-    // English
+    // English profanity
     'fuck','shit','ass','asshole','bitch','bastard','dick','cock','cunt',
-    'wanker','piss','damn','crap','slut','whore','nigger','nigga','fag',
-    'faggot','retard','twat','bollocks','wank','tits','boobs','penis',
-    'vagina','anus','dildo','porn','sexy','nude','naked','hentai',
+    'wanker','piss','slut','whore','twat','bollocks','wank','tits',
+    'penis','vagina','anus','dildo','porn','sexy','nude','naked','hentai',
     'butthole','arsehole','jackass','dumbass','dipshit','bullshit',
-    'motherfucker','fucker','fucking','shitty','bitchy','douchebag',
+    'motherfucker','fucker','fucking','shitty','douchebag',
     'douche','prick','jerkoff','blowjob','handjob',
-    // German
+    // English racial slurs & dogwhistles
+    'nigger','nigga','nigg','negro','negroid','coon','darkie','spic',
+    'spick','wetback','beaner','chink','chinky','gook','zipperhead',
+    'slant','slanteye','jap','paki','raghead','towelhead','sandnigger',
+    'camel jockey','redskin','injun','kike','heeb','yid',
+    'cracker','honky','gringo','wigger','halfbreed',
+    'fag','faggot','dyke','tranny','shemale','retard','retarded',
+    'mongol','mongoloid','spaz','spastic','cripple',
+    // Dogwhistles & hate symbols
+    'fourteen words','1488','heil','sieg heil','white power',
+    'white pride','rahowa','zog','goyim','dindu',
+    'jogger','despite','groyper','fren','boogaloo',
+    // German profanity
     'fick','ficken','ficker','scheiße','scheisse','scheiss','arsch',
     'arschloch','fotze','hurensohn','hure','wichser','wichsen','schwanz',
-    'schwuchtel','missgeburt','spast','spasti','behindert','vollidiot',
-    'depp','trottel','idiot','drecksau','sau','schlampe','nutte',
-    'penner','pisser','kacke','kacken','wixxer','wixxen','bastard',
-    'mongo','neger','kanake','Nazi','hitler','holocaust'
+    'schwuchtel','missgeburt','spast','spasti','vollidiot',
+    'drecksau','schlampe','nutte','pisser','kacke','wixxer','wixxen',
+    // German racial slurs & hate speech
+    'neger','kanake','kanack','kameltreiber','kümmeltürke','kuemmeltuerke',
+    'schlitzauge','polacke','zigeuner','zigo','itaker','spaghettifresser',
+    'nazi','hitler','holocaust','vergasung','judensau','judenschwein',
+    'ausländer raus','auslander raus','volksverräter','volksverraeter',
+    'umvolkung','lügenpresse','luegenpresse','untermensch',
+    'nsdap','reichsbürger','reichsbuerger','sieg heil','heil hitler'
   ];
   // Leetspeak substitutions
   const leet = {'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','@':'a','!':'i','$':'s'};
@@ -1869,7 +1885,7 @@ async function handleNameSubmit() {
   const name = nameInput.value.trim();
   if (!name) { showLoginError('Please enter your name'); return; }
   if (name.length < 2) { showLoginError('Name must be at least 2 characters'); return; }
-  if (_pf(name)) { showLoginError("Please use your real name"); return; }
+  if (_pf(name)) { showLoginError("That name is not allowed. Please choose another."); return; }
 
   const id = slugify(name);
   pendingLoginName = name;
