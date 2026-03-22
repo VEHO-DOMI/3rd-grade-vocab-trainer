@@ -2315,16 +2315,22 @@ function showHomeScreen() {
   document.getElementById('stat-sessions').textContent = d.totalSessions || 0;
   const acc = d.totalAnswered > 0 ? Math.round((d.totalCorrect / d.totalAnswered) * 100) + '%' : '–';
   document.getElementById('stat-accuracy').textContent = acc;
-  document.getElementById('stat-mastered').textContent = getTotalMastered();
+  const mastered = getTotalMastered();
+  document.getElementById('stat-mastered').textContent = mastered;
+  document.getElementById('stat-streak').textContent = state.studentData?.streak || 0;
+  renderBadgeRow();
+  renderDailyCard();
 
-  // Weak words button
-  const weakWords = getWeakWords();
-  const weakBtn = document.getElementById('weak-btn');
-  if (weakWords.length > 0) {
-    weakBtn.style.display = '';
-    weakBtn.textContent = `Practice ${weakWords.length} Weak Words`;
-  } else {
-    weakBtn.style.display = 'none';
+  // Smart review button (replaces old weak words)
+  const reviewWords2 = getSmartReviewWords();
+  const reviewBtn2 = document.getElementById('review-btn');
+  if (reviewBtn2) {
+    if (reviewWords2.length > 0) {
+      reviewBtn2.style.display = '';
+      reviewBtn2.textContent = `🔄 Smart Review (${reviewWords2.length} words)`;
+    } else {
+      reviewBtn2.style.display = 'none';
+    }
   }
 
   initSourceGrid();
