@@ -2611,7 +2611,11 @@ function checkAnswer() {
     input.className = 'answer-input wrong';
     feedback.className = 'feedback wrong';
     const isCtx = state.currentType === 'context' || state.currentType === 'context-hard';
-    const displayAnswer = isCtx ? getContextForm(word) : word.w;
+    const isDef = state.currentType === 'definition' || state.currentType === 'definition-hard';
+    let displayAnswer;
+    if (isCtx) { displayAnswer = getContextForm(word); }
+    else if (isDef) { displayAnswer = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' '); }
+    else { displayAnswer = word.w; }
     feedback.innerHTML = `The correct answer is: <span class="correct-answer">${displayAnswer}</span>`;
   }
 
