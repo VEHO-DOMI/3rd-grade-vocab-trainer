@@ -1717,6 +1717,7 @@ let dailyChallengeTypes = [];
 
 function startDailyChallenge() {
   isDailyChallenge = true;
+  state.exerciseType = 'mix';
   state.words = getDailyChallengeWords();
   dailyChallengeTypes = getDailyChallengeTypes();
   state.currentIdx = 0;
@@ -2480,6 +2481,7 @@ function practiceWeakWords() {
 }
 
 function getTaskType() {
+  if (isDailyChallenge && dailyChallengeTypes.length > 0) return dailyChallengeTypes[state.currentIdx % dailyChallengeTypes.length];
   if (state.exerciseType !== 'mix') return state.exerciseType;
   const types = ['context', 'context-hard', 'definition', 'definition-hard', 'translation'];
   return types[Math.floor(Math.random() * types.length)];
