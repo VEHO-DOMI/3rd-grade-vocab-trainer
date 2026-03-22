@@ -2505,7 +2505,7 @@ function getFirstLetterHint(word, showLetterCount) {
     return parts.map(p => {
       if (/^[\s-]+$/.test(p)) return p;
       if (small.has(p.toLowerCase()) && parts.filter(x => !/^[\s-]+$/.test(x)).length > 1) return p;
-      return p[0].toLowerCase() + '_'.repeat(Math.max(p.length - 1, 1));
+      const fl = (p[0] === 'I' && (p.length === 1 || p[1] === "'")) ? 'I' : p[0].toLowerCase(); return fl + '_'.repeat(Math.max(p.length - 1, 1));
     }).join('');
   } else {
     // Hard: just first letter of the whole phrase + one continuous line
@@ -2546,7 +2546,7 @@ function showWord() {
       const small = new Set(['to','a','an','the','in','on','of','for','at','up','out','by','with','off','down']);
       const allWords = parts.filter(x => !/^[\s-]+$/.test(x));
       const firstContent = allWords.find(p => !small.has(p.toLowerCase())) || allWords[0];
-      const letter = firstContent[0].toLowerCase();
+      const letter = (firstContent[0] === 'I' && (firstContent.length === 1 || firstContent[1] === "'")) ? 'I' : firstContent[0].toLowerCase();
       prompt.innerHTML = word.s.replace('_____', `<span class="gap gap-hard">${letter}<span class="gap-line"></span></span>`);
     }
   } else if (isDef) {
@@ -2558,7 +2558,7 @@ function showWord() {
       const small = new Set(['a','an','the','in','on','of','for','at','up','out','by','with','off','down','your','my','own','too','many','no']);
       const hintParts = answerWords.map(w => {
         if (small.has(w.toLowerCase()) && answerWords.length > 1) return w;
-        return w[0].toLowerCase() + '_'.repeat(Math.max(w.length - 1, 1));
+        const fl2 = (w[0] === 'I' && (w.length === 1 || w[1] === "'")) ? 'I' : w[0].toLowerCase(); return fl2 + '_'.repeat(Math.max(w.length - 1, 1));
       }).join(' ');
       const countLabel = wordCount === 1 ? '1 word' : `${wordCount} words`;
       prompt.innerHTML = `<em>${word.d}</em><div class="def-hint"><span class="def-hint-letter">${hintParts}</span><span class="def-hint-count">${countLabel}</span></div>`;
@@ -2614,7 +2614,10 @@ function checkAnswer() {
     const isDef = state.currentType === 'definition' || state.currentType === 'definition-hard';
     let displayAnswer;
     if (isCtx) { displayAnswer = getContextForm(word); }
-    else if (isDef) { displayAnswer = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' '); }
+    else if (isDef) {
+      displayAnswer = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
+      if (displayAnswer !== word.w) displayAnswer += ' <span style="font-weight:400;color:var(--muted);font-size:0.85em;">(' + word.w + ')</span>';
+    }
     else { displayAnswer = word.w; }
     feedback.innerHTML = `The correct answer is: <span class="correct-answer">${displayAnswer}</span>`;
   }
