@@ -216,6 +216,7 @@ h1 span {
 .type-btn.selected[data-type="context"] { background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.45); box-shadow: 0 0 16px rgba(56,189,248,0.08); }
 .type-btn.selected[data-type="context-hard"] { background: rgba(56,189,248,0.15); border-color: rgba(56,189,248,0.5); box-shadow: 0 0 16px rgba(56,189,248,0.1); }
 .type-btn.selected[data-type="definition"] { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); box-shadow: 0 0 16px rgba(251,191,36,0.08); }
+.type-btn.selected[data-type="definition-hard"] { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.5); box-shadow: 0 0 16px rgba(251,191,36,0.1); }
 .type-btn.selected[data-type="translation"] { background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.4); box-shadow: 0 0 16px rgba(244,114,182,0.08); }
 
 /* Buttons */
@@ -291,7 +292,7 @@ h1 span {
   font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.2rem;
 }
 .task-type-label.context { background: rgba(96,165,250,0.12); color: var(--context-color); border: 1px solid rgba(96,165,250,0.15); }
-.task-type-label.definition { background: rgba(251,191,36,0.1); color: var(--def-color); border: 1px solid rgba(251,191,36,0.12); }
+.task-type-label.definition, .task-type-label.definition-hard { background: rgba(251,191,36,0.1); color: var(--def-color); border: 1px solid rgba(251,191,36,0.12); }
 .task-type-label.translation { background: rgba(244,114,182,0.1); color: var(--trans-color); border: 1px solid rgba(244,114,182,0.12); }
 
 .quiz-prompt {
@@ -697,7 +698,8 @@ body.playing h1, body.playing .subtitle { display: none; }
       <button class="type-btn selected" data-type="mix" onclick="selectType(this)" title="Random mix of all exercise types">Mix</button>
       <button class="type-btn" data-type="context" onclick="selectType(this)" title="Complete the sentence — first letter + exact letter count shown">Context (easy)</button>
       <button class="type-btn" data-type="context-hard" onclick="selectType(this)" title="Complete the sentence — only the first letter is shown, no letter count">Context (hard)</button>
-      <button class="type-btn" data-type="definition" onclick="selectType(this)" title="Read an English definition and guess which word it describes">Definition</button>
+      <button class="type-btn" data-type="definition" onclick="selectType(this)" title="Read an English definition — first letters and word count shown">Definition (easy)</button>
+      <button class="type-btn" data-type="definition-hard" onclick="selectType(this)" title="Read an English definition — no hints given">Definition (hard)</button>
       <button class="type-btn" data-type="translation" onclick="selectType(this)" title="See the German word and type the English translation">Translation</button>
     </div>
   </div>
@@ -2089,7 +2091,7 @@ function practiceWeakWords() {
 
 function getTaskType() {
   if (state.exerciseType !== 'mix') return state.exerciseType;
-  const types = ['context', 'context-hard', 'definition', 'translation'];
+  const types = ['context', 'context-hard', 'definition', 'definition-hard', 'translation'];
   return types[Math.floor(Math.random() * types.length)];
 }
 
@@ -2137,8 +2139,9 @@ function showWord() {
 
   const label = document.getElementById('task-label');
   const isContext = type === 'context' || type === 'context-hard';
-  label.className = 'task-type-label ' + (isContext ? 'context' : type);
-  label.textContent = isContext ? 'Complete the sentence' : type === 'definition' ? 'Guess the word' : 'Translate to English';
+  const isDef = type === 'definition' || type === 'definition-hard';
+  label.className = 'task-type-label ' + (isContext ? 'context' : isDef ? 'definition' : type);
+  label.textContent = isContext ? 'Complete the sentence' : isDef ? 'Guess the word' : 'Translate to English';
 
   const prompt = document.getElementById('quiz-prompt');
   if (isContext) {
@@ -2156,24 +2159,23 @@ function showWord() {
       const letter = firstContent[0].toLowerCase();
       prompt.innerHTML = word.s.replace('_____', `<span class="gap gap-hard">${letter}<span class="gap-line"></span></span>`);
     }
-  } else if (type === 'definition') {
-    // Build hint: first letter pattern + word count
-    const cleaned = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
-    const answerWords = cleaned.split(' ').filter(w => w.length > 0);
-    const wordCount = answerWords.length;
-    // Show first letter of each content word (small words shown fully)
-    const small = new Set(['a','an','the','in','on','of','for','at','up','out','by','with','off','down','your','my','own','too','many','no']);
-    const letterPattern = answerWords.map(w => {
-      if (small.has(w.toLowerCase()) && answerWords.length > 1) return w;
-      return w[0].toLowerCase() + '_ '.repeat(0).trimEnd();
-    }).join(' … ');
-    // Build first-letter underscored pattern like: "s_ … u_"
-    const hintParts = answerWords.map(w => {
-      if (small.has(w.toLowerCase()) && answerWords.length > 1) return w;
-      return w[0].toLowerCase() + '_'.repeat(Math.max(w.length - 1, 1));
-    }).join(' ');
-    const countLabel = wordCount === 1 ? '1 word' : `${wordCount} words`;
-    prompt.innerHTML = `<em>${word.d}</em><div class="def-hint"><span class="def-hint-letter">${hintParts}</span><span class="def-hint-count">${countLabel}</span></div>`;
+  } else if (isDef) {
+    if (type === 'definition') {
+      // Easy mode: show first letter pattern + word count
+      const cleaned = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
+      const answerWords = cleaned.split(' ').filter(w => w.length > 0);
+      const wordCount = answerWords.length;
+      const small = new Set(['a','an','the','in','on','of','for','at','up','out','by','with','off','down','your','my','own','too','many','no']);
+      const hintParts = answerWords.map(w => {
+        if (small.has(w.toLowerCase()) && answerWords.length > 1) return w;
+        return w[0].toLowerCase() + '_'.repeat(Math.max(w.length - 1, 1));
+      }).join(' ');
+      const countLabel = wordCount === 1 ? '1 word' : `${wordCount} words`;
+      prompt.innerHTML = `<em>${word.d}</em><div class="def-hint"><span class="def-hint-letter">${hintParts}</span><span class="def-hint-count">${countLabel}</span></div>`;
+    } else {
+      // Hard mode: just the definition, no hints
+      prompt.innerHTML = `<em>${word.d}</em>`;
+    }
   } else {
     prompt.innerHTML = `<span class="german-word">${word.g}</span>`;
   }
