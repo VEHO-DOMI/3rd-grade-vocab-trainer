@@ -1768,7 +1768,7 @@ async function showLeaderboard() {
   document.getElementById('lb-daily').innerHTML = dailyStudents.map((s, i) => {
     const isMe = s.id === state.studentId;
     return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${i + 1}.</span><span class="lb-name">${s.name}</span><span class="lb-score">${s.score}/${s.total}</span></div>`;
-  }).join('') || '<p style="color:var(--muted);text-align:center;padding:0.5rem;font-size:0.85rem;">No one has done today's challenge yet</p>';
+  }).join('') || '<p style="color:var(--muted);text-align:center;padding:0.5rem;font-size:0.85rem;">No one has done today\\'s challenge yet</p>';
 }
 
 function getSmartReviewWords(limit = 20) {
