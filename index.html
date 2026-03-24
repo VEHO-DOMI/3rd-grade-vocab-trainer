@@ -1941,7 +1941,17 @@ function showComboLost() {
   setTimeout(() => { el.style.display = 'none'; }, 1000);
 }
 
-function showLevelUp(lv) {
+let _levelUpQueue = [];
+function showLevelUpQueue(levels) {
+  _levelUpQueue = [...levels];
+  _showNextLevelUp();
+}
+function _showNextLevelUp() {
+  if (_levelUpQueue.length === 0) return;
+  const lv = _levelUpQueue.shift();
+  showLevelUp(lv, () => { setTimeout(_showNextLevelUp, 300); });
+}
+function showLevelUp(lv, onDismiss) {
   const overlay = document.createElement('div');
   overlay.id = 'level-up-overlay';
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;animation:fadeIn 0.3s ease;';
@@ -1949,11 +1959,14 @@ function showLevelUp(lv) {
   const card = document.createElement('div');
   card.style.cssText = `background:linear-gradient(145deg,${zc.bg},${zc.accent});border-radius:20px;padding:32px 40px;text-align:center;color:#fff;max-width:320px;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);`;
   const avHtml = state.avatarId ? `<img src="${avatarSrc(state.avatarId)}" style="width:56px;height:56px;border-radius:14px;margin-bottom:8px;">` : '<div style="font-size:42px;margin-bottom:8px;">\u2694\uFE0F</div>';
-  card.innerHTML = `${avHtml}<div style="font-size:13px;text-transform:uppercase;letter-spacing:2px;opacity:0.8;">Level Up!</div><div style="font-size:28px;font-weight:700;margin:8px 0 4px;">Lv ${lv.level}</div><div style="font-size:20px;font-weight:600;margin-bottom:4px;">${lv.name}</div><div style="font-size:13px;opacity:0.7;font-style:italic;margin-bottom:20px;">${lv.vibe}</div><div style="display:inline-block;padding:4px 16px;border-radius:12px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,0.2);">${lv.zone} zone</div><div style="margin-top:20px;"><button onclick="document.getElementById('level-up-overlay').remove()" style="background:rgba(255,255,255,0.25);color:#fff;border:none;padding:10px 28px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Nice!</button></div>`;
+  const moreText = _levelUpQueue.length > 0 ? `<div style="font-size:11px;opacity:0.5;margin-top:8px;">${_levelUpQueue.length} more level${_levelUpQueue.length > 1 ? 's' : ''} unlocked!</div>` : '';
+  function dismiss() { overlay.remove(); if (onDismiss) onDismiss(); }
+  card.innerHTML = `${avHtml}<div style="font-size:13px;text-transform:uppercase;letter-spacing:2px;opacity:0.8;">Level Up!</div><div style="font-size:28px;font-weight:700;margin:8px 0 4px;">Lv ${lv.level}</div><div style="font-size:20px;font-weight:600;margin-bottom:4px;">${lv.name}</div><div style="font-size:13px;opacity:0.7;font-style:italic;margin-bottom:20px;">${lv.vibe}</div><div style="display:inline-block;padding:4px 16px;border-radius:12px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,0.2);">${lv.zone} zone</div>${moreText}<div style="margin-top:20px;"><button id="level-up-dismiss-btn" style="background:rgba(255,255,255,0.25);color:#fff;border:none;padding:10px 28px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Nice!</button></div>`;
   overlay.appendChild(card);
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  card.querySelector('#level-up-dismiss-btn').onclick = dismiss;
+  overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
   document.body.appendChild(overlay);
-  setTimeout(() => { if (document.getElementById('level-up-overlay')) overlay.remove(); }, 5000);
+  setTimeout(() => { if (document.getElementById('level-up-overlay')) dismiss(); }, 5000);
 }
 
 const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
@@ -3472,9 +3485,13 @@ async function endPractice() {
     state.studentData.totalSprints = (state.studentData.totalSprints || 0) + 1;
   }
   await saveSessionResults();
-  // Level-up detection
+  // Level-up detection — show ALL intermediate levels if multiple unlocked
   const newLevel = getLevel(state.studentData?.xp || 0).level;
-  if (newLevel > oldLevel) showLevelUp(getLevel(state.studentData?.xp || 0));
+  if (newLevel > oldLevel) {
+    const levelsToShow = [];
+    for (let i = oldLevel + 1; i <= newLevel; i++) levelsToShow.push(LEVELS[i - 1]);
+    showLevelUpQueue(levelsToShow);
+  }
   updateRankDisplay();
   state._wasSpeedRound = false;
   if (isDailyChallenge) await saveDailyChallengeResult();
