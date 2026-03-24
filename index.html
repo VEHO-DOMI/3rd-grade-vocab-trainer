@@ -717,6 +717,26 @@ body.playing h1, body.playing .subtitle { display: none; }
 .ref-detail-label:first-child { margin-top: 0; }
 .ref-detail-text { color: var(--text-secondary); }
 
+/* Class Selection Screen */
+.section-select-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.5rem; }
+.section-select-wrap h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-secondary); }
+.section-btns { display: flex; gap: 0.6rem; }
+.section-btn {
+  padding: 1rem 1.8rem; border-radius: var(--radius-lg); font-size: 1.2rem; font-weight: 800;
+  background: var(--card); border: 2px solid var(--card-border); color: var(--text);
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.section-btn:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-elevated); }
+.section-btn.selected { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 4px 20px var(--accent-glow); }
+.section-pin-row { display: flex; gap: 0.5rem; align-items: center; }
+.section-pin-row input { width: 140px; padding: 0.6rem; border-radius: var(--radius); border: 1.5px solid var(--card-border); background: var(--card); color: var(--text); font-family: inherit; font-size: 0.9rem; text-align: center; -webkit-text-security: disc; }
+.section-pin-row input:focus { outline: none; border-color: var(--accent); }
+.section-error { color: var(--wrong); font-size: 0.82rem; }
+.section-tag { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-left: 0.3rem; }
+.section-tag-3a { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.section-tag-3b { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.section-tag-3c { background: rgba(34,197,94,0.15); color: #22c55e; }
+
 /* Custom scrollbar global */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -733,8 +753,26 @@ body.playing h1, body.playing .subtitle { display: none; }
 <p class="subtitle">Practice &bull; Learn &bull; Master</p>
 <p class="school-name">VEHO &ndash; Gymnasium und wirtschaftskundliches Realgymnasium der Dominikanerinnen</p>
 
+<!-- CLASS SELECTION SCREEN -->
+<div id="section-screen" class="screen active">
+  <div class="login-card">
+    <h2>Select your class</h2>
+    <div class="section-select-wrap">
+      <div class="section-btns" id="section-btns"></div>
+      <div id="section-pin-area" style="display:none;">
+        <div class="section-pin-row">
+          <input type="text" id="section-pin" placeholder="Class PIN" maxlength="20" autocomplete="off">
+          <button class="btn btn-primary" onclick="handleSectionSubmit()">Go</button>
+        </div>
+      </div>
+      <div class="section-error" id="section-error"></div>
+      <button class="btn btn-primary btn-block" id="section-go-btn" style="display:none;" onclick="handleSectionSubmit()">Continue</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN SCREEN -->
-<div id="login-screen" class="screen active">
+<div id="login-screen" class="screen">
   <div class="login-card">
     <h2>Welcome!</h2>
     <!-- Step 1: Name entry -->
@@ -980,9 +1018,24 @@ firebase.initializeApp({
   appId: "1:623091115688:web:8c8fcbc87a623056d8449d"
 });
 const db = firebase.firestore();
-const CLASS_ID = '3rd-grade';
-const classRef = db.collection('classes').doc(CLASS_ID);
-const studentsRef = classRef.collection('students');
+
+const SECTIONS = [
+  { id: '3rd-grade', label: '3A', pin: '' },
+  { id: '3b', label: '3B', pin: '' },
+  { id: '3c', label: '3C', pin: '' },
+];
+const GRADE_LABEL = '3rd Grade';
+const LS_KEY = '3rd-grade-vocab-student';
+
+let CLASS_ID = null;
+let classRef = null;
+let studentsRef = null;
+
+function setClassId(id) {
+  CLASS_ID = id;
+  classRef = db.collection('classes').doc(CLASS_ID);
+  studentsRef = classRef.collection('students');
+}
 
 // ===== VOCABULARY DATA =====
 const vocabData = {
@@ -1815,23 +1868,41 @@ async function saveDailyChallengeResult() {
 
 async function showLeaderboard() {
   showScreen('leaderboard-screen');
-  const snapshot = await studentsRef.get();
-  const students = [];
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    students.push({ id: doc.id, name: d.name, xp: d.xp || 0, daily: d.dailyChallengeLog || {} });
-  });
-  // Main leaderboard
-  students.sort((a, b) => b.xp - a.xp);
+  const mySection = SECTIONS.find(s => s.id === CLASS_ID);
+  const myLabel = mySection ? mySection.label : CLASS_ID;
+
+  // Load all sections for cross-class leaderboard
+  const allStudents = [];
+  for (const sec of SECTIONS) {
+    try {
+      const snap = await db.collection('classes').doc(sec.id).collection('students').get();
+      snap.forEach(doc => {
+        const d = doc.data();
+        allStudents.push({ id: doc.id, name: d.name, xp: d.xp || 0, daily: d.dailyChallengeLog || {}, section: sec.label, sectionId: sec.id });
+      });
+    } catch (e) { /* section may not exist yet */ }
+  }
+
+  // My class leaderboard
+  const myStudents = allStudents.filter(s => s.sectionId === CLASS_ID);
+  myStudents.sort((a, b) => b.xp - a.xp);
   const medals = ['🥇', '🥈', '🥉'];
-  document.getElementById('lb-main').innerHTML = students.map((s, i) => {
-    const isMe = s.id === state.studentId;
+  const renderRows = (list, showSection) => list.map((s, i) => {
+    const isMe = s.id === state.studentId && s.sectionId === CLASS_ID;
     const rank = i < 3 ? medals[i] : `${i + 1}.`;
-    return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${rank}</span><span class="lb-name">${s.name}${isMe ? ' ← you' : ''}</span><span class="lb-xp">${s.xp.toLocaleString()} XP</span></div>`;
+    const tag = showSection ? ` <span class="section-tag section-tag-${s.section.toLowerCase()}">${s.section}</span>` : '';
+    return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${rank}</span><span class="lb-name">${s.name}${tag}${isMe ? ' ← you' : ''}</span><span class="lb-xp">${s.xp.toLocaleString()} XP</span></div>`;
   }).join('') || '<p style="color:var(--muted);text-align:center;padding:1rem;">No students yet</p>';
-  // Daily challenge leaderboard
+
+  document.getElementById('lb-main').innerHTML =
+    `<div style="font-size:0.75rem;font-weight:700;color:var(--accent-light);margin-bottom:0.5rem;text-transform:uppercase;">My Class (${myLabel})</div>` +
+    renderRows(myStudents, false) +
+    `<div style="font-size:0.75rem;font-weight:700;color:var(--accent-light);margin:1rem 0 0.5rem;text-transform:uppercase;border-top:1px solid var(--card-border);padding-top:0.8rem;">All Classes</div>` +
+    renderRows([...allStudents].sort((a, b) => b.xp - a.xp), true);
+
+  // Daily challenge leaderboard (my class only)
   const today = getTodayStr();
-  const dailyStudents = students.filter(s => s.daily[today]).map(s => ({ ...s, ...s.daily[today] })).sort((a, b) => b.score - a.score);
+  const dailyStudents = myStudents.filter(s => s.daily[today]).map(s => ({ ...s, ...s.daily[today] })).sort((a, b) => b.score - a.score);
   document.getElementById('lb-daily').innerHTML = dailyStudents.map((s, i) => {
     const isMe = s.id === state.studentId;
     return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${i + 1}.</span><span class="lb-name">${s.name}</span><span class="lb-score">${s.score}/${s.total}</span></div>`;
@@ -2018,7 +2089,7 @@ async function handlePinSubmit() {
     await studentsRef.doc(pendingLoginId).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() });
     state.studentId = pendingLoginId;
     state.studentName = pendingLoginName;
-    localStorage.setItem('3rd-grade-vocab-student', JSON.stringify({ id: pendingLoginId, name: pendingLoginName, pin: pin }));
+    localStorage.setItem(LS_KEY, JSON.stringify({ id: pendingLoginId, name: pendingLoginName, pin: pin }));
     await loadProgress();
     showHomeScreen();
   } catch (e) {
@@ -2059,7 +2130,7 @@ async function handleSetPin() {
     }
     state.studentId = pendingLoginId;
     state.studentName = pendingLoginName;
-    localStorage.setItem('3rd-grade-vocab-student', JSON.stringify({ id: pendingLoginId, name: pendingLoginName, pin: pin }));
+    localStorage.setItem(LS_KEY, JSON.stringify({ id: pendingLoginId, name: pendingLoginName, pin: pin }));
     await loadProgress();
     showHomeScreen();
   } catch (e) {
@@ -2180,14 +2251,15 @@ async function saveSessionResults() {
 }
 
 function logout() {
-  localStorage.removeItem('3rd-grade-vocab-student');
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(LS_KEY + '-section');
   state.studentId = null;
   state.studentName = null;
   state.studentData = null;
   state.progressData = {};
   document.getElementById('login-name').value = '';
   showNameStep();
-  showScreen('login-screen');
+  showScreen('section-screen');
 }
 
 // ===== PROGRESS HELPERS =====
@@ -2432,7 +2504,8 @@ function initSourceGrid() {
 
 function showHomeScreen() {
   // Welcome
-  document.getElementById('welcome-name').innerHTML = `${state.studentName} <small>3rd Grade</small>`;
+  const sectionLabel = SECTIONS.find(s => s.id === CLASS_ID)?.label || CLASS_ID;
+  document.getElementById('welcome-name').innerHTML = `${state.studentName} <small>${sectionLabel}</small>`;
   document.getElementById('welcome-xp').innerHTML = `⭐ ${(state.studentData?.xp || 0).toLocaleString()} XP`;
 
   // Stats
@@ -3092,12 +3165,56 @@ document.addEventListener('keydown', e => {
   }, { passive: false });
 })();
 
+// ===== SECTION SELECTION =====
+function initSectionScreen() {
+  const btns = document.getElementById('section-btns');
+  btns.innerHTML = SECTIONS.map(s =>
+    `<button class="section-btn" data-id="${s.id}" onclick="selectSection(this)">${s.label}</button>`
+  ).join('');
+}
+
+let pendingSection = null;
+function selectSection(btn) {
+  document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  pendingSection = SECTIONS.find(s => s.id === btn.dataset.id);
+  const pinArea = document.getElementById('section-pin-area');
+  const goBtn = document.getElementById('section-go-btn');
+  if (pendingSection.pin) {
+    pinArea.style.display = '';
+    goBtn.style.display = 'none';
+    document.getElementById('section-pin').value = '';
+    document.getElementById('section-pin').focus();
+  } else {
+    pinArea.style.display = 'none';
+    goBtn.style.display = '';
+  }
+  document.getElementById('section-error').textContent = '';
+}
+
+function handleSectionSubmit() {
+  if (!pendingSection) { document.getElementById('section-error').textContent = 'Select a class first.'; return; }
+  if (pendingSection.pin) {
+    const pin = document.getElementById('section-pin').value.trim();
+    if (pin !== pendingSection.pin) { document.getElementById('section-error').textContent = 'Wrong class PIN.'; return; }
+  }
+  setClassId(pendingSection.id);
+  localStorage.setItem(LS_KEY + '-section', pendingSection.id);
+  showScreen('login-screen');
+}
+
+document.getElementById('section-pin')?.addEventListener('keydown', e => { if (e.key === 'Enter') handleSectionSubmit(); });
+
 // ===== INIT =====
 (async function() {
-  // Check for saved session (auto-login only if PIN matches)
-  const saved = localStorage.getItem('3rd-grade-vocab-student');
-  if (saved) {
+  initSectionScreen();
+
+  // Check for saved session (auto-login with section)
+  const savedSection = localStorage.getItem(LS_KEY + '-section');
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved && savedSection) {
     try {
+      setClassId(savedSection);
       const { id, name, pin } = JSON.parse(saved);
       if (id && pin) {
         const doc = await studentsRef.doc(id).get();
@@ -3112,8 +3229,10 @@ document.addEventListener('keydown', e => {
         }
       }
     } catch (e) { console.error('Auto-login error:', e); }
-    localStorage.removeItem('3rd-grade-vocab-student');
+    localStorage.removeItem(LS_KEY);
   }
+  // Show section screen if no auto-login
+  showScreen('section-screen');
 })();
 </script>
 
