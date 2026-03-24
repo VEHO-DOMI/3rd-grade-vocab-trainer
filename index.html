@@ -231,6 +231,30 @@ h1 span {
 .avatar-pick-name { font-size: 10px; text-align: center; opacity: 0.5; margin-top: 2px; line-height: 1.2; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #avatar-picker-modal { background: #161d2e; color: rgba(255,255,255,0.9); }
 
+/* Rank display */
+#rank-display { color: rgba(255,255,255,0.9); }
+#rank-progress-track { background: rgba(255,255,255,0.12); }
+#rank-badge.zone-bronze { background: linear-gradient(135deg, #d4874a, #92572a); color: #fff; }
+#rank-badge.zone-silver { background: linear-gradient(135deg, #b8b8b8, #6b6b6b); color: #fff; }
+#rank-badge.zone-gold { background: linear-gradient(135deg, #f0c040, #a67c2e); color: #412402; }
+#rank-badge.zone-diamond { background: linear-gradient(135deg, #b8a9f0, #6e5cbf); color: #fff; }
+.zone-bronze #rank-progress-fill { background: #d4874a; }
+.zone-silver #rank-progress-fill { background: #9e9e9e; }
+.zone-gold #rank-progress-fill { background: #f0c040; }
+.zone-diamond #rank-progress-fill { background: #b8a9f0; }
+.rank-pill.zone-bronze { background: #f5c4a1; color: #4a1b0c; }
+.rank-pill.zone-silver { background: #d3d1c7; color: #2c2c2a; }
+.rank-pill.zone-gold { background: #fac775; color: #412402; }
+.rank-pill.zone-diamond { background: #cecbf6; color: #26215c; }
+
+/* Combo multiplier */
+@keyframes comboPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
+@keyframes comboLostFlash { 0%{opacity:1;transform:translate(-50%,-50%) scale(1.1);} 100%{opacity:0;transform:translate(-50%,-50%) scale(0.8);} }
+#combo-badge.x15 { background: #5DCAA5; color: #04342C; }
+#combo-badge.x2 { background: #EF9F27; color: #412402; }
+#combo-badge.x3 { background: #E24B4A; color: #fff; }
+@keyframes popIn { 0%{transform:scale(0.5);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+
 /* Buttons */
 .btn {
   padding: 0.75rem 1.4rem; border: none; border-radius: var(--radius); font-size: 0.88rem;
@@ -828,6 +852,15 @@ body.playing h1, body.playing .subtitle { display: none; }
     <button class="logout-btn" onclick="logout()">Log Out</button>
   </div>
 
+  <div id="rank-display" style="display:none;text-align:center;margin:0 0 16px;">
+    <div id="rank-badge" style="display:inline-block;padding:6px 18px;border-radius:20px;font-weight:600;font-size:15px;letter-spacing:0.5px;"></div>
+    <div style="margin:8px auto 0;max-width:260px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;opacity:0.7;margin-bottom:4px;"><span id="rank-current-label"></span><span id="rank-next-label"></span></div>
+      <div id="rank-progress-track" style="height:8px;border-radius:4px;overflow:hidden;"><div id="rank-progress-fill" style="height:100%;border-radius:4px;transition:width 0.6s ease;"></div></div>
+      <div id="rank-xp-to-next" style="font-size:11px;opacity:0.6;margin-top:4px;text-align:center;"></div>
+    </div>
+  </div>
+
   <div class="stats-bar">
     <div class="stat-card"><div class="stat-value" id="stat-sessions">0</div><div class="stat-label">Sessions</div></div>
     <div class="stat-card"><div class="stat-value" id="stat-accuracy">–</div><div class="stat-label">Accuracy</div></div>
@@ -986,9 +1019,10 @@ body.playing h1, body.playing .subtitle { display: none; }
   </div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
-    <div class="progress-text"><span><img id="practice-avatar" class="avatar avatar-xs" src="" alt="" style="display:none;vertical-align:middle;margin-right:4px;"><span id="progress-count">0/0</span></span><span id="progress-score">Score: 0</span></div>
+    <div class="progress-text"><span><img id="practice-avatar" class="avatar avatar-xs" src="" alt="" style="display:none;vertical-align:middle;margin-right:4px;"><span id="progress-count">0/0</span></span><span id="progress-score">Score: 0</span><span id="combo-badge" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;font-weight:700;font-size:14px;animation:comboPulse 0.8s ease-in-out infinite;"></span></div>
   </div>
-  <div class="quiz-card" id="quiz-card">
+  <div class="quiz-card" id="quiz-card" style="position:relative;">
+    <div id="combo-lost" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(220,50,50,0.9);color:#fff;padding:8px 20px;border-radius:12px;font-weight:700;font-size:16px;z-index:100;pointer-events:none;"></div>
     <div class="task-type-label" id="task-label">Context</div>
     <div class="quiz-prompt" id="quiz-prompt"></div>
     <div class="mc-grid" id="mc-grid" style="display:none;"></div>
@@ -1765,6 +1799,7 @@ let state = {
   results: [],
   currentType: null,
   avatarId: null,
+  comboStreak: 0, comboMult: 1, comboMax: 0,
   isSprint: false,
   isSpeedRound: false,
   isMultipleChoice: false,
@@ -1775,6 +1810,108 @@ let state = {
 
 
 // ===== GAMIFICATION =====
+// ===== LEVEL SYSTEM =====
+const LEVELS = [
+  {level:1,xp:0,name:'Wordling',zone:'bronze',vibe:'just spawned in'},
+  {level:2,xp:50,name:'Word Scout',zone:'bronze',vibe:'exploring the map'},
+  {level:3,xp:120,name:'Spell Rookie',zone:'bronze',vibe:'learning the controls'},
+  {level:4,xp:220,name:'Letter Looter',zone:'bronze',vibe:'grabbing the first loot'},
+  {level:5,xp:350,name:'Vocab Raider',zone:'bronze',vibe:'raiding the word vault'},
+  {level:6,xp:500,name:'Word Crafter',zone:'silver',vibe:'crafting with words now'},
+  {level:7,xp:700,name:'Phrase Builder',zone:'silver',vibe:'building something real'},
+  {level:8,xp:950,name:'Syntax Striker',zone:'silver',vibe:'landing clean hits'},
+  {level:9,xp:1250,name:'Word Warrior',zone:'silver',vibe:'battle-tested'},
+  {level:10,xp:1600,name:'Vocab Veteran',zone:'silver',vibe:'seen some things'},
+  {level:11,xp:2000,name:'Language Ninja',zone:'gold',vibe:'silent but deadly accurate'},
+  {level:12,xp:2700,name:'Word Wizard',zone:'gold',vibe:'spells are getting real'},
+  {level:13,xp:3500,name:'Grammar Ghost',zone:'gold',vibe:'moves through units unseen'},
+  {level:14,xp:5000,name:'Vocab Viking',zone:'gold',vibe:'conquering word by word'},
+  {level:15,xp:6500,name:'Lexicon Legend',zone:'gold',vibe:'people know your name'},
+  {level:16,xp:8000,name:'Word Warden',zone:'diamond',vibe:'guarding the language'},
+  {level:17,xp:11000,name:'Sentence Sovereign',zone:'diamond',vibe:'ruling the syntax realm'},
+  {level:18,xp:15000,name:'Vocab Titan',zone:'diamond',vibe:'final boss energy'},
+  {level:19,xp:20000,name:'Language Overlord',zone:'diamond',vibe:'nothing left to prove'},
+  {level:20,xp:30000,name:'Grandmaster',zone:'diamond',vibe:'GG'},
+];
+function getLevel(xp) {
+  let lvl = LEVELS[0];
+  for (let i = LEVELS.length - 1; i >= 0; i--) { if (xp >= LEVELS[i].xp) { lvl = LEVELS[i]; break; } }
+  const next = LEVELS[lvl.level] || null;
+  const progress = next ? (xp - lvl.xp) / (next.xp - lvl.xp) : 1;
+  return { ...lvl, next, progress, currentXp: xp };
+}
+const ZONE_COLORS = {
+  bronze:{bg:'#92572a',light:'#f5c4a1',text:'#4a1b0c',accent:'#d4874a'},
+  silver:{bg:'#6b6b6b',light:'#d3d1c7',text:'#2c2c2a',accent:'#9e9e9e'},
+  gold:{bg:'#a67c2e',light:'#fac775',text:'#412402',accent:'#d4a43a'},
+  diamond:{bg:'#6e5cbf',light:'#cecbf6',text:'#26215c',accent:'#8f83d8'},
+};
+
+// ===== COMBO MULTIPLIER =====
+const COMBO_TIERS = [
+  {streak:0,mult:1,label:''},
+  {streak:3,mult:1.5,label:'1.5x'},
+  {streak:5,mult:2,label:'2x'},
+  {streak:10,mult:3,label:'3x'},
+];
+function getComboTier(streak) {
+  let tier = COMBO_TIERS[0];
+  for (let i = COMBO_TIERS.length - 1; i >= 0; i--) { if (streak >= COMBO_TIERS[i].streak) { tier = COMBO_TIERS[i]; break; } }
+  return tier;
+}
+
+function updateRankDisplay() {
+  const el = document.getElementById('rank-display');
+  if (!el) return;
+  const xp = state.studentData?.xp || 0;
+  const lv = getLevel(xp);
+  el.style.display = '';
+  const badge = document.getElementById('rank-badge');
+  badge.className = 'zone-' + lv.zone;
+  badge.textContent = 'Lv ' + lv.level + ' \u00B7 ' + lv.name;
+  document.getElementById('rank-current-label').textContent = 'Lv ' + lv.level;
+  document.getElementById('rank-next-label').textContent = lv.next ? 'Lv ' + lv.next.level : 'MAX';
+  document.getElementById('rank-progress-fill').style.width = Math.round(lv.progress * 100) + '%';
+  const xpToNext = lv.next ? (lv.next.xp - xp) : 0;
+  document.getElementById('rank-xp-to-next').textContent = lv.next ? xpToNext.toLocaleString() + ' XP to ' + lv.next.name : 'Max level reached!';
+}
+
+function updateComboBadge() {
+  const badge = document.getElementById('combo-badge');
+  if (!badge) return;
+  const tier = getComboTier(state.comboStreak);
+  if (tier.mult <= 1) { badge.style.display = 'none'; badge.className = ''; return; }
+  badge.style.display = 'inline-block';
+  badge.textContent = tier.label;
+  badge.className = tier.mult === 1.5 ? 'x15' : tier.mult === 2 ? 'x2' : 'x3';
+}
+
+function showComboLost() {
+  const el = document.getElementById('combo-lost');
+  if (!el) return;
+  el.textContent = 'Combo lost!';
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = 'comboLostFlash 1s ease-out forwards';
+  setTimeout(() => { el.style.display = 'none'; }, 1000);
+}
+
+function showLevelUp(lv) {
+  const overlay = document.createElement('div');
+  overlay.id = 'level-up-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;animation:fadeIn 0.3s ease;';
+  const zc = ZONE_COLORS[lv.zone];
+  const card = document.createElement('div');
+  card.style.cssText = `background:linear-gradient(145deg,${zc.bg},${zc.accent});border-radius:20px;padding:32px 40px;text-align:center;color:#fff;max-width:320px;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);`;
+  const avHtml = state.avatarId ? `<img src="${avatarSrc(state.avatarId)}" style="width:56px;height:56px;border-radius:14px;margin-bottom:8px;">` : '<div style="font-size:42px;margin-bottom:8px;">\u2694\uFE0F</div>';
+  card.innerHTML = `${avHtml}<div style="font-size:13px;text-transform:uppercase;letter-spacing:2px;opacity:0.8;">Level Up!</div><div style="font-size:28px;font-weight:700;margin:8px 0 4px;">Lv ${lv.level}</div><div style="font-size:20px;font-weight:600;margin-bottom:4px;">${lv.name}</div><div style="font-size:13px;opacity:0.7;font-style:italic;margin-bottom:20px;">${lv.vibe}</div><div style="display:inline-block;padding:4px 16px;border-radius:12px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,0.2);">${lv.zone} zone</div><div style="margin-top:20px;"><button onclick="document.getElementById('level-up-overlay').remove()" style="background:rgba(255,255,255,0.25);color:#fff;border:none;padding:10px 28px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Nice!</button></div>`;
+  overlay.appendChild(card);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  setTimeout(() => { if (document.getElementById('level-up-overlay')) overlay.remove(); }, 5000);
+}
+
 const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
 const BADGE_DEFS = [
   { id:'first-session', icon:'⭐', name:'First Steps', desc:'Complete your first session', check:(d)=>(d.totalSessions||0)>=1 },
@@ -1832,7 +1969,7 @@ function getDailyChallengeTypes() {
 function calculateSessionXP(results) {
   let xp = 0;
   for (const r of results) {
-    if (r.correct) xp += (XP_TABLE[r.type] || 5);
+    if (r.correct) xp += Math.round((XP_TABLE[r.type] || 5) * (r.comboMult || 1));
   }
   if (results.length >= 5 && results.every(r => r.correct)) xp += 20;
   const streak = Math.min(state.studentData?.streak || 0, 7);
@@ -1926,6 +2063,7 @@ function startDailyChallenge() {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.comboStreak = 0; state.comboMult = 1; state.comboMax = 0;
   showScreen('practice-screen');
   showWord();
 }
@@ -1975,7 +2113,9 @@ async function showLeaderboard() {
     const rank = i < 3 ? medals[i] : `${i + 1}.`;
     const tag = showSection ? ` <span class="section-tag section-tag-${s.section.toLowerCase()}">${s.section}</span>` : '';
     const av = `<img src="${avatarSrc(s.avatarId)}" class="avatar avatar-sm" style="vertical-align:middle;margin-right:6px;">`;
-    return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${rank}</span><span class="lb-name">${av}${s.name}${tag}${isMe ? ' ← you' : ''}</span><span class="lb-xp">${s.xp.toLocaleString()} XP</span></div>`;
+    const sLv = getLevel(s.xp);
+    const rankPill = `<span class="rank-pill zone-${sLv.zone}" style="font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:600;">${sLv.name}</span>`;
+    return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${rank}</span><span class="lb-name">${av}${s.name}${rankPill}${tag}${isMe ? ' ← you' : ''}</span><span class="lb-xp">${s.xp.toLocaleString()} XP</span></div>`;
   }).join('') || '<p style="color:var(--muted);text-align:center;padding:1rem;">No students yet</p>';
 
   document.getElementById('lb-main').innerHTML =
@@ -2028,6 +2168,7 @@ function startSmartReview() {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.comboStreak = 0; state.comboMult = 1; state.comboMax = 0;
   isDailyChallenge = false;
   showScreen('practice-screen');
   showWord();
@@ -2295,6 +2436,14 @@ async function saveSessionResults() {
       lastSessionDate: streakUpdate.lastSessionDate,
       exerciseTypesUsed: allUsed
     };
+    // Level + combo persistence
+    const newXp = (state.studentData?.xp || 0) + earnedXP;
+    const lv = getLevel(newXp);
+    updateObj.level = lv.level;
+    updateObj.levelName = lv.name;
+    updateObj.levelZone = lv.zone;
+    updateObj.bestCombo = Math.max(state.comboMax, state.studentData?.bestCombo || 0);
+    updateObj.lastSessionCombo = state.comboMax;
     if (state.isSprint) updateObj.totalSprints = firebase.firestore.FieldValue.increment(1);
     if (state.isSpeedRound || state._wasSpeedRound) {
       const best = Math.max(state.studentData.bestSpeedRound || 0, state.score);
@@ -2618,6 +2767,7 @@ function showHomeScreen() {
   const mastered = getTotalMastered();
   document.getElementById('stat-mastered').textContent = mastered;
   document.getElementById('stat-streak').textContent = state.studentData?.streak || 0;
+  updateRankDisplay();
   renderBadgeRow();
   renderDailyCard();
 
@@ -2732,6 +2882,7 @@ function startPractice() {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.comboStreak = 0; state.comboMult = 1; state.comboMax = 0;
   state.isSprint = false;
   state.isSpeedRound = false;
   state.isMultipleChoice = state.exerciseType === 'multiple-choice' || (Array.isArray(state.exerciseType) && state.exerciseType.includes('multiple-choice'));
@@ -2747,6 +2898,7 @@ function startPracticeWith(words) {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.comboStreak = 0; state.comboMult = 1; state.comboMax = 0;
   document.body.classList.add('playing');
   showScreen('practice-screen');
   showWord();
@@ -2770,6 +2922,7 @@ function startSprint() {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.comboStreak = 0; state.comboMult = 1; state.comboMax = 0;
   state.isSprint = true;
   state.isSpeedRound = false;
   state.isMultipleChoice = state.exerciseType === 'multiple-choice' || (Array.isArray(state.exerciseType) && state.exerciseType.includes('multiple-choice'));
@@ -2792,6 +2945,7 @@ function startSpeedRound() {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.comboStreak = 0; state.comboMult = 1; state.comboMax = 0;
   state.isSprint = false;
   state.isSpeedRound = true;
   state.isMultipleChoice = false;
@@ -2900,16 +3054,21 @@ function handleMCClick(btn, correct, word, type, grid) {
   if (correct) {
     btn.classList.add('correct');
     state.score++;
-    state.results.push({ word, correct: true, userAnswer: btn.textContent, type: state.currentType });
+    state.comboStreak++;
+    if (state.comboStreak > state.comboMax) state.comboMax = state.comboStreak;
+    state.comboMult = getComboTier(state.comboStreak).mult;
+    updateComboBadge();
+    state.results.push({ word, correct: true, userAnswer: btn.textContent, type: state.currentType, comboMult: state.comboMult });
     if (state.isSpeedRound) showXPFloat();
     setTimeout(() => { nextWord(); }, state.isSpeedRound ? 400 : 800);
   } else {
+    if (state.comboStreak >= 3) showComboLost();
+    state.comboStreak = 0; state.comboMult = 1; updateComboBadge();
     btn.classList.add('wrong');
     allBtns.forEach(b => { if (!b.classList.contains('wrong')) b.classList.add('reveal'); });
-    // Find correct button and highlight
     const correctAnswer = getMCAnswer(word, type).toLowerCase().trim();
     allBtns.forEach(b => { if (b.textContent.toLowerCase().trim() === correctAnswer) b.classList.add('correct'); });
-    state.results.push({ word, correct: false, userAnswer: btn.textContent, type: state.currentType });
+    state.results.push({ word, correct: false, userAnswer: btn.textContent, type: state.currentType, comboMult: state.comboMult });
     setTimeout(() => { nextWord(); }, state.isSpeedRound ? 1000 : 1500);
   }
 }
@@ -3082,14 +3241,20 @@ function checkAnswer() {
   const feedback = document.getElementById('feedback');
   if (correct) {
     state.score++;
+    state.comboStreak++;
+    if (state.comboStreak > state.comboMax) state.comboMax = state.comboStreak;
+    state.comboMult = getComboTier(state.comboStreak).mult;
+    updateComboBadge();
     input.className = 'answer-input correct';
     feedback.className = 'feedback correct';
     feedback.innerHTML = 'Correct!';
     if (state.isSpeedRound) {
-      state.results.push({ word, correct: true, userAnswer, type: state.currentType });
+      state.results.push({ word, correct: true, userAnswer, type: state.currentType, comboMult: state.comboMult });
       showXPFloat(); setTimeout(nextWord, 400); return;
     }
   } else {
+    if (state.comboStreak >= 3) showComboLost();
+    state.comboStreak = 0; state.comboMult = 1; updateComboBadge();
     input.className = 'answer-input wrong';
     feedback.className = 'feedback wrong';
     const isCtx = state.currentType === 'context' || state.currentType === 'context-hard';
@@ -3103,12 +3268,12 @@ function checkAnswer() {
     else { displayAnswer = word.w; }
     feedback.innerHTML = `The correct answer is: <span class="correct-answer">${displayAnswer}</span>`;
     if (state.isSpeedRound) {
-      state.results.push({ word, correct: false, userAnswer, type: state.currentType });
+      state.results.push({ word, correct: false, userAnswer, type: state.currentType, comboMult: state.comboMult });
       setTimeout(nextWord, 1200); return;
     }
   }
 
-  state.results.push({ word, correct, userAnswer, type: state.currentType });
+  state.results.push({ word, correct, userAnswer, type: state.currentType, comboMult: state.comboMult });
 
   input.disabled = true;
   document.getElementById('check-btn').textContent = 'Next';
@@ -3157,7 +3322,7 @@ function isCorrect(userAnswer, word) {
 
 function skipWord() {
   const word = state.words[state.currentIdx];
-  state.results.push({ word, correct: false, userAnswer: '(skipped)', type: state.currentType });
+  state.results.push({ word, correct: false, userAnswer: '(skipped)', type: state.currentType, comboMult: state.comboMult });
   nextWord();
 }
 
@@ -3171,6 +3336,10 @@ async function endPractice() {
   const total = state.results.length || state.words.length;
   const pct = total > 0 ? Math.round((state.score / total) * 100) : 0;
   const sessionXP = calculateSessionXP(state.results);
+  const oldLevel = getLevel(state.studentData?.xp || 0).level;
+
+  // Combo stats for results
+  const comboText = state.comboMax >= 3 ? `<div style="font-size:14px;opacity:0.8;margin-top:4px;">Best combo: ${state.comboMax} in a row (${getComboTier(state.comboMax).label})</div>` : '';
 
   // Mode-specific header
   if (state.isSprint) {
@@ -3185,7 +3354,7 @@ async function endPractice() {
     document.getElementById('final-label').textContent = `${state.score} of ${total} correct`;
   }
 
-  document.getElementById('save-status').innerHTML = `<span style="color:var(--accent2);font-weight:700;">+${sessionXP} XP earned!</span>`;
+  document.getElementById('save-status').innerHTML = `<span style="color:var(--accent2);font-weight:700;">+${sessionXP} XP earned!</span>${comboText}`;
 
   // Show/hide sprint again button
   document.getElementById('sprint-again-btn').style.display = state.isSprint ? '' : 'none';
@@ -3214,11 +3383,16 @@ async function endPractice() {
     state.studentData.totalSprints = (state.studentData.totalSprints || 0) + 1;
   }
   await saveSessionResults();
+  // Level-up detection
+  const newLevel = getLevel(state.studentData?.xp || 0).level;
+  if (newLevel > oldLevel) showLevelUp(getLevel(state.studentData?.xp || 0));
+  updateRankDisplay();
   state._wasSpeedRound = false;
   if (isDailyChallenge) await saveDailyChallengeResult();
   await checkBadges(state.studentData, state.results);
   isDailyChallenge = false;
   state.isSpeedRound = false;
+  state.comboStreak = 0; state.comboMult = 1;
 }
 
 function retryWrong() {
