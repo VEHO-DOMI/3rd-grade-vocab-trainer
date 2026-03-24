@@ -247,6 +247,21 @@ h1 span {
 .rank-pill.zone-gold { background: #fac775; color: #412402; }
 .rank-pill.zone-diamond { background: #cecbf6; color: #26215c; }
 
+/* Level roadmap */
+.roadmap-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.roadmap-item:last-child { border-bottom: none; }
+.roadmap-lvl { width: 32px; text-align: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+.roadmap-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.roadmap-info { flex: 1; min-width: 0; }
+.roadmap-name { font-weight: 700; font-size: 13px; }
+.roadmap-vibe { font-size: 11px; opacity: 0.5; font-style: italic; }
+.roadmap-xp { font-size: 11px; opacity: 0.6; text-align: right; flex-shrink: 0; }
+.roadmap-item.current { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 8px; margin: 2px -8px; }
+.roadmap-item.current .roadmap-name { color: var(--accent-light); }
+.roadmap-item.locked { opacity: 0.45; }
+.roadmap-item.locked .roadmap-name { letter-spacing: 1px; }
+.roadmap-check { color: var(--correct); font-size: 14px; }
+
 /* Combo multiplier */
 @keyframes comboPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
 @keyframes comboLostFlash { 0%{opacity:1;transform:translate(-50%,-50%) scale(1.1);} 100%{opacity:0;transform:translate(-50%,-50%) scale(0.8);} }
@@ -984,6 +999,11 @@ body.playing h1, body.playing .subtitle { display: none; }
     <span><span class="legend-dot practiced"></span> Practiced</span>
     <span><span class="legend-dot weak"></span> Weak</span>
     <span><span class="legend-dot unseen"></span> Unseen</span>
+  </div>
+
+  <div class="card">
+    <h3>Level Roadmap</h3>
+    <div id="level-roadmap"></div>
   </div>
 
   <div class="card">
@@ -1876,6 +1896,30 @@ function updateRankDisplay() {
   document.getElementById('rank-xp-to-next').textContent = lv.next ? xpToNext.toLocaleString() + ' XP to ' + lv.next.name : 'Max level reached!';
 }
 
+function renderLevelRoadmap() {
+  const el = document.getElementById('level-roadmap');
+  if (!el) return;
+  const xp = state.studentData?.xp || 0;
+  const current = getLevel(xp);
+  const zoneIcons = { bronze: '\uD83E\uDD49', silver: '\uD83E\uDD48', gold: '\uD83E\uDD47', diamond: '\uD83D\uDC8E' };
+  el.innerHTML = LEVELS.map(lv => {
+    const done = xp >= lv.xp && lv.level < current.level;
+    const isCurrent = lv.level === current.level;
+    const locked = lv.level > current.level;
+    const cls = done ? 'done' : isCurrent ? 'current' : 'locked';
+    const name = locked ? '?? ??' : lv.name;
+    const vibe = locked ? '' : lv.vibe;
+    const icon = zoneIcons[lv.zone] || '';
+    const xpLabel = lv.xp === 0 ? 'Start' : lv.xp.toLocaleString() + ' XP';
+    return `<div class="roadmap-item ${cls}">
+      <div class="roadmap-lvl" style="color:${ZONE_COLORS[lv.zone].accent}">${lv.level}</div>
+      <div class="roadmap-icon" style="background:${ZONE_COLORS[lv.zone].bg}30;">${done ? '<span class="roadmap-check">\u2713</span>' : icon}</div>
+      <div class="roadmap-info"><div class="roadmap-name">${name}</div>${vibe ? `<div class="roadmap-vibe">${vibe}</div>` : ''}</div>
+      <div class="roadmap-xp">${isCurrent ? `<strong style="color:var(--accent-light);">YOU</strong>` : xpLabel}</div>
+    </div>`;
+  }).join('');
+}
+
 function updateComboBadge() {
   const badge = document.getElementById('combo-badge');
   if (!badge) return;
@@ -2659,6 +2703,7 @@ function showProgressScreen() {
     list.appendChild(item);
   }
 
+  renderLevelRoadmap();
   showScreen('progress-screen');
 }
 
@@ -2756,7 +2801,8 @@ function showHomeScreen() {
   // Welcome
   const sectionLabel = SECTIONS.find(s => s.id === CLASS_ID)?.label || CLASS_ID;
   document.getElementById('welcome-name').innerHTML = `${state.studentName} <small>${sectionLabel}</small>`;
-  document.getElementById('welcome-xp').innerHTML = `⭐ ${(state.studentData?.xp || 0).toLocaleString()} XP`;
+  const homeLv = getLevel(state.studentData?.xp || 0);
+  document.getElementById('welcome-xp').innerHTML = `⭐ ${(state.studentData?.xp || 0).toLocaleString()} XP · <span style="opacity:0.7;">${homeLv.name}</span>`;
   updateAllAvatars();
 
   // Stats
