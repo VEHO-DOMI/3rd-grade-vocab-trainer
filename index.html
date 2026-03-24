@@ -323,7 +323,6 @@ h1 span {
   font-size: 0.8rem; color: var(--muted); font-weight: 500;
 }
 
-
 /* Gamification: XP, Streak, Badges, Leaderboard, Daily Challenge */
 .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #f97316, #fb923c); }
 .stat-card:nth-child(4) .stat-value { color: #fb923c; }
@@ -614,8 +613,8 @@ h1 span {
   .type-grid { justify-content: center; }
   .home-actions { max-width: 640px; margin-left: auto; margin-right: auto; }
   .mode-row { max-width: 640px; margin-left: auto; margin-right: auto; }
-  #wotd-card { max-width: 640px; margin-left: auto; margin-right: auto; }
-  #weekly-goal { max-width: 640px; margin-left: auto; margin-right: auto; }
+  #wotd-card { width: 100%; }
+  #weekly-goal { width: 100%; }
   .quiz-card { max-width: 720px; margin-left: auto; margin-right: auto; padding: 2.4rem 2.5rem; }
   .quiz-prompt { font-size: 1.35rem; }
   .quiz-prompt .german-word { font-size: 1.7rem; }
@@ -847,6 +846,13 @@ body.playing h1, body.playing .subtitle { display: none; }
 /* Weekly Goal card */
 #weekly-goal-card { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
 
+/* Tighter home screen spacing */
+.stats-bar { margin-bottom: 0.5rem; }
+.badge-row { margin-bottom: 0.4rem; }
+#wotd-card, #weekly-goal-card { margin-bottom: 0.5rem; }
+.daily-card { margin-bottom: 0.5rem; }
+#rank-display { margin-bottom: 0.4rem !important; }
+
 /* Battle system */
 .btn-battle { width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;border:none;margin-top:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;transition:transform 0.1s,opacity 0.1s; }
 .btn-battle:hover { opacity:0.9; }
@@ -931,9 +937,9 @@ body.playing h1, body.playing .subtitle { display: none; }
     <button class="logout-btn" onclick="logout()">Log Out</button>
   </div>
 
-  <div id="rank-display" style="display:none;text-align:center;margin:0 0 16px;">
+  <div id="rank-display" style="display:none;text-align:center;margin:0 0 6px;">
     <div id="rank-badge" style="display:inline-block;padding:6px 18px;border-radius:20px;font-weight:600;font-size:15px;letter-spacing:0.5px;"></div>
-    <div style="margin:8px auto 0;max-width:260px;">
+    <div style="margin:4px auto 0;max-width:260px;">
       <div style="display:flex;justify-content:space-between;font-size:11px;opacity:0.7;margin-bottom:4px;"><span id="rank-current-label"></span><span id="rank-next-label"></span></div>
       <div id="rank-progress-track" style="height:8px;border-radius:4px;overflow:hidden;"><div id="rank-progress-fill" style="height:100%;border-radius:4px;transition:width 0.6s ease;"></div></div>
       <div id="rank-xp-to-next" style="font-size:11px;opacity:0.6;margin-top:4px;text-align:center;"></div>
@@ -946,7 +952,6 @@ body.playing h1, body.playing .subtitle { display: none; }
     <div class="stat-card"><div class="stat-value" id="stat-mastered">0</div><div class="stat-label">Mastered</div></div>
     <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak 🔥</div></div>
   </div>
-
 
   <div class="badge-row" id="badge-row"></div>
 
@@ -1023,7 +1028,6 @@ body.playing h1, body.playing .subtitle { display: none; }
     </div>
   </div>
 </div>
-
 
 <!-- LEADERBOARD SCREEN -->
 <div id="leaderboard-screen" class="screen">
@@ -1946,7 +1950,6 @@ let state = {
   sprintCount: 0,
 };
 
-
 // ===== GAMIFICATION =====
 // ===== LEVEL SYSTEM =====
 const LEVELS = [
@@ -2424,7 +2427,6 @@ function slugify(name) {
 let pendingLoginName = '';
 let pendingLoginId = '';
 
-
 function showNameStep() {
   document.getElementById('login-step-name').style.display = '';
   document.getElementById('login-step-pin').style.display = 'none';
@@ -2433,7 +2435,6 @@ function showNameStep() {
   document.getElementById('pin-error').style.display = 'none';
   document.getElementById('set-pin-error').style.display = 'none';
 }
-
 
 // ===== PROFANITY FILTER =====
 const _pf = (function() {
