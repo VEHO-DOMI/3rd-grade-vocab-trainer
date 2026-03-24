@@ -3035,23 +3035,66 @@ function endSpeedRound() {
 }
 
 // ===== MULTIPLE CHOICE =====
-function getDistractors(word, count) {
-  const correctCf = getContextForm(word).toLowerCase();
+function getDistractors(word, count, type) {
+  const correct = getMCAnswer(word, type).toLowerCase();
+  const correctWords = new Set(correct.split(/\s+/));
+  const isVerb = /^to\s/.test(word.w);
   const pool = [];
+
+  // Collect all vocab entries as candidates
   for (const [src, entries] of Object.entries(vocabData)) {
     for (const e of entries) {
-      const cf = getContextForm(e).toLowerCase();
-      if (cf !== correctCf && cf !== word.w.toLowerCase()) pool.push(e);
+      const ans = getMCAnswer(e, type).toLowerCase();
+      if (ans === correct) continue;
+      // Score similarity: shared words = more similar = better distractor
+      const eWords = new Set(ans.split(/\s+/));
+      let shared = 0;
+      for (const w of eWords) { if (correctWords.has(w)) shared++; }
+      // Prefer same word type (verb distractors for verbs, nouns for nouns)
+      const sameType = (isVerb && /^to\s/.test(e.w)) || (!isVerb && !/^to\s/.test(e.w));
+      // Prefer same source (unit) for topical relevance
+      const sameSource = src === word.source;
+      const score = (sameType ? 3 : 0) + (sameSource ? 2 : 0) + (shared > 0 ? -5 : 0) + Math.random() * 2;
+      pool.push({ entry: e, score, ans });
     }
   }
-  shuffle(pool);
-  return pool.slice(0, count);
+  // Sort by score descending (best distractors first), exclude those sharing key words with answer
+  pool.sort((a, b) => b.score - a.score);
+  // Deduplicate by answer text
+  const seen = new Set([correct]);
+  const result = [];
+  for (const p of pool) {
+    if (seen.has(p.ans)) continue;
+    seen.add(p.ans);
+    result.push(p.entry);
+    if (result.length >= count) break;
+  }
+  // If not enough, fill with random
+  if (result.length < count) {
+    for (const [src, entries] of Object.entries(vocabData)) {
+      for (const e of entries) {
+        const ans = getMCAnswer(e, type).toLowerCase();
+        if (!seen.has(ans)) { seen.add(ans); result.push(e); }
+        if (result.length >= count) break;
+      }
+      if (result.length >= count) break;
+    }
+  }
+  return result;
 }
 
 function getMCAnswer(word, type) {
-  if (type === 'translation' || type === 'mc-translation') return getContextForm(word);
-  if (type === 'context' || type === 'context-hard' || type === 'mc-context') return getContextForm(word);
-  return word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim();
+  // For MC, show the FULL phrase (not stripped context form)
+  if (type === 'mc-translation' || type === 'translation') {
+    // Full English phrase: strip only "to " prefix and placeholders
+    return word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
+  }
+  if (type === 'mc-context' || type === 'context' || type === 'context-hard') {
+    // For context MC, use the context form (what fits in the blank)
+    return getContextForm(word);
+  }
+  // Definition MC — full word
+  return word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
 }
 
 function renderMultipleChoice(word, type) {
@@ -3064,7 +3107,7 @@ function renderMultipleChoice(word, type) {
   grid.innerHTML = '';
 
   const correctAnswer = getMCAnswer(word, type);
-  const distractors = getDistractors(word, 3);
+  const distractors = getDistractors(word, 3, type);
   const options = [
     { text: correctAnswer, correct: true },
     ...distractors.map(d => ({ text: getMCAnswer(d, type), correct: false }))
