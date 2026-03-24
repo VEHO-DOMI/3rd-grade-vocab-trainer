@@ -328,8 +328,9 @@ h1 span {
 .stat-card:nth-child(4) .stat-value { color: #fb923c; }
 .welcome-xp { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: var(--accent2); font-weight: 600; margin-top: 0.15rem; }
 
-.badge-row { display: flex; gap: 0.4rem; overflow-x: auto; padding: 0.3rem 0; margin-bottom: 0.8rem; scrollbar-width: none; -ms-overflow-style: none; }
+.badge-row { display: flex; gap: 0.3rem; overflow-x: auto; padding: 0; margin: 0; scrollbar-width: none; -ms-overflow-style: none; align-items: center; }
 .badge-row::-webkit-scrollbar { display: none; }
+.badge-row .badge-icon { width: 22px; height: 22px; font-size: 14px; }
 .badge-icon { font-size: 1.4rem; min-width: 2.2rem; height: 2.2rem; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; cursor: pointer; transition: transform 0.15s; }
 .badge-icon:hover { transform: scale(1.15); }
 .badge-icon.empty { opacity: 0.3; font-size: 1rem; }
@@ -927,23 +928,19 @@ body.playing h1, body.playing .subtitle { display: none; }
 <!-- HOME SCREEN -->
 <div id="home-screen" class="screen">
   <div class="welcome-bar">
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
       <img id="home-avatar" class="avatar avatar-lg" src="" alt="" style="display:none;cursor:pointer;" onclick="openAvatarPicker()">
-      <div>
+      <div style="min-width:0;">
         <div class="welcome-name" id="welcome-name">Welcome <small>3rd Grade</small></div>
         <div class="welcome-xp" id="welcome-xp"></div>
       </div>
+      <div id="rank-badge" style="display:none;padding:4px 12px;border-radius:14px;font-weight:600;font-size:12px;letter-spacing:0.3px;white-space:nowrap;flex-shrink:0;"></div>
+      <div class="badge-row" id="badge-row" style="flex-shrink:0;"></div>
     </div>
     <button class="logout-btn" onclick="logout()">Log Out</button>
   </div>
-
-  <div id="rank-display" style="display:none;text-align:center;margin:0 0 6px;">
-    <div id="rank-badge" style="display:inline-block;padding:6px 18px;border-radius:20px;font-weight:600;font-size:15px;letter-spacing:0.5px;"></div>
-    <div style="margin:4px auto 0;max-width:260px;">
-      <div style="display:flex;justify-content:space-between;font-size:11px;opacity:0.7;margin-bottom:4px;"><span id="rank-current-label"></span><span id="rank-next-label"></span></div>
-      <div id="rank-progress-track" style="height:8px;border-radius:4px;overflow:hidden;"><div id="rank-progress-fill" style="height:100%;border-radius:4px;transition:width 0.6s ease;"></div></div>
-      <div id="rank-xp-to-next" style="font-size:11px;opacity:0.6;margin-top:4px;text-align:center;"></div>
-    </div>
+  <div id="rank-display" style="display:none;margin:0 0 6px;">
+    <div style="max-width:100%;"><div id="rank-progress-track" style="height:5px;border-radius:3px;overflow:hidden;"><div id="rank-progress-fill" style="height:100%;border-radius:3px;transition:width 0.6s ease;"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;opacity:0.5;margin-top:2px;"><span id="rank-current-label"></span><span id="rank-xp-to-next"></span><span id="rank-next-label"></span></div></div>
   </div>
 
   <div class="stats-bar">
@@ -952,8 +949,6 @@ body.playing h1, body.playing .subtitle { display: none; }
     <div class="stat-card"><div class="stat-value" id="stat-mastered">0</div><div class="stat-label">Mastered</div></div>
     <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak 🔥</div></div>
   </div>
-
-  <div class="badge-row" id="badge-row"></div>
 
   <div id="wotd-card" style="display:none;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
