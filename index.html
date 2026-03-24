@@ -2101,7 +2101,7 @@ async function saveSessionResults() {
     await studentsRef.doc(state.studentId).collection('sessions').add({
       date: firebase.firestore.FieldValue.serverTimestamp(),
       sources: sources,
-      type: state.exerciseType,
+      type: Array.isArray(state.exerciseType) ? state.exerciseType.join('+') : state.exerciseType,
       score: state.score,
       total: state.words.length,
       pct: pct,
@@ -2492,9 +2492,30 @@ function selectAll(mode) {
 }
 
 function selectType(btn) {
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  state.exerciseType = btn.dataset.type;
+  const type = btn.dataset.type;
+  const allBtns = document.querySelectorAll('.type-btn');
+  const mixBtn = document.querySelector('.type-btn[data-type="mix"]');
+  if (type === 'mix') {
+    // Mix: deselect all individuals, select mix
+    allBtns.forEach(b => b.classList.remove('selected'));
+    mixBtn.classList.add('selected');
+    state.exerciseType = 'mix';
+  } else {
+    // Toggle this type
+    mixBtn.classList.remove('selected');
+    btn.classList.toggle('selected');
+    // Collect selected types
+    const selected = [...document.querySelectorAll('.type-btn.selected')].map(b => b.dataset.type).filter(t => t !== 'mix');
+    if (selected.length === 0) {
+      // Nothing selected — revert to mix
+      mixBtn.classList.add('selected');
+      state.exerciseType = 'mix';
+    } else if (selected.length === 1) {
+      state.exerciseType = selected[0];
+    } else {
+      state.exerciseType = selected; // Array = custom mix
+    }
+  }
 }
 
 function updateWordCount() {
@@ -2538,7 +2559,7 @@ function startPractice() {
   state.answered = false;
   state.isSprint = false;
   state.isSpeedRound = false;
-  state.isMultipleChoice = state.exerciseType === 'multiple-choice';
+  state.isMultipleChoice = state.exerciseType === 'multiple-choice' || (Array.isArray(state.exerciseType) && state.exerciseType.includes('multiple-choice'));
   resetSpeedTimer();
   document.body.classList.add('playing');
   showScreen('practice-screen');
@@ -2576,7 +2597,7 @@ function startSprint() {
   state.answered = false;
   state.isSprint = true;
   state.isSpeedRound = false;
-  state.isMultipleChoice = state.exerciseType === 'multiple-choice';
+  state.isMultipleChoice = state.exerciseType === 'multiple-choice' || (Array.isArray(state.exerciseType) && state.exerciseType.includes('multiple-choice'));
   resetSpeedTimer();
   document.body.classList.add('playing');
   showScreen('practice-screen');
@@ -2734,13 +2755,16 @@ function getTaskType() {
     const easyTypes = ['context', 'definition', 'translation'];
     return easyTypes[Math.floor(Math.random() * easyTypes.length)];
   }
-  if (state.exerciseType === 'multiple-choice') {
-    const mcTypes = ['mc-context', 'mc-definition', 'mc-translation'];
-    return mcTypes[Math.floor(Math.random() * mcTypes.length)];
+  // Handle array (custom multi-select) or single type
+  const sel = state.exerciseType;
+  const pool = Array.isArray(sel) ? sel : sel === 'mix' ? ['context', 'context-hard', 'definition', 'definition-hard', 'translation'] : [sel];
+  // Expand MC entries to mc- prefixed types
+  const expanded = [];
+  for (const t of pool) {
+    if (t === 'multiple-choice') expanded.push('mc-context', 'mc-definition', 'mc-translation');
+    else expanded.push(t);
   }
-  if (state.exerciseType !== 'mix') return state.exerciseType;
-  const types = ['context', 'context-hard', 'definition', 'definition-hard', 'translation'];
-  return types[Math.floor(Math.random() * types.length)];
+  return expanded[Math.floor(Math.random() * expanded.length)];
 }
 
 function getContextForm(word) {
