@@ -220,6 +220,17 @@ h1 span {
 .type-btn.selected[data-type="translation"] { background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.4); box-shadow: 0 0 16px rgba(244,114,182,0.08); }
 .type-btn.selected[data-type="multiple-choice"] { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.4); box-shadow: 0 0 16px rgba(34,197,94,0.08); }
 
+/* Avatar system */
+.avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+.avatar-xs { width: 24px; height: 24px; border-width: 1.5px; }
+.avatar-sm { width: 28px; height: 28px; border-width: 1.5px; }
+.avatar-lg { width: 64px; height: 64px; border-width: 2.5px; }
+.avatar-pick-item { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; cursor: pointer; border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s; }
+.avatar-pick-item:hover { transform: scale(1.12); }
+.avatar-pick-item.selected { border-color: #f0c040; transform: scale(1.15); }
+.avatar-pick-name { font-size: 10px; text-align: center; opacity: 0.5; margin-top: 2px; line-height: 1.2; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#avatar-picker-modal { background: #161d2e; color: rgba(255,255,255,0.9); }
+
 /* Buttons */
 .btn {
   padding: 0.75rem 1.4rem; border: none; border-radius: var(--radius); font-size: 0.88rem;
@@ -807,8 +818,13 @@ body.playing h1, body.playing .subtitle { display: none; }
 <!-- HOME SCREEN -->
 <div id="home-screen" class="screen">
   <div class="welcome-bar">
-    <div class="welcome-name" id="welcome-name">Welcome <small>3rd Grade</small></div>
-    <div class="welcome-xp" id="welcome-xp"></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img id="home-avatar" class="avatar avatar-lg" src="" alt="" style="display:none;cursor:pointer;" onclick="openAvatarPicker()">
+      <div>
+        <div class="welcome-name" id="welcome-name">Welcome <small>3rd Grade</small></div>
+        <div class="welcome-xp" id="welcome-xp"></div>
+      </div>
+    </div>
     <button class="logout-btn" onclick="logout()">Log Out</button>
   </div>
 
@@ -970,7 +986,7 @@ body.playing h1, body.playing .subtitle { display: none; }
   </div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
-    <div class="progress-text"><span id="progress-count">0/0</span><span id="progress-score">Score: 0</span></div>
+    <div class="progress-text"><span><img id="practice-avatar" class="avatar avatar-xs" src="" alt="" style="display:none;vertical-align:middle;margin-right:4px;"><span id="progress-count">0/0</span></span><span id="progress-score">Score: 0</span></div>
   </div>
   <div class="quiz-card" id="quiz-card">
     <div class="task-type-label" id="task-label">Context</div>
@@ -992,6 +1008,7 @@ body.playing h1, body.playing .subtitle { display: none; }
 <!-- RESULTS SCREEN -->
 <div id="results-screen" class="screen">
   <div class="results-score">
+    <img id="results-avatar" class="avatar avatar-lg" src="" alt="" style="display:none;margin:0 auto 8px;">
     <div class="big-score" id="final-score">0%</div>
     <div class="score-label" id="final-label">0 of 0 correct</div>
     <div class="save-status" id="save-status"></div>
@@ -1668,6 +1685,71 @@ const vocabData = {
 ],
 };
 
+// ===== AVATAR SYSTEM =====
+const TOTAL_AVATARS = 50;
+const AVATAR_NAMES = [
+  'Pixel Hero','Cat','Owl','Panda','Wolf','Red Panda','Axolotl','Chameleon','Penguin','Skeleton',
+  'Baby Dragon','Phoenix','Unicorn','Griffin','Kraken','Wizard','Knight','Ninja','Pirate','Viking',
+  'Astronaut','Alien','Robot','Space Cat','Diamond Gem','Mushroom Sprite','Flame Spirit','Ice Crystal','Storm Cloud','Leaf Guardian',
+  'Taco','Donut','Cactus','Coffee Cup','Book','Fox','Slime','Treasure Chest','Potion Bottle','Shield',
+  'Star','Moon','Dice','Lightning Bolt','Goblin','Yeti','Ghost','Cyclops','Rocket','Sword'
+];
+function avatarSrc(id) { return 'avatars/' + String(id).padStart(2, '0') + '.png'; }
+
+async function getAvailableAvatar() {
+  try {
+    const snapshot = await studentsRef.get();
+    const taken = [];
+    snapshot.forEach(doc => { const d = doc.data(); if (d.avatarId) taken.push(d.avatarId); });
+    let available = [];
+    for (let i = 1; i <= TOTAL_AVATARS; i++) { if (!taken.includes(i)) available.push(i); }
+    if (available.length === 0) { for (let i = 1; i <= TOTAL_AVATARS; i++) available.push(i); }
+    return available[Math.floor(Math.random() * available.length)];
+  } catch (e) { return Math.floor(Math.random() * TOTAL_AVATARS) + 1; }
+}
+
+function updateAllAvatars() {
+  const els = ['home-avatar','profile-avatar','practice-avatar','results-avatar'];
+  for (const id of els) {
+    const el = document.getElementById(id);
+    if (el && state.avatarId) { el.src = avatarSrc(state.avatarId); el.alt = AVATAR_NAMES[state.avatarId - 1] || ''; el.style.display = ''; }
+  }
+}
+
+function openAvatarPicker() {
+  const overlay = document.getElementById('avatar-picker-overlay');
+  const grid = document.getElementById('avatar-grid');
+  if (!overlay || !grid) return;
+  grid.innerHTML = '';
+  for (let i = 1; i <= TOTAL_AVATARS; i++) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+    const img = document.createElement('img');
+    img.src = avatarSrc(i); img.alt = AVATAR_NAMES[i-1];
+    img.className = 'avatar-pick-item' + (i === state.avatarId ? ' selected' : '');
+    img.dataset.id = i;
+    img.onclick = function() { selectAvatar(parseInt(this.dataset.id)); };
+    const label = document.createElement('div');
+    label.className = 'avatar-pick-name'; label.textContent = AVATAR_NAMES[i-1];
+    wrap.appendChild(img); wrap.appendChild(label); grid.appendChild(wrap);
+  }
+  overlay.style.display = '';
+}
+function closeAvatarPicker() { document.getElementById('avatar-picker-overlay').style.display = 'none'; }
+
+async function selectAvatar(id) {
+  if (id === state.avatarId) { closeAvatarPicker(); return; }
+  state.avatarId = id;
+  updateAllAvatars();
+  document.querySelectorAll('.avatar-pick-item').forEach(img => {
+    img.classList.toggle('selected', parseInt(img.dataset.id) === id);
+  });
+  try { await studentsRef.doc(state.studentId).update({ avatarId: id }); } catch (e) { console.error('Failed to save avatar:', e); }
+  setTimeout(closeAvatarPicker, 300);
+}
+
+function preloadAvatars() { for (let i = 1; i <= TOTAL_AVATARS; i++) { const img = new Image(); img.src = avatarSrc(i); } }
+
 // ===== APP STATE =====
 let state = {
   studentId: null,
@@ -1682,6 +1764,7 @@ let state = {
   answered: false,
   results: [],
   currentType: null,
+  avatarId: null,
   isSprint: false,
   isSpeedRound: false,
   isMultipleChoice: false,
@@ -1878,7 +1961,7 @@ async function showLeaderboard() {
       const snap = await db.collection('classes').doc(sec.id).collection('students').get();
       snap.forEach(doc => {
         const d = doc.data();
-        allStudents.push({ id: doc.id, name: d.name, xp: d.xp || 0, daily: d.dailyChallengeLog || {}, section: sec.label, sectionId: sec.id });
+        allStudents.push({ id: doc.id, name: d.name, xp: d.xp || 0, daily: d.dailyChallengeLog || {}, section: sec.label, sectionId: sec.id, avatarId: d.avatarId || 1 });
       });
     } catch (e) { /* section may not exist yet */ }
   }
@@ -1891,7 +1974,8 @@ async function showLeaderboard() {
     const isMe = s.id === state.studentId && s.sectionId === CLASS_ID;
     const rank = i < 3 ? medals[i] : `${i + 1}.`;
     const tag = showSection ? ` <span class="section-tag section-tag-${s.section.toLowerCase()}">${s.section}</span>` : '';
-    return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${rank}</span><span class="lb-name">${s.name}${tag}${isMe ? ' ← you' : ''}</span><span class="lb-xp">${s.xp.toLocaleString()} XP</span></div>`;
+    const av = `<img src="${avatarSrc(s.avatarId)}" class="avatar avatar-sm" style="vertical-align:middle;margin-right:6px;">`;
+    return `<div class="lb-row ${isMe ? 'me' : ''}"><span class="lb-rank">${rank}</span><span class="lb-name">${av}${s.name}${tag}${isMe ? ' ← you' : ''}</span><span class="lb-xp">${s.xp.toLocaleString()} XP</span></div>`;
   }).join('') || '<p style="color:var(--muted);text-align:center;padding:1rem;">No students yet</p>';
 
   document.getElementById('lb-main').innerHTML =
@@ -2086,11 +2170,14 @@ async function handlePinSubmit() {
     }
     // PIN correct — log in
     state.studentData = data;
+    state.avatarId = data.avatarId || 1;
     await studentsRef.doc(pendingLoginId).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() });
     state.studentId = pendingLoginId;
     state.studentName = pendingLoginName;
     localStorage.setItem(LS_KEY, JSON.stringify({ id: pendingLoginId, name: pendingLoginName, pin: pin }));
     await loadProgress();
+    preloadAvatars();
+    updateAllAvatars();
     showHomeScreen();
   } catch (e) {
     console.error('PIN login error:', e);
@@ -2117,21 +2204,27 @@ async function handleSetPin() {
       state.studentData = { ...existingDoc.data(), pin: pin };
     } else {
       // Brand new student
+      const avatarId = await getAvailableAvatar();
       const newStudent = {
         name: pendingLoginName,
         pin: pin,
+        avatarId: avatarId,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         lastActive: firebase.firestore.FieldValue.serverTimestamp(),
         totalSessions: 0, totalCorrect: 0, totalAnswered: 0,
         xp: 0, streak: 0, lastSessionDate: '', badges: [], dailyChallengeLog: {}, exerciseTypesUsed: []
       };
       await studentsRef.doc(pendingLoginId).set(newStudent);
-      state.studentData = { ...newStudent, totalSessions: 0, totalCorrect: 0, totalAnswered: 0, xp: 0, streak: 0, badges: [], dailyChallengeLog: {}, exerciseTypesUsed: [] };
+      state.avatarId = avatarId;
+      state.studentData = { ...newStudent };
     }
     state.studentId = pendingLoginId;
     state.studentName = pendingLoginName;
     localStorage.setItem(LS_KEY, JSON.stringify({ id: pendingLoginId, name: pendingLoginName, pin: pin }));
+    if (!state.avatarId) state.avatarId = state.studentData?.avatarId || 1;
     await loadProgress();
+    preloadAvatars();
+    updateAllAvatars();
     showHomeScreen();
   } catch (e) {
     console.error('Registration error:', e);
@@ -2507,6 +2600,7 @@ function showHomeScreen() {
   const sectionLabel = SECTIONS.find(s => s.id === CLASS_ID)?.label || CLASS_ID;
   document.getElementById('welcome-name').innerHTML = `${state.studentName} <small>${sectionLabel}</small>`;
   document.getElementById('welcome-xp').innerHTML = `⭐ ${(state.studentData?.xp || 0).toLocaleString()} XP`;
+  updateAllAvatars();
 
   // Stats
   const d = state.studentData || {};
@@ -3222,8 +3316,11 @@ document.getElementById('section-pin')?.addEventListener('keydown', e => { if (e
           state.studentId = id;
           state.studentName = name;
           state.studentData = doc.data();
+          state.avatarId = state.studentData.avatarId || 1;
           await studentsRef.doc(id).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() });
           await loadProgress();
+          preloadAvatars();
+          updateAllAvatars();
           showHomeScreen();
           return;
         }
@@ -3249,5 +3346,17 @@ document.getElementById('section-pin')?.addEventListener('keydown', e => { if (e
   </div>
 </div>
 
+<div id="avatar-picker-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;overflow-y:auto;padding:20px;" onclick="if(event.target===this)closeAvatarPicker()">
+  <div id="avatar-picker-modal" style="max-width:400px;margin:40px auto;border-radius:16px;padding:24px;position:relative;">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:18px;font-weight:600;">Choose your avatar</div>
+      <div style="font-size:13px;opacity:0.6;margin-top:4px;">Pick a character that represents you</div>
+    </div>
+    <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;justify-items:center;"></div>
+    <div style="text-align:center;margin-top:16px;">
+      <button class="btn btn-secondary" onclick="closeAvatarPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
