@@ -2730,13 +2730,13 @@ function showXPFloat() {
 
 function getTaskType() {
   if (isDailyChallenge && dailyChallengeTypes.length > 0) return dailyChallengeTypes[state.currentIdx % dailyChallengeTypes.length];
-  if (state.exerciseType === 'multiple-choice') {
-    const mcTypes = ['mc-context', 'mc-definition', 'mc-translation'];
-    return mcTypes[Math.floor(Math.random() * mcTypes.length)];
-  }
   if (state.isSpeedRound) {
     const easyTypes = ['context', 'definition', 'translation'];
     return easyTypes[Math.floor(Math.random() * easyTypes.length)];
+  }
+  if (state.exerciseType === 'multiple-choice') {
+    const mcTypes = ['mc-context', 'mc-definition', 'mc-translation'];
+    return mcTypes[Math.floor(Math.random() * mcTypes.length)];
   }
   if (state.exerciseType !== 'mix') return state.exerciseType;
   const types = ['context', 'context-hard', 'definition', 'definition-hard', 'translation'];
