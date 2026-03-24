@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 :root {
   --bg: #0b1120;
@@ -845,6 +846,19 @@ body.playing h1, body.playing .subtitle { display: none; }
 
 /* Weekly Goal card */
 #weekly-goal-card { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
+
+/* Battle system */
+.btn-battle { width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;border:none;margin-top:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;transition:transform 0.1s,opacity 0.1s; }
+.btn-battle:hover { opacity:0.9; }
+.btn-battle:active { transform:scale(0.98); }
+.battle-modal-bg { background:#161d2e;color:rgba(255,255,255,0.9); }
+#battle-area { background:rgba(255,255,255,0.05);border-radius:14px; }
+#battle-input { background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.15); }
+#battle-input:focus { border-color:rgba(255,255,255,0.3);outline:none; }
+#battle-timer-bar { background:rgba(255,255,255,0.1); }
+#battle-timer-fill { background:#f59e0b; }
+#battle-countdown { font-size:64px;font-weight:800; }
+@keyframes countdownPulse { 0%{transform:scale(1.5);opacity:0}50%{opacity:1}100%{transform:scale(1);opacity:1} }
 </style>
 </head>
 <body>
@@ -999,6 +1013,7 @@ body.playing h1, body.playing .subtitle { display: none; }
       <button class="btn btn-sprint" id="sprint-btn" disabled onclick="startSprint()">🏃 Sprint (10)</button>
       <button class="btn btn-speed" id="speed-btn" disabled onclick="startSpeedRound()">⚡ Speed Round</button>
     </div>
+    <button id="btn-battle" class="btn-battle" onclick="openBattleLobby()" style="display:none;">⚔️ Battle</button>
     <button class="btn btn-review btn-block btn-small" id="review-btn" style="display:none;" onclick="startSmartReview()">🔄 Smart Review</button>
     <div class="home-actions-row">
       <button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊 My Progress</button>
@@ -1139,6 +1154,26 @@ body.playing h1, body.playing .subtitle { display: none; }
   <button class="btn btn-danger btn-small" onclick="endPractice()" style="align-self:center;opacity:0.6;">End Practice</button>
 </div>
 
+<!-- BATTLE SCREEN -->
+<div id="battle-screen" class="screen">
+  <div style="max-width:520px;margin:0 auto;padding:16px;width:100%;">
+    <div id="battle-header" style="text-align:center;margin-bottom:16px;">
+      <div id="battle-round-num" style="font-size:13px;opacity:0.5;text-transform:uppercase;letter-spacing:1px;">Round 1 of 10</div>
+    </div>
+    <div id="battle-scores" style="margin-bottom:16px;"></div>
+    <div id="battle-area" style="padding:24px;text-align:center;position:relative;">
+      <div id="battle-countdown" style="display:none;"></div>
+      <div id="battle-prompt" style="margin-bottom:16px;"></div>
+      <input type="text" id="battle-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer..." style="width:100%;padding:12px 16px;border-radius:10px;font-size:16px;text-align:center;box-sizing:border-box;" onkeydown="if(event.key==='Enter')submitBattleAnswer(this.value)">
+      <div id="battle-feedback" style="margin-top:12px;font-size:15px;font-weight:600;min-height:24px;"></div>
+      <div id="battle-timer-bar" style="margin-top:12px;height:4px;border-radius:2px;overflow:hidden;"><div id="battle-timer-fill" style="height:100%;border-radius:2px;width:100%;"></div></div>
+    </div>
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="leaveBattle()" style="font-size:13px;opacity:0.5;background:none;border:none;cursor:pointer;text-decoration:underline;color:var(--text);">Forfeit &amp; leave</button>
+    </div>
+  </div>
+</div>
+
 <!-- RESULTS SCREEN -->
 <div id="results-screen" class="screen">
   <div class="results-score">
@@ -1163,6 +1198,7 @@ body.playing h1, body.playing .subtitle { display: none; }
 firebase.initializeApp({
   apiKey: "AIzaSyDBZaWpfNXamve3OiiqFG1HdoA-KMa3un8",
   authDomain: "veho-vocab.firebaseapp.com",
+  databaseURL: "https://veho-vocab-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "veho-vocab",
   storageBucket: "veho-vocab.firebasestorage.app",
   messagingSenderId: "623091115688",
@@ -1900,6 +1936,8 @@ let state = {
   currentType: null,
   avatarId: null,
   comboStreak: 0, comboMult: 1, comboMax: 0,
+  battleRoom: null, battleRole: null, battleData: null, battleRound: 0, battleAnswered: false,
+  _inviteListener: null, _inviteChangeListener: null, _roomListener: null, _battleRoundTimer: null,
   isSprint: false,
   isSpeedRound: false,
   isMultipleChoice: false,
@@ -2708,6 +2746,10 @@ async function saveSessionResults() {
 }
 
 function logout() {
+  const logoutSlug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+  presenceRef.child(logoutSlug).update({ online: false });
+  if (state._inviteListener) invitesRef.off('child_added', state._inviteListener);
+  if (state._inviteChangeListener) invitesRef.off('child_changed', state._inviteChangeListener);
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(LS_KEY + '-section');
   state.studentId = null;
@@ -3074,6 +3116,10 @@ function showHomeScreen() {
 
   initSourceGrid();
   showScreen('home-screen');
+  setupPresence();
+  const battleBtn = document.getElementById('btn-battle');
+  if (battleBtn) battleBtn.style.display = '';
+  setTimeout(cleanupStaleBattleData, 5000);
 }
 
 function toggleSource(btn) {
@@ -3852,6 +3898,420 @@ function handleSectionSubmit() {
 }
 
 document.getElementById('section-pin')?.addEventListener('keydown', e => { if (e.key === 'Enter') handleSectionSubmit(); });
+
+// ===== BATTLE SYSTEM =====
+const rtdb = firebase.database();
+const battleRoot = rtdb.ref('battles/' + CLASS_ID);
+const presenceRef = battleRoot.child('presence');
+const invitesRef = battleRoot.child('invites');
+const roomsRef = battleRoot.child('rooms');
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function setupPresence() {
+  const slug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+  const myPresenceRef = presenceRef.child(slug);
+  rtdb.ref('.info/connected').on('value', (snap) => {
+    if (snap.val() === true) {
+      myPresenceRef.set({
+        name: state.studentName,
+        online: true,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+        avatarId: state.avatarId || 1
+      });
+      myPresenceRef.onDisconnect().update({
+        online: false,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  });
+  listenForInvites();
+}
+
+function listenForInvites() {
+  const mySlug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+  state._inviteListener = invitesRef.orderByChild('to').equalTo(mySlug)
+    .on('child_added', (snap) => {
+      const invite = snap.val();
+      if (invite.status !== 'pending') return;
+      const age = Date.now() - invite.timestamp;
+      if (age > 30000) { snap.ref.update({ status: 'expired' }); return; }
+      showIncomingInvite(snap.key, invite);
+    });
+  state._inviteChangeListener = invitesRef.on('child_changed', (snap) => {
+    const invite = snap.val();
+    if (invite.from === mySlug && invite.status === 'accepted') {
+      dismissInviteWaiting();
+      joinBattleRoom(invite.roomId, 'p1');
+    }
+    if (invite.from === mySlug && invite.status === 'declined') {
+      dismissInviteWaiting();
+      showBattleMessage('Challenge declined', invite.toName + ' is busy right now.');
+    }
+  });
+}
+
+function pickBattleWords(count) {
+  const allWords = [];
+  for (const key in vocabData) {
+    if (Array.isArray(vocabData[key])) vocabData[key].forEach(w => allWords.push(w));
+  }
+  const shuffled = allWords.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length)).map(w => ({
+    w: w.w, g: w.g, d: w.d, s: w.s, cf: w.cf || null, a: w.a || []
+  }));
+}
+
+function openBattleLobby() {
+  presenceRef.once('value', (snap) => {
+    const mySlug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+    const players = [];
+    snap.forEach(child => {
+      const d = child.val();
+      if (child.key !== mySlug && d.online === true) players.push({ slug: child.key, name: d.name, avatarId: d.avatarId || 1 });
+    });
+    if (players.length === 0) { showBattleMessage('No opponents online', 'Nobody else is online right now. Try again later!'); return; }
+    showBattleLobby(players);
+  });
+}
+
+function showBattleLobby(players) {
+  const overlay = document.createElement('div');
+  overlay.id = 'battle-lobby-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease;';
+  overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+  let listHtml = '';
+  players.forEach(p => {
+    listHtml += '<div data-slug="' + p.slug + '" data-name="' + escapeHtml(p.name) + '" onclick="sendBattleInvite(this.dataset.slug,this.dataset.name);document.getElementById(\'battle-lobby-overlay\').remove();" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">' +
+      '<img src="' + avatarSrc(p.avatarId) + '" class="avatar avatar-sm">' +
+      '<div style="font-size:15px;font-weight:600;">' + escapeHtml(p.name) + '</div>' +
+      '<div style="margin-left:auto;font-size:12px;opacity:0.5;">Challenge \u2192</div>' +
+    '</div>';
+  });
+  const modal = document.createElement('div');
+  modal.className = 'battle-modal-bg';
+  modal.style.cssText = 'max-width:380px;width:90%;border-radius:16px;padding:24px;';
+  modal.innerHTML = '<div style="text-align:center;margin-bottom:16px;"><div style="font-size:18px;font-weight:600;">\u2694\uFE0F Choose your opponent</div><div style="font-size:13px;opacity:0.5;margin-top:4px;">' + players.length + ' classmate' + (players.length > 1 ? 's' : '') + ' online</div></div><div>' + listHtml + '</div><div style="text-align:center;margin-top:16px;"><button onclick="document.getElementById(\'battle-lobby-overlay\').remove()" style="padding:8px 20px;border-radius:10px;font-size:13px;cursor:pointer;background:var(--card,rgba(255,255,255,0.05));border:1px solid var(--card-border,rgba(255,255,255,0.1));color:inherit;">Cancel</button></div>';
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+async function sendBattleInvite(opponentSlug, opponentName) {
+  const mySlug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+  const roomRef = roomsRef.push();
+  const roomId = roomRef.key;
+  const battleWords = pickBattleWords(10);
+  await roomRef.set({
+    players: { p1: mySlug, p2: opponentSlug },
+    playerNames: { p1: state.studentName, p2: opponentName },
+    status: 'waiting', round: 0, words: battleWords,
+    answers: {}, scores: { p1: 0, p2: 0 }, winner: null,
+    createdAt: firebase.database.ServerValue.TIMESTAMP
+  });
+  const inviteRef = invitesRef.push();
+  await inviteRef.set({
+    from: mySlug, fromName: state.studentName,
+    to: opponentSlug, toName: opponentName,
+    status: 'pending', roomId: roomId, timestamp: Date.now()
+  });
+  showInviteWaiting(opponentName, inviteRef.key);
+  setTimeout(async () => {
+    const snap = await inviteRef.once('value');
+    if (snap.exists() && snap.val().status === 'pending') {
+      inviteRef.update({ status: 'expired' });
+      dismissInviteWaiting();
+      showBattleMessage('No response', opponentName + ' didn\'t respond in time.');
+    }
+  }, 30000);
+}
+
+function showInviteWaiting(opponentName, inviteKey) {
+  const overlay = document.createElement('div');
+  overlay.id = 'invite-waiting-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;';
+  const card = document.createElement('div');
+  card.className = 'battle-modal-bg';
+  card.style.cssText = 'max-width:320px;width:85%;border-radius:16px;padding:28px;text-align:center;';
+  card.innerHTML = '<div style="font-size:36px;margin-bottom:12px;animation:comboPulse 1.5s ease-in-out infinite;">\u2694\uFE0F</div><div style="font-size:16px;font-weight:600;margin-bottom:4px;">Waiting for ' + escapeHtml(opponentName) + '...</div><div style="font-size:13px;opacity:0.5;margin-bottom:20px;">They have 30 seconds to accept</div><button onclick="cancelInvite(\'' + inviteKey + '\')" style="padding:8px 20px;border-radius:10px;font-size:13px;cursor:pointer;background:var(--card,rgba(255,255,255,0.05));border:1px solid var(--card-border,rgba(255,255,255,0.1));color:inherit;">Cancel</button>';
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+function dismissInviteWaiting() { const el = document.getElementById('invite-waiting-overlay'); if (el) el.remove(); }
+async function cancelInvite(inviteKey) { await invitesRef.child(inviteKey).update({ status: 'cancelled' }); dismissInviteWaiting(); }
+
+function showIncomingInvite(inviteKey, invite) {
+  if (state.battleRoom) return;
+  window._pendingInvite = { key: inviteKey, data: invite };
+  const overlay = document.createElement('div');
+  overlay.id = 'invite-popup-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10001;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease;';
+  const card = document.createElement('div');
+  card.className = 'battle-modal-bg';
+  card.style.cssText = 'max-width:320px;width:85%;border-radius:16px;padding:28px;text-align:center;animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);';
+  card.innerHTML = '<div style="font-size:36px;margin-bottom:8px;">\u2694\uFE0F</div><div style="font-size:18px;font-weight:700;margin-bottom:4px;">' + escapeHtml(invite.fromName) + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:20px;">challenges you to a battle!</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="declineInvite(window._pendingInvite.key)" style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(220,60,60,0.15);color:#f87171;border:1px solid rgba(220,60,60,0.3);">Decline</button><button onclick="acceptInvite(window._pendingInvite.key,window._pendingInvite.data)" style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(80,200,120,0.15);color:#4ade80;border:1px solid rgba(80,200,120,0.3);">Accept!</button></div>';
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  if (typeof SFX !== 'undefined') SFX.play('combo');
+  setTimeout(() => { if (document.getElementById('invite-popup-overlay')) { dismissIncomingInvite(); invitesRef.child(inviteKey).update({ status: 'expired' }); } }, 25000);
+}
+function dismissIncomingInvite() { const el = document.getElementById('invite-popup-overlay'); if (el) el.remove(); }
+
+async function acceptInvite(inviteKey, invite) {
+  await invitesRef.child(inviteKey).update({ status: 'accepted' });
+  dismissIncomingInvite();
+  joinBattleRoom(invite.roomId, 'p2');
+}
+async function declineInvite(inviteKey) {
+  await invitesRef.child(inviteKey).update({ status: 'declined' });
+  dismissIncomingInvite();
+}
+
+function joinBattleRoom(roomId, role) {
+  state.battleRoom = roomId;
+  state.battleRole = role;
+  state.battleRound = 0;
+  state.battleAnswered = false;
+  const roomRef = roomsRef.child(roomId);
+  state._roomListener = roomRef.on('value', (snap) => {
+    if (!snap.exists()) return;
+    state.battleData = snap.val();
+    handleBattleUpdate(snap.val());
+  });
+  roomRef.child('joined_' + role).set(true);
+  showScreen('battle-screen');
+  if (role === 'p1') {
+    roomRef.child('joined_p2').on('value', (snap) => {
+      if (snap.val() === true) { roomRef.child('joined_p2').off(); startBattleCountdown(roomId); }
+    });
+  }
+}
+
+async function startBattleCountdown(roomId) {
+  const roomRef = roomsRef.child(roomId);
+  await roomRef.update({ status: 'countdown', countdownValue: 3 });
+  setTimeout(() => roomRef.update({ countdownValue: 2 }), 1000);
+  setTimeout(() => roomRef.update({ countdownValue: 1 }), 2000);
+  setTimeout(() => roomRef.update({ status: 'active', round: 1, countdownValue: 0 }), 3000);
+}
+
+function handleBattleUpdate(data) {
+  if (!data) return;
+  switch (data.status) {
+    case 'waiting': renderBattleWaiting(data); break;
+    case 'countdown': renderBattleCountdown(data.countdownValue); break;
+    case 'active': renderBattleRound(data); break;
+    case 'round-result': renderRoundResult(data); break;
+    case 'done': renderBattleResults(data); break;
+  }
+}
+
+function renderBattleWaiting(data) {
+  const area = document.getElementById('battle-area');
+  if (area) area.innerHTML = '<div style="text-align:center;padding:40px 20px;"><div style="font-size:36px;margin-bottom:12px;animation:comboPulse 1.5s ease-in-out infinite;">\u2694\uFE0F</div><div style="font-size:16px;opacity:0.7;">Waiting for opponent to join...</div></div>';
+}
+
+function renderBattleCountdown(value) {
+  const cdEl = document.getElementById('battle-countdown');
+  const promptEl = document.getElementById('battle-prompt');
+  const inputEl = document.getElementById('battle-input');
+  const feedbackEl = document.getElementById('battle-feedback');
+  if (!cdEl) return;
+  if (promptEl) promptEl.style.display = 'none';
+  if (inputEl) inputEl.style.display = 'none';
+  if (feedbackEl) feedbackEl.textContent = '';
+  cdEl.style.display = '';
+  cdEl.textContent = value > 0 ? value : 'GO!';
+  cdEl.style.animation = 'none'; cdEl.offsetHeight; cdEl.style.animation = 'countdownPulse 0.5s ease-out';
+  if (value <= 0) setTimeout(() => { cdEl.style.display = 'none'; if (promptEl) promptEl.style.display = ''; if (inputEl) inputEl.style.display = ''; }, 500);
+}
+
+function renderBattleRound(data) {
+  const round = data.round;
+  if (!round || round < 1 || round > 10) return;
+  const word = data.words[round - 1];
+  if (!word) return;
+  if (state.battleRound === round) return;
+  state.battleRound = round;
+  state.battleAnswered = false;
+  const promptEl = document.getElementById('battle-prompt');
+  const inputEl = document.getElementById('battle-input');
+  const feedbackEl = document.getElementById('battle-feedback');
+  const roundEl = document.getElementById('battle-round-num');
+  if (roundEl) roundEl.textContent = 'Round ' + round + ' of 10';
+  if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.color = ''; }
+  if (promptEl) { promptEl.style.display = ''; promptEl.innerHTML = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Translate to English</div><div style="font-size:24px;font-weight:700;">' + escapeHtml(word.g) + '</div>'; }
+  if (inputEl) { inputEl.style.display = ''; inputEl.value = ''; inputEl.disabled = false; inputEl.focus(); }
+  renderBattleScores(data);
+  clearTimeout(state._battleRoundTimer);
+  state._battleRoundTimer = setTimeout(() => { if (!state.battleAnswered) submitBattleAnswer(''); }, 15000);
+}
+
+async function submitBattleAnswer(answer) {
+  if (state.battleAnswered) return;
+  state.battleAnswered = true;
+  const roomId = state.battleRoom;
+  const role = state.battleRole;
+  const round = state.battleRound;
+  const roomRef = roomsRef.child(roomId);
+  const word = state.battleData.words[round - 1];
+  const correct = answer.trim() !== '' && isCorrect(answer, word);
+  await roomRef.child('answers/' + round + '/' + role).set({ answer: answer, correct: correct, time: Date.now() });
+  const inputEl = document.getElementById('battle-input');
+  if (inputEl) inputEl.disabled = true;
+  const feedbackEl = document.getElementById('battle-feedback');
+  if (feedbackEl) { feedbackEl.textContent = correct ? '\u2713 Waiting for opponent...' : '\u2717 Wrong \u2014 waiting...'; feedbackEl.style.color = correct ? '#4ade80' : '#f87171'; }
+  if (typeof SFX !== 'undefined') SFX.play(correct ? 'correct' : 'wrong');
+  if (role === 'p1') checkRoundComplete(roomId, round);
+}
+
+async function checkRoundComplete(roomId, round) {
+  const roomRef = roomsRef.child(roomId);
+  const checkBoth = async () => {
+    const snap = await roomRef.child('answers/' + round).once('value');
+    const answers = snap.val();
+    if (!answers || !answers.p1 || !answers.p2) return false;
+    let roundWinner = null;
+    if (answers.p1.correct && !answers.p2.correct) roundWinner = 'p1';
+    else if (!answers.p1.correct && answers.p2.correct) roundWinner = 'p2';
+    else if (answers.p1.correct && answers.p2.correct) roundWinner = answers.p1.time <= answers.p2.time ? 'p1' : 'p2';
+    else roundWinner = 'draw';
+    const scoresSnap = await roomRef.child('scores').once('value');
+    const scores = scoresSnap.val() || { p1: 0, p2: 0 };
+    if (roundWinner === 'p1') scores.p1++;
+    if (roundWinner === 'p2') scores.p2++;
+    await roomRef.update({ status: 'round-result', ['answers/' + round + '/winner']: roundWinner, scores: scores });
+    setTimeout(async () => {
+      if (round >= 10) {
+        let winner = 'draw';
+        if (scores.p1 > scores.p2) winner = 'p1';
+        if (scores.p2 > scores.p1) winner = 'p2';
+        await roomRef.update({ status: 'done', winner: winner });
+      } else {
+        const remaining = 10 - round;
+        const lead = Math.abs(scores.p1 - scores.p2);
+        if (lead > remaining) {
+          await roomRef.update({ status: 'done', winner: scores.p1 > scores.p2 ? 'p1' : 'p2' });
+        } else {
+          await roomRef.update({ status: 'active', round: round + 1 });
+        }
+      }
+    }, 2500);
+    return true;
+  };
+  const resolved = await checkBoth();
+  if (!resolved) {
+    const listener = roomRef.child('answers/' + round + '/p2').on('value', async (snap) => {
+      if (snap.val()) { roomRef.child('answers/' + round + '/p2').off('value', listener); await checkBoth(); }
+    });
+    setTimeout(async () => {
+      roomRef.child('answers/' + round + '/p2').off('value', listener);
+      const snap = await roomRef.child('answers/' + round).once('value');
+      const answers = snap.val();
+      if (answers && answers.p1 && !answers.p2) {
+        await roomRef.child('answers/' + round + '/p2').set({ answer: '', correct: false, time: Date.now() });
+        await checkBoth();
+      }
+    }, 18000);
+  }
+}
+
+function renderRoundResult(data) {
+  const round = data.round || state.battleRound;
+  const answers = data.answers && data.answers[round];
+  if (!answers) return;
+  const word = data.words[round - 1];
+  const winner = answers.winner;
+  const myRole = state.battleRole;
+  const opRole = myRole === 'p1' ? 'p2' : 'p1';
+  const feedbackEl = document.getElementById('battle-feedback');
+  let resultText = '';
+  if (winner === 'draw') resultText = 'No point \u2014 both wrong!';
+  else if (winner === myRole) resultText = '\uD83C\uDFAF You win this round!';
+  else resultText = '\u274C ' + escapeHtml(data.playerNames[opRole]) + ' was faster!';
+  if (feedbackEl) { feedbackEl.textContent = resultText; feedbackEl.style.color = winner === myRole ? '#4ade80' : winner === 'draw' ? '#999' : '#f87171'; }
+  const promptEl = document.getElementById('battle-prompt');
+  if (promptEl && word) { const correct = word.cf || word.w; promptEl.innerHTML += '<div style="margin-top:10px;font-size:14px;opacity:0.6;">Answer: <strong>' + escapeHtml(correct) + '</strong></div>'; }
+  renderBattleScores(data);
+}
+
+function renderBattleScores(data) {
+  const myRole = state.battleRole;
+  const opRole = myRole === 'p1' ? 'p2' : 'p1';
+  const myScore = data.scores[myRole] || 0;
+  const opScore = data.scores[opRole] || 0;
+  const myName = data.playerNames[myRole] || 'You';
+  const opName = data.playerNames[opRole] || 'Opponent';
+  const scoresEl = document.getElementById('battle-scores');
+  if (scoresEl) scoresEl.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;"><div style="text-align:center;">' + (state.avatarId ? '<img src="' + avatarSrc(state.avatarId) + '" class="avatar avatar-sm" style="display:block;margin:0 auto 4px;">' : '') + '<div style="font-weight:600;font-size:14px;">' + escapeHtml(myName) + '</div><div style="font-size:28px;font-weight:700;">' + myScore + '</div></div><div style="font-size:18px;opacity:0.4;font-weight:700;">VS</div><div style="text-align:center;"><div style="font-weight:600;font-size:14px;">' + escapeHtml(opName) + '</div><div style="font-size:28px;font-weight:700;">' + opScore + '</div></div></div>';
+}
+
+function renderBattleResults(data) {
+  clearTimeout(state._battleRoundTimer);
+  const myRole = state.battleRole;
+  const opRole = myRole === 'p1' ? 'p2' : 'p1';
+  const myScore = data.scores[myRole] || 0;
+  const opScore = data.scores[opRole] || 0;
+  const iWon = data.winner === myRole;
+  const isDraw = data.winner === 'draw';
+  const opName = data.playerNames[opRole] || 'Opponent';
+  let xpEarned = iWon ? 50 : isDraw ? 25 : 15;
+  xpEarned += myScore * 5;
+  state.xp = (state.xp || 0) + xpEarned;
+  const area = document.getElementById('battle-area');
+  if (area) area.innerHTML = '<div style="text-align:center;padding:20px;"><div style="font-size:48px;margin-bottom:12px;">' + (iWon ? '\uD83C\uDFC6' : isDraw ? '\uD83E\uDD1D' : '\uD83D\uDCAA') + '</div><div style="font-size:24px;font-weight:700;margin-bottom:4px;">' + (iWon ? 'Victory!' : isDraw ? 'Draw!' : escapeHtml(opName) + ' wins!') + '</div><div style="font-size:16px;opacity:0.7;margin-bottom:16px;">' + myScore + ' \u2013 ' + opScore + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:24px;">+' + xpEarned + ' XP earned</div><button onclick="leaveBattle()" class="btn btn-primary" style="padding:10px 28px;">Back to Home</button></div>';
+  if (typeof SFX !== 'undefined') SFX.play(iWon ? 'levelup' : 'correct');
+  saveBattleResults(data, xpEarned);
+}
+
+async function saveBattleResults(data, xpEarned) {
+  try {
+    const slug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+    await studentsRef.doc(slug).update({
+      xp: state.xp,
+      battlesPlayed: firebase.firestore.FieldValue.increment(1),
+      battlesWon: firebase.firestore.FieldValue.increment(data.winner === state.battleRole ? 1 : 0),
+      battleXpEarned: firebase.firestore.FieldValue.increment(xpEarned),
+      lastBattle: new Date().toISOString()
+    });
+    if (typeof contributeToWeeklyGoal === 'function') contributeToWeeklyGoal(xpEarned);
+  } catch (e) { console.error('Battle save error:', e); }
+}
+
+function leaveBattle() {
+  if (state.battleRoom && state._roomListener) roomsRef.child(state.battleRoom).off('value', state._roomListener);
+  clearTimeout(state._battleRoundTimer);
+  state.battleRoom = null; state.battleRole = null; state.battleData = null;
+  state.battleRound = 0; state.battleAnswered = false; state._roomListener = null;
+  showScreen('home-screen');
+}
+
+function showBattleMessage(title, message) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease;';
+  overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+  const card = document.createElement('div');
+  card.className = 'battle-modal-bg';
+  card.style.cssText = 'max-width:300px;width:85%;border-radius:16px;padding:24px;text-align:center;';
+  card.innerHTML = '<div style="font-size:16px;font-weight:600;margin-bottom:8px;">' + escapeHtml(title) + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:16px;">' + message + '</div><button onclick="this.closest(\'div[style]\').parentElement.remove()" style="padding:8px 20px;border-radius:10px;font-size:13px;cursor:pointer;background:var(--card,rgba(255,255,255,0.05));border:1px solid var(--card-border,rgba(255,255,255,0.1));color:inherit;">OK</button>';
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+async function cleanupStaleBattleData() {
+  try {
+    const cutoff = Date.now() - (24 * 60 * 60 * 1000);
+    const invSnap = await invitesRef.orderByChild('timestamp').endAt(cutoff).once('value');
+    const iu = {}; invSnap.forEach(c => { iu[c.key] = null; });
+    if (Object.keys(iu).length > 0) await invitesRef.update(iu);
+    const rmSnap = await roomsRef.orderByChild('createdAt').endAt(cutoff).once('value');
+    const ru = {}; rmSnap.forEach(c => { ru[c.key] = null; });
+    if (Object.keys(ru).length > 0) await roomsRef.update(ru);
+  } catch(e) {}
+}
 
 // ===== INIT =====
 (async function() {
