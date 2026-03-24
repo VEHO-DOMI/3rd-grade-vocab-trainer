@@ -2656,6 +2656,10 @@ function isCorrect(userAnswer, word) {
   const cf = normalizeAnswer(getContextForm(word));
   const candidates = [expected, cf];
   if (word.a) word.a.forEach(a => candidates.push(normalizeAnswer(a)));
+  // Accept partial answers: strip small words shown fully in easy-mode hints
+  const _sw = new Set(['to','a','an','the','in','on','of','for','at','up','out','by','with','off','down']);
+  const _co = s => s.split(' ').filter(w => !_sw.has(w)).join(' ');
+  for (const c of [...candidates]) { const p = _co(c); if (p && p !== c) candidates.push(p); }
   const strip = s => s.replace(/[-_.,!?'"()]/g, '').replace(/\s+/g, ' ').trim();
   const userV = spellVariants(norm);
   const userS = spellVariants(strip(norm));
