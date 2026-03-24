@@ -218,6 +218,7 @@ h1 span {
 .type-btn.selected[data-type="definition"] { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); box-shadow: 0 0 16px rgba(251,191,36,0.08); }
 .type-btn.selected[data-type="definition-hard"] { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.5); box-shadow: 0 0 16px rgba(251,191,36,0.1); }
 .type-btn.selected[data-type="translation"] { background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.4); box-shadow: 0 0 16px rgba(244,114,182,0.08); }
+.type-btn.selected[data-type="multiple-choice"] { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.4); box-shadow: 0 0 16px rgba(34,197,94,0.08); }
 
 /* Buttons */
 .btn {
@@ -566,6 +567,51 @@ body.playing h1, body.playing .subtitle { display: none; }
 .home-actions { width: 100%; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.2rem; }
 .home-actions-row { display: flex; gap: 0.5rem; }
 .home-actions-row .btn { flex: 1; }
+.mode-row { display: flex; gap: 0.5rem; }
+.mode-row .btn { flex: 1; }
+.btn-sprint {
+  background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+  box-shadow: 0 4px 20px rgba(245,158,11,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.btn-speed {
+  background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
+  box-shadow: 0 4px 20px rgba(239,68,68,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Speed Round timer */
+.speed-timer-wrap { display: none; margin-bottom: 0.5rem; }
+.speed-timer-wrap.active { display: block; }
+.speed-timer-bar { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #ef4444, #f59e0b); transition: width 0.1s linear; }
+.speed-timer-bg { background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.speed-timer-text { text-align: center; font-size: 1.4rem; font-weight: 800; color: #f87171; margin-bottom: 0.3rem; font-variant-numeric: tabular-nums; }
+.speed-timer-text.urgent { animation: pulse-red 0.5s ease infinite; }
+@keyframes pulse-red { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+/* Speed Round XP float */
+.xp-float { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 1.3rem; font-weight: 800; color: var(--accent2); pointer-events: none; animation: float-up 0.8s ease-out forwards; z-index: 10; }
+@keyframes float-up { 0%{opacity:1;transform:translate(-50%,-50%);} 100%{opacity:0;transform:translate(-50%,-150%);} }
+
+/* Multiple Choice */
+.mc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
+.mc-option {
+  padding: 0.8rem 0.6rem; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600;
+  background: var(--card); border: 1.5px solid var(--card-border); color: var(--text);
+  cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: inherit;
+  word-break: break-word; min-height: 3rem; display: flex; align-items: center; justify-content: center;
+}
+.mc-option:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
+.mc-option.correct { background: rgba(34,197,94,0.2); border-color: var(--correct); color: var(--correct); }
+.mc-option.wrong { background: rgba(239,68,68,0.15); border-color: var(--wrong); color: var(--wrong); }
+.mc-option.reveal { background: rgba(34,197,94,0.1); border-color: var(--correct); color: var(--correct); }
+.mc-option.disabled { pointer-events: none; opacity: 0.6; }
+
+/* Sprint results extras */
+.sprint-again { margin-top: 0.5rem; }
+
+/* Times up overlay */
+.times-up { text-align: center; padding: 2rem; }
+.times-up h2 { font-size: 2rem; color: #f87171; margin-bottom: 0.5rem; }
+.times-up .big-score { font-size: 3rem; font-weight: 900; color: var(--text); }
 
 /* Progress Screen */
 .progress-nav { display: flex; gap: 0.5rem; width: 100%; margin-bottom: 1rem; }
@@ -768,13 +814,18 @@ body.playing h1, body.playing .subtitle { display: none; }
       <button class="type-btn" data-type="definition" onclick="selectType(this)" title="Read an English definition — first letters and word count shown">Definition (easy)</button>
       <button class="type-btn" data-type="definition-hard" onclick="selectType(this)" title="Read an English definition — no hints given">Definition (hard)</button>
       <button class="type-btn" data-type="translation" onclick="selectType(this)" title="See the German word and type the English translation">Translation</button>
+      <button class="type-btn" data-type="multiple-choice" onclick="selectType(this)" title="Choose the correct answer from 4 options">Multiple Choice</button>
     </div>
   </div>
 
   <div class="word-count-display" id="word-count">Select sources to begin</div>
 
   <div class="home-actions">
-    <button class="btn btn-primary btn-block" id="start-btn" disabled onclick="startPractice()">Start Practice</button>
+    <button class="btn btn-primary btn-block" id="start-btn" disabled onclick="startPractice()">Full Practice</button>
+    <div class="mode-row">
+      <button class="btn btn-sprint" id="sprint-btn" disabled onclick="startSprint()">🏃 Sprint (10)</button>
+      <button class="btn btn-speed" id="speed-btn" disabled onclick="startSpeedRound()">⚡ Speed Round</button>
+    </div>
     <button class="btn btn-review btn-block btn-small" id="review-btn" style="display:none;" onclick="startSmartReview()">🔄 Smart Review</button>
     <div class="home-actions-row">
       <button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊 My Progress</button>
@@ -875,6 +926,10 @@ body.playing h1, body.playing .subtitle { display: none; }
 
 <!-- PRACTICE SCREEN -->
 <div id="practice-screen" class="screen">
+  <div class="speed-timer-wrap" id="speed-timer-wrap">
+    <div class="speed-timer-text" id="speed-timer-text">60</div>
+    <div class="speed-timer-bg"><div class="speed-timer-bar" id="speed-timer-bar" style="width:100%"></div></div>
+  </div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
     <div class="progress-text"><span id="progress-count">0/0</span><span id="progress-score">Score: 0</span></div>
@@ -882,7 +937,8 @@ body.playing h1, body.playing .subtitle { display: none; }
   <div class="quiz-card" id="quiz-card">
     <div class="task-type-label" id="task-label">Context</div>
     <div class="quiz-prompt" id="quiz-prompt"></div>
-    <div class="answer-row">
+    <div class="mc-grid" id="mc-grid" style="display:none;"></div>
+    <div class="answer-row" id="answer-row">
       <input type="text" class="answer-input" id="answer-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="none" spellcheck="false">
     </div>
     <div class="feedback" id="feedback"></div>
@@ -908,6 +964,7 @@ body.playing h1, body.playing .subtitle { display: none; }
   </div>
   <div class="results-actions">
     <button class="btn btn-primary" onclick="retryWrong()">Practice Wrong Words</button>
+    <button class="btn btn-sprint sprint-again" id="sprint-again-btn" style="display:none;" onclick="startSprint()">🏃 Another Sprint</button>
     <button class="btn btn-secondary" onclick="goHome()">New Practice</button>
   </div>
 </div>
@@ -1572,11 +1629,17 @@ let state = {
   answered: false,
   results: [],
   currentType: null,
+  isSprint: false,
+  isSpeedRound: false,
+  isMultipleChoice: false,
+  speedTimer: null,
+  speedTimeLeft: 60,
+  sprintCount: 0,
 };
 
 
 // ===== GAMIFICATION =====
-const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7 };
+const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
 const BADGE_DEFS = [
   { id:'first-session', icon:'⭐', name:'First Steps', desc:'Complete your first session', check:(d)=>(d.totalSessions||0)>=1 },
   { id:'ten-sessions', icon:'🔥', name:'On Fire', desc:'Complete 10 sessions', check:(d)=>(d.totalSessions||0)>=10 },
@@ -1591,6 +1654,9 @@ const BADGE_DEFS = [
   { id:'all-types', icon:'🎨', name:'Explorer', desc:'Try all 5 exercise types', check:(d)=>(d.exerciseTypesUsed||[]).length>=5 },
   { id:'daily-first', icon:'🌅', name:'Daily Challenger', desc:'Complete your first daily challenge', check:(d)=>Object.keys(d.dailyChallengeLog||{}).length>=1 },
   { id:'daily-perfect', icon:'✨', name:'Daily Genius', desc:'Score 100% on a daily challenge', check:(d)=>Object.values(d.dailyChallengeLog||{}).some(v=>v.pct===100) },
+  { id:'speed-demon', icon:'⚡', name:'Speed Demon', desc:'Get 15+ correct in a Speed Round', check:(d)=>(d.bestSpeedRound||0)>=15 },
+  { id:'sprinter', icon:'🏃', name:'Sprinter', desc:'Complete 10 sprints', check:(d)=>(d.totalSprints||0)>=10 },
+  { id:'sharp-eye', icon:'👁️', name:'Sharp Eye', desc:'Get 20+ correct in Multiple Choice', check:(d)=>(d.bestMCStreak||0)>=20 },
 ];
 
 function dailySeed(dateStr, classId) {
@@ -2047,16 +2113,22 @@ async function saveSessionResults() {
     const usedTypes = [...new Set(state.results.map(r => r.type))];
     const allUsed = [...new Set([...(state.studentData.exerciseTypesUsed || []), ...usedTypes])];
 
-    await studentsRef.doc(state.studentId).update({
+    const updateObj = {
       totalSessions: firebase.firestore.FieldValue.increment(1),
       totalCorrect: firebase.firestore.FieldValue.increment(state.score),
-      totalAnswered: firebase.firestore.FieldValue.increment(state.words.length),
+      totalAnswered: firebase.firestore.FieldValue.increment(state.results.length || state.words.length),
       lastActive: firebase.firestore.FieldValue.serverTimestamp(),
       xp: firebase.firestore.FieldValue.increment(earnedXP),
       streak: streakUpdate.streak,
       lastSessionDate: streakUpdate.lastSessionDate,
       exerciseTypesUsed: allUsed
-    });
+    };
+    if (state.isSprint) updateObj.totalSprints = firebase.firestore.FieldValue.increment(1);
+    if (state.isSpeedRound || state._wasSpeedRound) {
+      const best = Math.max(state.studentData.bestSpeedRound || 0, state.score);
+      updateObj.bestSpeedRound = best;
+    }
+    await studentsRef.doc(state.studentId).update(updateObj);
     state.studentData.xp = (state.studentData.xp || 0) + earnedXP;
     state.studentData.streak = streakUpdate.streak;
     state.studentData.lastSessionDate = streakUpdate.lastSessionDate;
@@ -2430,12 +2502,18 @@ function updateWordCount() {
   state.selectedSources.forEach(src => { count += vocabData[src].length; });
   const el = document.getElementById('word-count');
   const startBtn = document.getElementById('start-btn');
+  const sprintBtn = document.getElementById('sprint-btn');
+  const speedBtn = document.getElementById('speed-btn');
   if (count === 0) {
     el.innerHTML = 'Select sources to begin';
     startBtn.disabled = true;
+    sprintBtn.disabled = true;
+    speedBtn.disabled = true;
   } else {
     el.innerHTML = `<strong>${count}</strong> words selected`;
     startBtn.disabled = false;
+    sprintBtn.disabled = false;
+    speedBtn.disabled = false;
   }
 }
 
@@ -2458,6 +2536,10 @@ function startPractice() {
   state.score = 0;
   state.results = [];
   state.answered = false;
+  state.isSprint = false;
+  state.isSpeedRound = false;
+  state.isMultipleChoice = state.exerciseType === 'multiple-choice';
+  resetSpeedTimer();
   document.body.classList.add('playing');
   showScreen('practice-screen');
   showWord();
@@ -2480,8 +2562,182 @@ function practiceWeakWords() {
   startPracticeWith(weak);
 }
 
+// ===== SPRINT MODE =====
+function startSprint() {
+  state.words = [];
+  state.selectedSources.forEach(src => {
+    vocabData[src].forEach(word => { state.words.push({ ...word, source: src }); });
+  });
+  shuffle(state.words);
+  state.words = state.words.slice(0, 10);
+  state.currentIdx = 0;
+  state.score = 0;
+  state.results = [];
+  state.answered = false;
+  state.isSprint = true;
+  state.isSpeedRound = false;
+  state.isMultipleChoice = state.exerciseType === 'multiple-choice';
+  resetSpeedTimer();
+  document.body.classList.add('playing');
+  showScreen('practice-screen');
+  showWord();
+}
+
+// ===== SPEED ROUND =====
+function startSpeedRound() {
+  state.words = [];
+  state.selectedSources.forEach(src => {
+    vocabData[src].forEach(word => { state.words.push({ ...word, source: src }); });
+  });
+  shuffle(state.words);
+  // Lots of words — keep going until time runs out
+  state.words = state.words.slice(0, 200);
+  state.currentIdx = 0;
+  state.score = 0;
+  state.results = [];
+  state.answered = false;
+  state.isSprint = false;
+  state.isSpeedRound = true;
+  state.isMultipleChoice = false;
+  state.speedTimeLeft = 60;
+  document.body.classList.add('playing');
+  showScreen('practice-screen');
+  // Show & start timer
+  const wrap = document.getElementById('speed-timer-wrap');
+  wrap.classList.add('active');
+  document.getElementById('speed-timer-text').textContent = '60';
+  document.getElementById('speed-timer-bar').style.width = '100%';
+  document.getElementById('skip-btn').style.display = 'none';
+  state.speedTimer = setInterval(() => {
+    state.speedTimeLeft--;
+    const txt = document.getElementById('speed-timer-text');
+    txt.textContent = state.speedTimeLeft;
+    if (state.speedTimeLeft <= 10) txt.classList.add('urgent');
+    document.getElementById('speed-timer-bar').style.width = (state.speedTimeLeft / 60 * 100) + '%';
+    if (state.speedTimeLeft <= 0) {
+      clearInterval(state.speedTimer);
+      state.speedTimer = null;
+      endSpeedRound();
+    }
+  }, 1000);
+  showWord();
+}
+
+function resetSpeedTimer() {
+  if (state.speedTimer) { clearInterval(state.speedTimer); state.speedTimer = null; }
+  document.getElementById('speed-timer-wrap').classList.remove('active');
+  document.getElementById('speed-timer-text').classList.remove('urgent');
+  document.getElementById('skip-btn').style.display = '';
+}
+
+function endSpeedRound() {
+  resetSpeedTimer();
+  state.isSpeedRound = false;
+  // Trim results to only what was answered
+  state.words = state.words.slice(0, state.currentIdx);
+  endPractice();
+}
+
+// ===== MULTIPLE CHOICE =====
+function getDistractors(word, count) {
+  const correctCf = getContextForm(word).toLowerCase();
+  const pool = [];
+  for (const [src, entries] of Object.entries(vocabData)) {
+    for (const e of entries) {
+      const cf = getContextForm(e).toLowerCase();
+      if (cf !== correctCf && cf !== word.w.toLowerCase()) pool.push(e);
+    }
+  }
+  shuffle(pool);
+  return pool.slice(0, count);
+}
+
+function getMCAnswer(word, type) {
+  if (type === 'translation' || type === 'mc-translation') return getContextForm(word);
+  if (type === 'context' || type === 'context-hard' || type === 'mc-context') return getContextForm(word);
+  return word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim();
+}
+
+function renderMultipleChoice(word, type) {
+  const grid = document.getElementById('mc-grid');
+  const answerRow = document.getElementById('answer-row');
+  const actions = document.getElementById('quiz-actions');
+  grid.style.display = 'grid';
+  answerRow.style.display = 'none';
+  actions.style.display = 'none';
+  grid.innerHTML = '';
+
+  const correctAnswer = getMCAnswer(word, type);
+  const distractors = getDistractors(word, 3);
+  const options = [
+    { text: correctAnswer, correct: true },
+    ...distractors.map(d => ({ text: getMCAnswer(d, type), correct: false }))
+  ];
+  shuffle(options);
+
+  // Deduplicate — if any distractor matches correct, replace it
+  const seen = new Set();
+  for (const opt of options) {
+    const key = opt.text.toLowerCase().trim();
+    if (seen.has(key)) {
+      opt.text = '—';
+      opt.correct = false;
+    }
+    seen.add(key);
+  }
+
+  for (const opt of options) {
+    const btn = document.createElement('button');
+    btn.className = 'mc-option';
+    btn.textContent = opt.text;
+    btn.onclick = () => handleMCClick(btn, opt.correct, word, type, grid);
+    grid.appendChild(btn);
+  }
+}
+
+function handleMCClick(btn, correct, word, type, grid) {
+  if (state.answered) return;
+  state.answered = true;
+  const allBtns = grid.querySelectorAll('.mc-option');
+  allBtns.forEach(b => b.classList.add('disabled'));
+
+  if (correct) {
+    btn.classList.add('correct');
+    state.score++;
+    state.results.push({ word, correct: true, userAnswer: btn.textContent, type: state.currentType });
+    if (state.isSpeedRound) showXPFloat();
+    setTimeout(() => { nextWord(); }, state.isSpeedRound ? 400 : 800);
+  } else {
+    btn.classList.add('wrong');
+    allBtns.forEach(b => { if (!b.classList.contains('wrong')) b.classList.add('reveal'); });
+    // Find correct button and highlight
+    const correctAnswer = getMCAnswer(word, type).toLowerCase().trim();
+    allBtns.forEach(b => { if (b.textContent.toLowerCase().trim() === correctAnswer) b.classList.add('correct'); });
+    state.results.push({ word, correct: false, userAnswer: btn.textContent, type: state.currentType });
+    setTimeout(() => { nextWord(); }, state.isSpeedRound ? 1000 : 1500);
+  }
+}
+
+function showXPFloat() {
+  const card = document.getElementById('quiz-card');
+  const float = document.createElement('div');
+  float.className = 'xp-float';
+  float.textContent = '+' + (XP_TABLE[state.currentType] || 5) + ' XP';
+  card.style.position = 'relative';
+  card.appendChild(float);
+  setTimeout(() => float.remove(), 800);
+}
+
 function getTaskType() {
   if (isDailyChallenge && dailyChallengeTypes.length > 0) return dailyChallengeTypes[state.currentIdx % dailyChallengeTypes.length];
+  if (state.exerciseType === 'multiple-choice') {
+    const mcTypes = ['mc-context', 'mc-definition', 'mc-translation'];
+    return mcTypes[Math.floor(Math.random() * mcTypes.length)];
+  }
+  if (state.isSpeedRound) {
+    const easyTypes = ['context', 'definition', 'translation'];
+    return easyTypes[Math.floor(Math.random() * easyTypes.length)];
+  }
   if (state.exerciseType !== 'mix') return state.exerciseType;
   const types = ['context', 'context-hard', 'definition', 'definition-hard', 'translation'];
   return types[Math.floor(Math.random() * types.length)];
@@ -2518,32 +2774,45 @@ function getFirstLetterHint(word, showLetterCount) {
 }
 
 function showWord() {
-  if (state.currentIdx >= state.words.length) { endPractice(); return; }
+  if (state.isSpeedRound && state.speedTimeLeft <= 0) return;
+  if (state.currentIdx >= state.words.length) {
+    if (state.isSpeedRound) { endSpeedRound(); return; }
+    endPractice(); return;
+  }
   const word = state.words[state.currentIdx];
   const type = getTaskType();
   state.currentType = type;
   state.answered = false;
 
-  const pct = (state.currentIdx / state.words.length) * 100;
+  const isMC = type.startsWith('mc-');
+  const pct = state.isSpeedRound ? 0 : (state.currentIdx / state.words.length) * 100;
   document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-count').textContent = `${state.currentIdx + 1}/${state.words.length}`;
+  document.getElementById('progress-count').textContent = state.isSpeedRound ? `#${state.currentIdx + 1}` : `${state.currentIdx + 1}/${state.words.length}`;
   document.getElementById('progress-score').textContent = `Score: ${state.score}`;
 
+  // Reset MC/input display
+  document.getElementById('mc-grid').style.display = isMC ? 'grid' : 'none';
+  document.getElementById('mc-grid').innerHTML = '';
+  document.getElementById('answer-row').style.display = isMC ? 'none' : '';
+  document.getElementById('quiz-actions').style.display = isMC ? 'none' : '';
+
   const label = document.getElementById('task-label');
-  const isContext = type === 'context' || type === 'context-hard';
-  const isDef = type === 'definition' || type === 'definition-hard';
-  label.className = 'task-type-label ' + (isContext ? 'context' : isDef ? 'definition' : type);
-  label.textContent = isContext ? 'Complete the sentence' : isDef ? 'Guess the word' : 'Translate to English';
+  const baseType = isMC ? type.replace('mc-', '') : type;
+  const isContext = baseType === 'context' || baseType === 'context-hard';
+  const isDef = baseType === 'definition' || baseType === 'definition-hard';
+  label.className = 'task-type-label ' + (isContext ? 'context' : isDef ? 'definition' : baseType);
+  label.textContent = isMC ? 'Choose the answer' : isContext ? 'Complete the sentence' : isDef ? 'Guess the word' : 'Translate to English';
 
   const prompt = document.getElementById('quiz-prompt');
   if (isContext) {
-    const showLetterCount = type === 'context';
-    const contextForm = getContextForm(word);
-    if (showLetterCount) {
+    if (isMC) {
+      prompt.innerHTML = word.s.replace('_____', '<span class="gap">_____</span>');
+    } else if (type === 'context') {
+      const contextForm = getContextForm(word);
       const hint = getFirstLetterHint(contextForm, true);
       prompt.innerHTML = word.s.replace('_____', `<span class="gap">${hint}</span>`);
     } else {
-      // Hard mode: first letter + one solid CSS line
+      const contextForm = getContextForm(word);
       const parts = contextForm.trim().split(/(\s+|-)/);
       const small = new Set(['to','a','an','the','in','on','of','for','at','up','out','by','with','off','down']);
       const allWords = parts.filter(x => !/^[\s-]+$/.test(x));
@@ -2552,7 +2821,9 @@ function showWord() {
       prompt.innerHTML = word.s.replace('_____', `<span class="gap gap-hard">${letter}<span class="gap-line"></span></span>`);
     }
   } else if (isDef) {
-    if (type === 'definition') {
+    if (isMC) {
+      prompt.innerHTML = `<em>${word.d}</em>`;
+    } else if (type === 'definition') {
       // Easy mode: show first letter pattern + word count
       const cleaned = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
       const answerWords = cleaned.split(' ').filter(w => w.length > 0);
@@ -2574,19 +2845,25 @@ function showWord() {
 
   document.getElementById('source-tag').textContent = word.source;
 
-  const input = document.getElementById('answer-input');
-  input.value = '';
-  input.className = 'answer-input';
-  input.disabled = false;
-  input.focus();
+  if (isMC) {
+    renderMultipleChoice(word, type);
+  } else {
+    const input = document.getElementById('answer-input');
+    input.value = '';
+    input.className = 'answer-input';
+    input.disabled = false;
+    input.focus();
+  }
 
   document.getElementById('feedback').className = 'feedback';
   document.getElementById('feedback').innerHTML = '';
 
-  document.getElementById('check-btn').style.display = '';
-  document.getElementById('skip-btn').style.display = '';
-  document.getElementById('check-btn').textContent = 'Check';
-  document.getElementById('check-btn').onclick = checkAnswer;
+  if (!isMC) {
+    document.getElementById('check-btn').style.display = '';
+    document.getElementById('skip-btn').style.display = state.isSpeedRound ? 'none' : '';
+    document.getElementById('check-btn').textContent = 'Check';
+    document.getElementById('check-btn').onclick = checkAnswer;
+  }
 }
 
 function normalizeAnswer(str) {
@@ -2609,6 +2886,10 @@ function checkAnswer() {
     input.className = 'answer-input correct';
     feedback.className = 'feedback correct';
     feedback.innerHTML = 'Correct!';
+    if (state.isSpeedRound) {
+      state.results.push({ word, correct: true, userAnswer, type: state.currentType });
+      showXPFloat(); setTimeout(nextWord, 400); return;
+    }
   } else {
     input.className = 'answer-input wrong';
     feedback.className = 'feedback wrong';
@@ -2622,6 +2903,10 @@ function checkAnswer() {
     }
     else { displayAnswer = word.w; }
     feedback.innerHTML = `The correct answer is: <span class="correct-answer">${displayAnswer}</span>`;
+    if (state.isSpeedRound) {
+      state.results.push({ word, correct: false, userAnswer, type: state.currentType });
+      setTimeout(nextWord, 1200); return;
+    }
   }
 
   state.results.push({ word, correct, userAnswer, type: state.currentType });
@@ -2680,15 +2965,31 @@ function skipWord() {
 function nextWord() { state.currentIdx++; showWord(); }
 
 async function endPractice() {
+  resetSpeedTimer();
   document.body.classList.remove('playing');
   showScreen('results-screen');
 
-  const pct = state.words.length > 0 ? Math.round((state.score / state.words.length) * 100) : 0;
+  const total = state.results.length || state.words.length;
+  const pct = total > 0 ? Math.round((state.score / total) * 100) : 0;
   const sessionXP = calculateSessionXP(state.results);
-  document.getElementById('final-score').textContent = pct + '%';
-  document.getElementById('final-label').textContent = `${state.score} of ${state.words.length} correct`;
+
+  // Mode-specific header
+  if (state.isSprint) {
+    document.getElementById('final-score').textContent = pct + '%';
+    document.getElementById('final-label').textContent = `Sprint: ${state.score} of ${total} correct`;
+    state.sprintCount++;
+  } else if (state.isSpeedRound) {
+    document.getElementById('final-score').textContent = state.score + '';
+    document.getElementById('final-label').textContent = `Speed Round: ${state.score} correct in 60s`;
+  } else {
+    document.getElementById('final-score').textContent = pct + '%';
+    document.getElementById('final-label').textContent = `${state.score} of ${total} correct`;
+  }
+
   document.getElementById('save-status').innerHTML = `<span style="color:var(--accent2);font-weight:700;">+${sessionXP} XP earned!</span>`;
-  document.getElementById('save-status').textContent = '';
+
+  // Show/hide sprint again button
+  document.getElementById('sprint-again-btn').style.display = state.isSprint ? '' : 'none';
 
   const list = document.getElementById('results-list');
   list.innerHTML = '';
@@ -2704,10 +3005,21 @@ async function endPractice() {
     list.appendChild(item);
   }
 
+  // Update mode-specific stats for badges before saving
+  const wasSpeedRound = state.isSpeedRound;
+  if (wasSpeedRound && state.studentData) {
+    state.studentData.bestSpeedRound = Math.max(state.studentData.bestSpeedRound || 0, state.score);
+    state._wasSpeedRound = true;
+  }
+  if (state.isSprint && state.studentData) {
+    state.studentData.totalSprints = (state.studentData.totalSprints || 0) + 1;
+  }
   await saveSessionResults();
+  state._wasSpeedRound = false;
   if (isDailyChallenge) await saveDailyChallengeResult();
   await checkBadges(state.studentData, state.results);
   isDailyChallenge = false;
+  state.isSpeedRound = false;
 }
 
 function retryWrong() {
@@ -2717,6 +3029,9 @@ function retryWrong() {
 }
 
 function goHome() {
+  resetSpeedTimer();
+  state.isSprint = false;
+  state.isSpeedRound = false;
   document.body.classList.remove('playing');
   showHomeScreen();
 }
