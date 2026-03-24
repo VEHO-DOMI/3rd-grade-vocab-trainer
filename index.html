@@ -514,7 +514,7 @@ h1 span {
 
 /* Responsive — Desktop */
 @media (min-width: 768px) {
-  .screen { max-width: 680px; padding: 0 2rem; }
+  .screen { max-width: 780px; padding: 0 2rem; }
   h1 { font-size: 2.6rem; margin: 2rem 0 0.2rem; }
   .subtitle { font-size: 0.82rem; margin-bottom: 0.5rem; letter-spacing: 0.25em; }
   .school-name { font-size: 0.7rem; max-width: 420px; margin-bottom: 2rem; }
@@ -601,7 +601,43 @@ h1 span {
 
 /* Large desktop */
 @media (min-width: 1024px) {
-  .screen { max-width: 760px; }
+  .screen { max-width: 900px; padding: 0 2.5rem; }
+  .screen.active { align-items: stretch; }
+  h1 { font-size: 3rem; }
+  .welcome-bar { max-width: 900px; width: 100%; }
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .stat-card { padding: 1.2rem 1rem; }
+  .stat-value { font-size: 2rem; }
+  .source-grid { grid-template-columns: repeat(5, 1fr); gap: 0.7rem; }
+  .source-btn { padding: 1rem 0.9rem; font-size: 0.92rem; }
+  .type-grid { justify-content: center; }
+  .home-actions { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .mode-row { max-width: 640px; margin-left: auto; margin-right: auto; }
+  #wotd-card { max-width: 640px; margin-left: auto; margin-right: auto; }
+  #weekly-goal { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .quiz-card { max-width: 720px; margin-left: auto; margin-right: auto; padding: 2.4rem 2.5rem; }
+  .quiz-prompt { font-size: 1.35rem; }
+  .quiz-prompt .german-word { font-size: 1.7rem; }
+  .answer-input { font-size: 1.15rem; }
+  .login-card { max-width: 480px; padding: 3rem 2.5rem; }
+  .results-list { max-width: 720px; margin-left: auto; margin-right: auto; width: 100%; }
+  .mc-grid { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .progress-overall { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+  .badge-row { justify-content: center; }
+  #rank-display { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .progress-ring-wrap svg { width: 220px; height: 220px; }
+}
+
+/* Extra-large desktop */
+@media (min-width: 1440px) {
+  .screen { max-width: 1080px; }
+  h1 { font-size: 3.4rem; }
+  .source-grid { grid-template-columns: repeat(6, 1fr); }
+  .stat-value { font-size: 2.3rem; }
+  .quiz-card { padding: 3rem 3.5rem; }
+  .quiz-prompt { font-size: 1.45rem; }
+  .answer-input { font-size: 1.25rem; padding: 1.1rem 1.4rem; }
+}
   h1 { font-size: 3rem; }
   .source-grid { grid-template-columns: repeat(4, 1fr); }
   .quiz-card { padding: 2.4rem 2.5rem; }
