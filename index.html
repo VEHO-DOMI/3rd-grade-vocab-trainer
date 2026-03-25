@@ -4164,8 +4164,20 @@ function handleBattleUpdate(data) {
 }
 
 function renderBattleWaiting(data) {
-  const area = document.getElementById('battle-area');
-  if (area) area.innerHTML = '<div style="text-align:center;padding:40px 20px;"><div style="font-size:36px;margin-bottom:12px;animation:comboPulse 1.5s ease-in-out infinite;">\u2694\uFE0F</div><div style="font-size:16px;opacity:0.7;">Waiting for opponent to join...</div></div>';
+  // Hide game elements, show waiting message in prompt area
+  const cdEl = document.getElementById('battle-countdown');
+  const promptEl = document.getElementById('battle-prompt');
+  const inputEl = document.getElementById('battle-input');
+  const feedbackEl = document.getElementById('battle-feedback');
+  const timerEl = document.getElementById('battle-timer-bar');
+  if (cdEl) cdEl.style.display = 'none';
+  if (inputEl) inputEl.style.display = 'none';
+  if (timerEl) timerEl.style.display = 'none';
+  if (feedbackEl) feedbackEl.textContent = '';
+  if (promptEl) {
+    promptEl.style.display = '';
+    promptEl.innerHTML = '<div style="padding:40px 0;"><div style="font-size:36px;margin-bottom:12px;animation:comboPulse 1.5s ease-in-out infinite;">\u2694\uFE0F</div><div style="font-size:16px;opacity:0.7;">Waiting for opponent to join...</div></div>';
+  }
 }
 
 function renderBattleCountdown(value) {
@@ -4199,6 +4211,8 @@ function renderBattleRound(data) {
   if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.color = ''; }
   if (promptEl) { promptEl.style.display = ''; promptEl.innerHTML = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Translate to English</div><div style="font-size:24px;font-weight:700;">' + escapeHtml(word.g) + '</div>'; }
   if (inputEl) { inputEl.style.display = ''; inputEl.value = ''; inputEl.disabled = false; inputEl.focus(); }
+  const timerBar = document.getElementById('battle-timer-bar');
+  if (timerBar) timerBar.style.display = '';
   renderBattleScores(data);
   clearTimeout(state._battleRoundTimer);
   state._battleRoundTimer = setTimeout(() => { if (!state.battleAnswered) submitBattleAnswer(''); }, 15000);
@@ -4340,6 +4354,11 @@ function leaveBattle() {
   clearTimeout(state._battleRoundTimer);
   state.battleRoom = null; state.battleRole = null; state.battleData = null;
   state.battleRound = 0; state.battleAnswered = false; state._roomListener = null;
+  // Restore battle-area DOM if it was replaced by results
+  const area = document.getElementById('battle-area');
+  if (area && !document.getElementById('battle-countdown')) {
+    area.innerHTML = '<div id="battle-countdown" style="display:none;"></div><div id="battle-prompt" style="margin-bottom:16px;"></div><input type="text" id="battle-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer..." style="width:100%;padding:12px 16px;border-radius:10px;font-size:16px;text-align:center;box-sizing:border-box;" onkeydown="if(event.key===\'Enter\')submitBattleAnswer(this.value)"><div id="battle-feedback" style="margin-top:12px;font-size:15px;font-weight:600;min-height:24px;"></div><div id="battle-timer-bar" style="margin-top:12px;height:4px;border-radius:2px;overflow:hidden;"><div id="battle-timer-fill" style="height:100%;border-radius:2px;width:100%;"></div></div>';
+  }
   showScreen('home-screen');
 }
 
