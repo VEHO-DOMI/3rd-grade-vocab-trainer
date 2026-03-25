@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1.0 – 2026-03-21 · 3rd Grade MORE! 3 -->
+<!-- v2.0 – 2026-03-25 · DomiVocab 3rd Grade -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,9 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b1120">
-<title>3rd Grade Vocab Trainer</title>
+<title>DomiVocab – 3rd Grade</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -65,22 +66,36 @@ body {
 }
 
 /* Typography */
-h1 {
-  font-size: 2rem; margin: 1.2rem 0 0.15rem; font-weight: 900; letter-spacing: -0.04em;
-  line-height: 1.1;
+/* Header — DomiVocab branding */
+.header-container {
+  text-align: center; padding: 52px 32px 40px; position: relative; overflow: hidden; border-radius: 24px;
 }
-h1 span {
-  background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent) 40%, var(--accent2) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+.header-glow {
+  position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+  width: 280px; height: 280px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(37,99,235,0.12), transparent 70%);
 }
-.subtitle {
-  color: var(--muted); font-size: 0.72rem; margin-bottom: 0.4rem; letter-spacing: 0.2em;
-  text-transform: uppercase; font-weight: 600;
+.header-title {
+  font-family: 'Fredoka', sans-serif; font-size: 56px; font-weight: 700; margin: 0;
+  line-height: 1; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; color: transparent; display: inline-block; letter-spacing: -1px;
+  position: relative; background-image: linear-gradient(140deg, #3b82f6, #8ba4cc 50%, #d4943a 90%);
 }
-.school-name {
-  color: rgba(245,158,11,0.35); font-size: 0.62rem; text-align: center;
-  max-width: 320px; line-height: 1.4; margin-bottom: 1.6rem; font-weight: 500;
+.header-tagline {
+  font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 600;
+  letter-spacing: 5px; text-transform: uppercase; margin: 10px 0 0; color: rgba(255,255,255,0.28);
 }
+.header-grade {
+  font-family: 'Fredoka', sans-serif; font-size: 18px; font-weight: 600;
+  margin: 16px 0 0; color: rgba(255,255,255,0.42);
+}
+.header-school {
+  font-family: 'Quicksand', sans-serif; font-size: 10.5px; font-weight: 500;
+  line-height: 1.6; margin: 14px 0 0; letter-spacing: 0.3px; color: rgba(255,255,255,0.16);
+}
+h1 { display: none; }
+.subtitle { display: none; }
+.school-name { display: none; }
 
 /* Screen transitions */
 .screen { display: none; width: 100%; max-width: 480px; padding: 0 1rem; }
@@ -515,7 +530,8 @@ h1 span {
 
 /* Responsive — Mobile */
 @media (max-width: 600px) {
-  h1 { font-size: 1.7rem; }
+  .header-title { font-size: 40px; }
+  .header-container { padding: 36px 20px 28px; }
   .source-grid { gap: 0.35rem; }
   .source-btn { padding: 0.65rem 0.4rem; font-size: 0.78rem; }
   .quiz-card { padding: 1.3rem 1rem; }
@@ -534,9 +550,8 @@ h1 span {
 /* Responsive — Desktop */
 @media (min-width: 768px) {
   .screen { max-width: 780px; padding: 0 2rem; }
-  h1 { font-size: 2.6rem; margin: 2rem 0 0.2rem; }
-  .subtitle { font-size: 0.82rem; margin-bottom: 0.5rem; letter-spacing: 0.25em; }
-  .school-name { font-size: 0.7rem; max-width: 420px; margin-bottom: 2rem; }
+  .header-title { font-size: 64px; }
+  .header-container { padding: 56px 40px 44px; }
 
   .welcome-bar { margin-bottom: 1.2rem; }
   .welcome-name { font-size: 1.4rem; }
@@ -622,7 +637,7 @@ h1 span {
 @media (min-width: 1024px) {
   .screen { max-width: 900px; padding: 0 2.5rem; }
   .screen.active { align-items: stretch; }
-  h1 { font-size: 3rem; }
+  .header-title { font-size: 72px; }
   .welcome-bar { max-width: 900px; width: 100%; }
   .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
   .stat-card { padding: 1.2rem 1rem; }
@@ -650,14 +665,14 @@ h1 span {
 /* Extra-large desktop */
 @media (min-width: 1440px) {
   .screen { max-width: 1080px; }
-  h1 { font-size: 3.4rem; }
+  .header-title { font-size: 80px; }
   .source-grid { grid-template-columns: repeat(6, 1fr); }
   .stat-value { font-size: 2.3rem; }
   .quiz-card { padding: 3rem 3.5rem; }
   .quiz-prompt { font-size: 1.45rem; }
   .answer-input { font-size: 1.25rem; padding: 1.1rem 1.4rem; }
 }
-  h1 { font-size: 3rem; }
+  .header-title { font-size: 72px; }
   .source-grid { grid-template-columns: repeat(4, 1fr); }
   .quiz-card { padding: 2.4rem 2.5rem; }
   .quiz-prompt { font-size: 1.35rem; }
@@ -666,7 +681,7 @@ h1 span {
   .login-card { max-width: 460px; padding: 3rem 2.5rem; }
 }
 
-body.playing h1, body.playing .subtitle { display: none; }
+body.playing .header-container { display: none; }
 
 /* Bottom action area */
 .home-actions { width: 100%; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.2rem; }
@@ -888,9 +903,13 @@ body.playing h1, body.playing .subtitle { display: none; }
 </head>
 <body>
 
-<h1><span>3rd Grade Vocab Trainer</span></h1>
-<p class="subtitle">Practice &bull; Learn &bull; Master</p>
-<p class="school-name">VEHO &ndash; Gymnasium und wirtschaftskundliches Realgymnasium der Dominikanerinnen</p>
+<div class="header-container">
+  <div class="header-glow"></div>
+  <h1 class="header-title" style="display:inline-block;">DomiVocab</h1>
+  <p class="header-tagline">Learn · Play · Win</p>
+  <p class="header-grade">3rd Grade</p>
+  <p class="header-school">VEHO – Gymnasium und wirtschaftskundliches<br>Realgymnasium der Dominikanerinnen</p>
+</div>
 
 <!-- CLASS SELECTION SCREEN -->
 <div id="section-screen" class="screen active">
