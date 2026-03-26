@@ -4326,10 +4326,10 @@ function renderBattleRound(data) {
   const feedbackEl = document.getElementById('battle-feedback');
   const roundEl = document.getElementById('battle-round-num');
   if (roundEl) roundEl.textContent = 'Round ' + round + ' of 10';
-  const modeLabelEl = document.getElementById('battle-mode-label');
-  if (modeLabelEl) { const ml = {translation:'🌍 Translation Duel',definition:'📖 Definition Duel',context:'📝 Context Clash'}; modeLabelEl.textContent = ml[bMode] || ml.translation; }
   if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.color = ''; }
   const bMode = data.mode || 'translation';
+  const modeLabelEl = document.getElementById('battle-mode-label');
+  if (modeLabelEl) { const ml = {translation:'🌍 Translation Duel',definition:'📖 Definition Duel',context:'📝 Context Clash'}; modeLabelEl.textContent = ml[bMode] || ml.translation; }
   let promptHtml = '';
   if (bMode === 'definition') {
     promptHtml = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Guess the word</div><div style="font-size:20px;font-style:italic;">' + escapeHtml(word.d) + '</div>';
