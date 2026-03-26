@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2.0 – 2026-03-25 · DomiVocab 3rd Grade -->
+<!-- v2.1 – 2026-03-26 · DomiVocab 3rd Grade · Battle modes fix -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1307,6 +1307,7 @@ function setClassId(id) {
   CLASS_ID = id;
   classRef = db.collection('classes').doc(CLASS_ID);
   studentsRef = classRef.collection('students');
+  if (typeof initBattleRefs === 'function') initBattleRefs();
 }
 
 // ===== VOCABULARY DATA =====
@@ -4046,10 +4047,18 @@ document.getElementById('section-pin')?.addEventListener('keydown', e => { if (e
 
 // ===== BATTLE SYSTEM =====
 const rtdb = firebase.database();
-const battleRoot = rtdb.ref('battles/' + CLASS_ID);
-const presenceRef = battleRoot.child('presence');
-const invitesRef = battleRoot.child('invites');
-const roomsRef = battleRoot.child('rooms');
+let battleRoot = null;
+let presenceRef = null;
+let invitesRef = null;
+let roomsRef = null;
+
+function initBattleRefs() {
+  if (!CLASS_ID) return;
+  battleRoot = rtdb.ref('battles/' + CLASS_ID);
+  presenceRef = battleRoot.child('presence');
+  invitesRef = battleRoot.child('invites');
+  roomsRef = battleRoot.child('rooms');
+}
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -4321,6 +4330,9 @@ function renderBattleRound(data) {
   if (state.battleRound === round) return;
   state.battleRound = round;
   state.battleAnswered = false;
+  // Ensure countdown is hidden when round starts
+  const cdEl = document.getElementById('battle-countdown');
+  if (cdEl) cdEl.style.display = 'none';
   const promptEl = document.getElementById('battle-prompt');
   const inputEl = document.getElementById('battle-input');
   const feedbackEl = document.getElementById('battle-feedback');
