@@ -1159,6 +1159,32 @@ body.playing .header-container { display: none; }
     <div id="level-roadmap"></div>
   </div>
 
+  <div class="card" id="battle-stats-card" style="display:none;">
+    <h3>⚔️ Battle Stats</h3>
+    <div class="progress-overall" style="margin-bottom:12px;">
+      <div class="stat-card">
+        <div class="stat-value" id="bs-played">0</div>
+        <div class="stat-label">Played</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="bs-won" style="color:var(--correct)">0</div>
+        <div class="stat-label">Won</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="bs-winrate">–</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="bs-xp" style="color:#f59e0b">0</div>
+        <div class="stat-label">Battle XP</div>
+      </div>
+    </div>
+    <div id="battle-history-toggle" style="cursor:pointer;font-size:13px;opacity:0.6;text-align:center;padding:8px;" onclick="toggleBattleHistory()">
+      ▼ Recent battles
+    </div>
+    <div id="battle-history-list" style="display:none;"></div>
+  </div>
+
   <div class="card">
     <h3>By Source</h3>
     <div class="source-progress-list" id="source-progress-list"></div>
@@ -1216,6 +1242,7 @@ body.playing .header-container { display: none; }
 <div id="battle-screen" class="screen">
   <div style="max-width:520px;margin:0 auto;padding:16px;width:100%;">
     <div id="battle-header" style="text-align:center;margin-bottom:16px;">
+      <div id="battle-mode-label" style="font-size:12px;opacity:0.4;margin-bottom:2px;"></div>
       <div id="battle-round-num" style="font-size:13px;opacity:0.5;text-transform:uppercase;letter-spacing:1px;">Round 1 of 10</div>
     </div>
     <div id="battle-scores" style="margin-bottom:16px;"></div>
@@ -2979,7 +3006,57 @@ function showProgressScreen() {
   }
 
   renderLevelRoadmap();
+  loadBattleStats();
   showScreen('progress-screen');
+}
+
+async function loadBattleStats() {
+  const card = document.getElementById('battle-stats-card');
+  if (!card || !state.studentId) return;
+  const d = state.studentData || {};
+  const played = d.battlesPlayed || 0;
+  if (played === 0) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  document.getElementById('bs-played').textContent = played;
+  document.getElementById('bs-won').textContent = d.battlesWon || 0;
+  document.getElementById('bs-winrate').textContent = Math.round(((d.battlesWon || 0) / played) * 100) + '%';
+  document.getElementById('bs-xp').textContent = d.battleXpEarned || 0;
+  try {
+    const snap = await studentsRef.doc(state.studentId).collection('battleHistory').orderBy('date', 'desc').limit(20).get();
+    state.battleHistory = [];
+    snap.forEach(doc => state.battleHistory.push(doc.data()));
+    renderBattleHistory();
+  } catch (e) { console.error('Battle history load error:', e); }
+}
+
+function renderBattleHistory() {
+  const list = document.getElementById('battle-history-list');
+  if (!list) return;
+  if (!state.battleHistory || state.battleHistory.length === 0) {
+    list.innerHTML = '<div style="text-align:center;opacity:0.4;padding:12px;font-size:13px;">No battles yet</div>';
+    return;
+  }
+  const modeLabels = {translation:'Translation',definition:'Definition',context:'Context'};
+  const resultEmoji = {win:'\uD83C\uDFC6',loss:'\uD83D\uDCAA',draw:'\uD83E\uDD1D'};
+  const resultColor = {win:'var(--correct)',loss:'var(--wrong)',draw:'var(--muted)'};
+  list.innerHTML = state.battleHistory.map(b => {
+    const d = new Date(b.date);
+    const dateStr = d.toLocaleDateString('en-GB', {month:'short',day:'numeric'});
+    return '<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">' +
+      '<span style="font-size:18px;">' + (resultEmoji[b.result] || '') + '</span>' +
+      '<div style="flex:1;"><div style="font-weight:600;">' + escapeHtml(b.opponent) + '</div><div style="font-size:11px;opacity:0.4;">' + (modeLabels[b.mode] || b.mode) + ' · ' + dateStr + '</div></div>' +
+      '<div style="text-align:right;"><div style="font-weight:700;color:' + (resultColor[b.result] || '') + '">' + b.myScore + '–' + b.theirScore + '</div><div style="font-size:11px;opacity:0.5;">+' + b.xpEarned + ' XP</div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleBattleHistory() {
+  const list = document.getElementById('battle-history-list');
+  const toggle = document.getElementById('battle-history-toggle');
+  if (!list) return;
+  const hidden = list.style.display === 'none';
+  list.style.display = hidden ? '' : 'none';
+  toggle.innerHTML = (hidden ? '▲' : '▼') + ' Recent battles';
 }
 
 // ===== WORD REFERENCE =====
@@ -4054,7 +4131,7 @@ function showBattleLobby(players) {
   overlay.onclick = function(e) { if (e.target === this) this.remove(); };
   let listHtml = '';
   players.forEach(p => {
-    listHtml += '<div data-slug="' + p.slug + '" data-name="' + escapeHtml(p.name) + '" onclick="sendBattleInvite(this.dataset.slug,this.dataset.name);document.getElementById(\'battle-lobby-overlay\').remove();" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">' +
+    listHtml += '<div data-slug="' + p.slug + '" data-name="' + escapeHtml(p.name) + '" onclick="document.getElementById(\'battle-lobby-overlay\').remove();showBattleModeSelect(this.dataset.slug,this.dataset.name);" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">' +
       '<img src="' + avatarSrc(p.avatarId) + '" class="avatar avatar-sm">' +
       '<div style="font-size:15px;font-weight:600;">' + escapeHtml(p.name) + '</div>' +
       '<div style="margin-left:auto;font-size:12px;opacity:0.5;">Challenge \u2192</div>' +
@@ -4068,7 +4145,32 @@ function showBattleLobby(players) {
   document.body.appendChild(overlay);
 }
 
-async function sendBattleInvite(opponentSlug, opponentName) {
+function showBattleModeSelect(slug, name) {
+  const overlay = document.createElement('div');
+  overlay.id = 'battle-mode-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease;';
+  overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+  const modal = document.createElement('div');
+  modal.className = 'battle-modal-bg';
+  modal.style.cssText = 'max-width:340px;width:90%;border-radius:16px;padding:24px;text-align:center;';
+  const modes = [
+    { id: 'translation', icon: '🌍', name: 'Translation Duel', desc: 'German → English' },
+    { id: 'definition', icon: '📖', name: 'Definition Duel', desc: 'Read the definition, guess the word' },
+    { id: 'context', icon: '📝', name: 'Context Clash', desc: 'Fill the blank in the sentence' }
+  ];
+  let btnsHtml = modes.map(m =>
+    '<button onclick="document.getElementById(\'battle-mode-overlay\').remove();sendBattleInvite(\'' + slug + '\',\'' + escapeHtml(name).replace(/'/g, "\\'") + '\',\'' + m.id + '\')" style="width:100%;padding:14px 16px;margin-bottom:8px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);cursor:pointer;text-align:left;display:flex;align-items:center;gap:12px;color:inherit;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.05)\'">' +
+      '<span style="font-size:24px;">' + m.icon + '</span>' +
+      '<div><div style="font-weight:700;font-size:15px;">' + m.name + '</div><div style="font-size:12px;opacity:0.5;">' + m.desc + '</div></div>' +
+    '</button>'
+  ).join('');
+  modal.innerHTML = '<div style="font-size:18px;font-weight:700;margin-bottom:4px;">⚔️ Challenge ' + escapeHtml(name) + '</div><div style="font-size:13px;opacity:0.5;margin-bottom:16px;">Choose a battle mode</div>' + btnsHtml + '<button onclick="document.getElementById(\'battle-mode-overlay\').remove()" style="margin-top:4px;padding:8px 20px;border-radius:10px;font-size:13px;cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,0.1);color:inherit;">Cancel</button>';
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+async function sendBattleInvite(opponentSlug, opponentName, mode) {
+  mode = mode || 'translation';
   const mySlug = state.studentName.toLowerCase().replace(/\s+/g, '-');
   const roomRef = roomsRef.push();
   const roomId = roomRef.key;
@@ -4076,7 +4178,7 @@ async function sendBattleInvite(opponentSlug, opponentName) {
   await roomRef.set({
     players: { p1: mySlug, p2: opponentSlug },
     playerNames: { p1: state.studentName, p2: opponentName },
-    status: 'waiting', round: 0, words: battleWords,
+    status: 'waiting', round: 0, words: battleWords, mode: mode,
     answers: {}, scores: { p1: 0, p2: 0 }, winner: null,
     createdAt: firebase.database.ServerValue.TIMESTAMP
   });
@@ -4084,7 +4186,7 @@ async function sendBattleInvite(opponentSlug, opponentName) {
   await inviteRef.set({
     from: mySlug, fromName: state.studentName,
     to: opponentSlug, toName: opponentName,
-    status: 'pending', roomId: roomId, timestamp: Date.now()
+    status: 'pending', roomId: roomId, mode: mode, timestamp: Date.now()
   });
   showInviteWaiting(opponentName, inviteRef.key);
   setTimeout(async () => {
@@ -4120,7 +4222,9 @@ function showIncomingInvite(inviteKey, invite) {
   const card = document.createElement('div');
   card.className = 'battle-modal-bg';
   card.style.cssText = 'max-width:320px;width:85%;border-radius:16px;padding:28px;text-align:center;animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);';
-  card.innerHTML = '<div style="font-size:36px;margin-bottom:8px;">\u2694\uFE0F</div><div style="font-size:18px;font-weight:700;margin-bottom:4px;">' + escapeHtml(invite.fromName) + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:20px;">challenges you to a battle!</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="declineInvite(window._pendingInvite.key)" style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(220,60,60,0.15);color:#f87171;border:1px solid rgba(220,60,60,0.3);">Decline</button><button onclick="acceptInvite(window._pendingInvite.key,window._pendingInvite.data)" style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(80,200,120,0.15);color:#4ade80;border:1px solid rgba(80,200,120,0.3);">Accept!</button></div>';
+  const modeLabels = {translation:'🌍 Translation Duel',definition:'📖 Definition Duel',context:'📝 Context Clash'};
+  const modeLabel = modeLabels[invite.mode] || modeLabels.translation;
+  card.innerHTML = '<div style="font-size:36px;margin-bottom:8px;">\u2694\uFE0F</div><div style="font-size:18px;font-weight:700;margin-bottom:4px;">' + escapeHtml(invite.fromName) + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:4px;">challenges you to a battle!</div><div style="font-size:13px;padding:6px 14px;border-radius:8px;background:rgba(255,255,255,0.07);display:inline-block;margin-bottom:16px;">' + modeLabel + '</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="declineInvite(window._pendingInvite.key)" style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(220,60,60,0.15);color:#f87171;border:1px solid rgba(220,60,60,0.3);">Decline</button><button onclick="acceptInvite(window._pendingInvite.key,window._pendingInvite.data)" style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(80,200,120,0.15);color:#4ade80;border:1px solid rgba(80,200,120,0.3);">Accept!</button></div>';
   overlay.appendChild(card);
   document.body.appendChild(overlay);
   if (typeof SFX !== 'undefined') SFX.play('combo');
@@ -4222,8 +4326,20 @@ function renderBattleRound(data) {
   const feedbackEl = document.getElementById('battle-feedback');
   const roundEl = document.getElementById('battle-round-num');
   if (roundEl) roundEl.textContent = 'Round ' + round + ' of 10';
+  const modeLabelEl = document.getElementById('battle-mode-label');
+  if (modeLabelEl) { const ml = {translation:'🌍 Translation Duel',definition:'📖 Definition Duel',context:'📝 Context Clash'}; modeLabelEl.textContent = ml[bMode] || ml.translation; }
   if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.color = ''; }
-  if (promptEl) { promptEl.style.display = ''; promptEl.innerHTML = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Translate to English</div><div style="font-size:24px;font-weight:700;">' + escapeHtml(word.g) + '</div>'; }
+  const bMode = data.mode || 'translation';
+  let promptHtml = '';
+  if (bMode === 'definition') {
+    promptHtml = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Guess the word</div><div style="font-size:20px;font-style:italic;">' + escapeHtml(word.d) + '</div>';
+  } else if (bMode === 'context') {
+    const sentenceHtml = word.s ? escapeHtml(word.s).replace('_____', '<span style="border-bottom:2px solid #f59e0b;padding:0 12px;">_____</span>') : '';
+    promptHtml = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Fill in the blank</div><div style="font-size:18px;line-height:1.6;">' + sentenceHtml + '</div>';
+  } else {
+    promptHtml = '<div style="font-size:13px;opacity:0.5;margin-bottom:4px;">Translate to English</div><div style="font-size:24px;font-weight:700;">' + escapeHtml(word.g) + '</div>';
+  }
+  if (promptEl) { promptEl.style.display = ''; promptEl.innerHTML = promptHtml; }
   if (inputEl) { inputEl.style.display = ''; inputEl.value = ''; inputEl.disabled = false; inputEl.focus(); }
   const timerBar = document.getElementById('battle-timer-bar');
   if (timerBar) timerBar.style.display = '';
@@ -4352,12 +4468,24 @@ function renderBattleResults(data) {
 async function saveBattleResults(data, xpEarned) {
   try {
     const slug = state.studentName.toLowerCase().replace(/\s+/g, '-');
+    const myRole = state.battleRole;
+    const opRole = myRole === 'p1' ? 'p2' : 'p1';
     await studentsRef.doc(slug).update({
       xp: state.xp,
       battlesPlayed: firebase.firestore.FieldValue.increment(1),
-      battlesWon: firebase.firestore.FieldValue.increment(data.winner === state.battleRole ? 1 : 0),
+      battlesWon: firebase.firestore.FieldValue.increment(data.winner === myRole ? 1 : 0),
       battleXpEarned: firebase.firestore.FieldValue.increment(xpEarned),
       lastBattle: new Date().toISOString()
+    });
+    // Save individual battle record
+    await studentsRef.doc(slug).collection('battleHistory').add({
+      opponent: data.playerNames[opRole] || 'Unknown',
+      result: data.winner === myRole ? 'win' : data.winner === 'draw' ? 'draw' : 'loss',
+      date: new Date().toISOString(),
+      mode: data.mode || 'translation',
+      myScore: data.scores[myRole] || 0,
+      theirScore: data.scores[opRole] || 0,
+      xpEarned: xpEarned
     });
     if (typeof contributeToWeeklyGoal === 'function') contributeToWeeklyGoal(xpEarned);
   } catch (e) { console.error('Battle save error:', e); }
