@@ -913,6 +913,196 @@ body.playing .header-container { display: none; }
 #battle-timer-fill { background:#f59e0b; }
 #battle-countdown { font-size:64px;font-weight:800; }
 @keyframes countdownPulse { 0%{transform:scale(1.5);opacity:0}50%{opacity:1}100%{transform:scale(1);opacity:1} }
+
+/* Today card */
+.today-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  margin-bottom: 0.8rem;
+  overflow: hidden;
+}
+.today-section {
+  padding: 1rem 1.2rem;
+}
+.today-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.today-label {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--accent-light);
+}
+.today-source, .today-date {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+.today-wotd {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+.today-word {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.today-german {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.today-def {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.today-divider {
+  height: 1px;
+  background: var(--card-border);
+  margin: 0;
+}
+.today-daily-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.8rem;
+}
+
+/* Start Practice button */
+.btn-start-practice {
+  font-size: 1.1rem !important;
+  padding: 1rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Practice Setup Overlay */
+.practice-setup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  z-index: 9000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: fadeIn 0.2s ease;
+}
+.setup-step {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.setup-header {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  padding: 1rem 0 0.8rem;
+  z-index: 10;
+  text-align: center;
+}
+.setup-header h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 0;
+}
+.setup-step-indicator {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.setup-close, .setup-back {
+  position: absolute;
+  left: 0;
+  top: 1rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.setup-close:hover, .setup-back:hover {
+  background: var(--card-hover);
+}
+.setup-body {
+  flex: 1;
+  padding: 0.5rem 0;
+}
+.setup-footer {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  padding: 1rem 0 calc(env(safe-area-inset-bottom) + 1rem);
+}
+
+/* Mode cards */
+.mode-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.mode-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+  color: var(--text);
+}
+.mode-card:hover:not(.disabled) {
+  background: var(--card-hover);
+  border-color: var(--accent);
+}
+.mode-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.mode-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mode-icon {
+  font-size: 1.6rem;
+  width: 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.mode-info {
+  flex: 1;
+}
+.mode-name {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+.mode-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.type-select-wrap {
+  margin-top: 0.5rem;
+}
+.type-select-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
 </style>
 </head>
 <body>
@@ -1009,14 +1199,27 @@ body.playing .header-container { display: none; }
     <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak 🔥</div></div>
   </div>
 
-  <div id="wotd-card" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-      <span style="font-weight:800;font-size:0.85rem;color:var(--accent-light);">📝 Word of the Day</span>
-      <span id="wotd-source" style="font-size:0.68rem;color:var(--muted);"></span>
+  <div class="today-card" id="today-card" style="display:none;">
+    <div class="today-section">
+      <div class="today-header">
+        <span class="today-label">📝 Word of the Day</span>
+        <span class="today-source" id="wotd-source"></span>
+      </div>
+      <div class="today-wotd">
+        <span class="today-word" id="wotd-word"></span>
+        <span class="today-german" id="wotd-german"></span>
+      </div>
+      <div class="today-def" id="wotd-def"></div>
     </div>
-    <div id="wotd-word" style="font-size:1.15rem;font-weight:700;margin-bottom:2px;"></div>
-    <div id="wotd-german" style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:4px;"></div>
-    <div id="wotd-def" style="font-size:0.78rem;color:var(--muted);font-style:italic;"></div>
+    <div class="today-divider"></div>
+    <div class="today-section">
+      <div class="today-header">
+        <span class="today-label">⚡ Daily Challenge</span>
+        <span class="today-date" id="daily-date"></span>
+      </div>
+      <div class="today-daily-desc">10 words · same for everyone today</div>
+      <div id="daily-action"></div>
+    </div>
   </div>
 
   <div id="weekly-goal-card" style="display:none;">
@@ -1030,55 +1233,15 @@ body.playing .header-container { display: none; }
     <div id="weekly-goal-text" style="font-size:0.75rem;color:var(--text-secondary);text-align:center;"></div>
   </div>
 
-  <div class="daily-card" id="daily-card">
-    <div class="daily-card-header">
-      <span class="daily-card-title">⚡ Daily Challenge</span>
-      <span class="daily-card-date" id="daily-date"></span>
-    </div>
-    <div class="daily-card-desc">10 words · same for everyone today</div>
-    <div id="daily-action"></div>
-  </div>
-
-  <div class="card">
-    <h3>Select Sources</h3>
-    <div class="source-section">
-      <div class="source-section-label unit-label">📘 MORE! 3 Units</div>
-      <div class="source-grid" id="source-grid-units"></div>
-    </div>
-    <div class="quick-btns">
-      <button class="quick-btn" onclick="selectAll('all')">Select All</button>
-      <button class="quick-btn" onclick="selectAll('none')">Clear</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Exercise Type</h3>
-    <div class="type-grid" id="type-grid">
-      <button class="type-btn selected" data-type="mix" onclick="selectType(this)" title="Random mix of all exercise types">Mix</button>
-      <button class="type-btn" data-type="context" onclick="selectType(this)" title="Complete the sentence — first letter + exact letter count shown">Context (easy)</button>
-      <button class="type-btn" data-type="context-hard" onclick="selectType(this)" title="Complete the sentence — only the first letter is shown, no letter count">Context (hard)</button>
-      <button class="type-btn" data-type="definition" onclick="selectType(this)" title="Read an English definition — first letters and word count shown">Definition (easy)</button>
-      <button class="type-btn" data-type="definition-hard" onclick="selectType(this)" title="Read an English definition — no hints given">Definition (hard)</button>
-      <button class="type-btn" data-type="translation" onclick="selectType(this)" title="See the German word and type the English translation">Translation</button>
-      <button class="type-btn" data-type="multiple-choice" onclick="selectType(this)" title="Choose the correct answer from 4 options">Multiple Choice</button>
-    </div>
-  </div>
-
-  <div class="word-count-display" id="word-count">Select sources to begin</div>
-
   <div class="home-actions">
-    <button class="btn btn-primary btn-block" id="start-btn" disabled onclick="startPractice()">Full Practice</button>
-    <div class="mode-row">
-      <button class="btn btn-sprint" id="sprint-btn" disabled onclick="startSprint()">🏃 Sprint (10)</button>
-      <button class="btn btn-speed" id="speed-btn" disabled onclick="startSpeedRound()">⚡ Speed Round</button>
-    </div>
-    <button id="btn-battle" class="btn-battle" onclick="openBattleLobby()" style="display:none;">⚔️ Battle</button>
+    <button class="btn btn-primary btn-block btn-start-practice" onclick="openPracticeSetup()">🎯 Start Practice</button>
     <button class="btn btn-review btn-block btn-small" id="review-btn" style="display:none;" onclick="startSmartReview()">🔄 Smart Review</button>
+    <button id="btn-battle" class="btn-battle" onclick="openBattleLobby()" style="display:none;">⚔️ Battle</button>
     <div class="home-actions-row">
-      <button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊 My Progress</button>
+      <button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊 Progress</button>
       <button class="btn btn-secondary btn-small" onclick="showLeaderboard()">🏆 Leaderboard</button>
-      <button class="btn btn-secondary btn-small" onclick="showWordReference()">📖 Word Reference</button>
-      <button id="sfx-toggle-btn" onclick="toggleSfx()" style="font-size:13px;padding:8px 16px;border-radius:10px;cursor:pointer;background:var(--card);border:1px solid var(--card-border);color:var(--text);">🔊 Sound: ON</button>
+      <button class="btn btn-secondary btn-small" onclick="showWordReference()">📖 Words</button>
+      <button id="sfx-toggle-btn" onclick="toggleSfx()" style="font-size:13px;padding:8px 16px;border-radius:10px;cursor:pointer;background:var(--card);border:1px solid var(--card-border);color:var(--text);">🔊</button>
     </div>
   </div>
 </div>
@@ -3166,7 +3329,7 @@ function getWordOfTheDay() {
 
 function renderWordOfTheDay() {
   const wotd = getWordOfTheDay();
-  const card = document.getElementById('wotd-card');
+  const card = document.getElementById('today-card');
   if (!wotd || !card) return;
   card.style.display = '';
   document.getElementById('wotd-word').textContent = wotd.w;
@@ -3260,7 +3423,6 @@ function showHomeScreen() {
     }
   }
 
-  initSourceGrid();
   showScreen('home-screen');
   setupPresence();
   const battleBtn = document.getElementById('btn-battle');
@@ -3299,8 +3461,9 @@ function selectAll(mode) {
 
 function selectType(btn) {
   const type = btn.dataset.type;
-  const allBtns = document.querySelectorAll('.type-btn');
-  const mixBtn = document.querySelector('.type-btn[data-type="mix"]');
+  const container = btn.closest('.type-grid');
+  const allBtns = container.querySelectorAll('.type-btn');
+  const mixBtn = container.querySelector('.type-btn[data-type="mix"]');
   if (type === 'mix') {
     // Mix: deselect all individuals, select mix
     allBtns.forEach(b => b.classList.remove('selected'));
@@ -3311,7 +3474,7 @@ function selectType(btn) {
     mixBtn.classList.remove('selected');
     btn.classList.toggle('selected');
     // Collect selected types
-    const selected = [...document.querySelectorAll('.type-btn.selected')].map(b => b.dataset.type).filter(t => t !== 'mix');
+    const selected = [...container.querySelectorAll('.type-btn.selected')].map(b => b.dataset.type).filter(t => t !== 'mix');
     if (selected.length === 0) {
       // Nothing selected — revert to mix
       mixBtn.classList.add('selected');
@@ -3325,22 +3488,215 @@ function selectType(btn) {
 }
 
 function updateWordCount() {
+  // Legacy function — word count now handled by updateSetupWordCount() in overlay
   let count = 0;
-  state.selectedSources.forEach(src => { count += vocabData[src].length; });
-  const el = document.getElementById('word-count');
-  const startBtn = document.getElementById('start-btn');
-  const sprintBtn = document.getElementById('sprint-btn');
-  const speedBtn = document.getElementById('speed-btn');
+  state.selectedSources.forEach(src => { if (vocabData[src]) count += vocabData[src].length; });
+  return count;
+}
+
+// ===== PRACTICE SETUP OVERLAY =====
+let selectedMode = 'full';
+
+function openPracticeSetup() {
+  // Remove existing overlay if any
+  const old = document.getElementById('practice-setup-overlay');
+  if (old) old.remove();
+
+  // Reset selections
+  state.selectedSources.clear();
+  state.exerciseType = 'mix';
+  selectedMode = 'full';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'practice-setup-overlay';
+  overlay.className = 'practice-setup-overlay';
+
+  // Step 1: Unit Selection
+  const step1 = document.createElement('div');
+  step1.id = 'setup-step-1';
+  step1.className = 'setup-step';
+  step1.innerHTML = `
+    <div class="setup-header">
+      <button class="setup-close" onclick="closePracticeSetup()">✕</button>
+      <h2>Select Units</h2>
+      <div class="setup-step-indicator">Step 1 of 2</div>
+    </div>
+    <div class="setup-body">
+      <div class="source-grid" id="setup-source-grid"></div>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="setupSelectAll('all')">Select All</button>
+        <button class="quick-btn" onclick="setupSelectAll('none')">Clear</button>
+      </div>
+      <div class="word-count-display" id="setup-word-count">Select units to begin</div>
+    </div>
+    <div class="setup-footer">
+      <button class="btn btn-primary btn-block" id="setup-next-btn" disabled onclick="practiceSetupNext()">Next →</button>
+    </div>
+  `;
+
+  // Step 2: Mode & Type Selection
+  const step2 = document.createElement('div');
+  step2.id = 'setup-step-2';
+  step2.className = 'setup-step';
+  step2.style.display = 'none';
+  step2.innerHTML = `
+    <div class="setup-header">
+      <button class="setup-back" onclick="practiceSetupBack()">← Back</button>
+      <h2>Choose Mode</h2>
+      <div class="setup-step-indicator">Step 2 of 2</div>
+    </div>
+    <div class="setup-body">
+      <div class="mode-select" id="mode-select">
+        <button class="mode-card selected" data-mode="full" onclick="selectMode(this)">
+          <span class="mode-icon">📚</span>
+          <div class="mode-info"><div class="mode-name">Full Run</div><div class="mode-desc">All selected words, mixed types</div></div>
+        </button>
+        <button class="mode-card" data-mode="sprint" onclick="selectMode(this)">
+          <span class="mode-icon">🏃</span>
+          <div class="mode-info"><div class="mode-name">Sprint</div><div class="mode-desc">10 random words, quick round</div></div>
+        </button>
+        <button class="mode-card" data-mode="speed" onclick="selectMode(this)">
+          <span class="mode-icon">⚡</span>
+          <div class="mode-info"><div class="mode-name">Speed Round</div><div class="mode-desc">60 seconds, answer fast!</div></div>
+        </button>
+        <button class="mode-card" data-mode="mc" onclick="selectMode(this)">
+          <span class="mode-icon">🎯</span>
+          <div class="mode-info"><div class="mode-name">Multiple Choice</div><div class="mode-desc">Choose from 4 options</div></div>
+        </button>
+        <button class="mode-card disabled" data-mode="flashcards">
+          <span class="mode-icon">📇</span>
+          <div class="mode-info"><div class="mode-name">Flashcards</div><div class="mode-desc">Coming soon</div></div>
+        </button>
+      </div>
+      <div id="type-select-wrap" class="type-select-wrap">
+        <div class="type-select-label">Exercise Type</div>
+        <div class="type-grid" id="setup-type-grid">
+          <button class="type-btn selected" data-type="mix" onclick="selectType(this)">Mix</button>
+          <button class="type-btn" data-type="context" onclick="selectType(this)">Context (easy)</button>
+          <button class="type-btn" data-type="context-hard" onclick="selectType(this)">Context (hard)</button>
+          <button class="type-btn" data-type="definition" onclick="selectType(this)">Definition (easy)</button>
+          <button class="type-btn" data-type="definition-hard" onclick="selectType(this)">Definition (hard)</button>
+          <button class="type-btn" data-type="translation" onclick="selectType(this)">Translation</button>
+        </div>
+      </div>
+    </div>
+    <div class="setup-footer">
+      <button class="btn btn-primary btn-block" onclick="practiceSetupGo()">Go! 🚀</button>
+    </div>
+  `;
+
+  overlay.appendChild(step1);
+  overlay.appendChild(step2);
+  document.body.appendChild(overlay);
+
+  // Populate source grid
+  initSetupSourceGrid();
+}
+
+function closePracticeSetup() {
+  const overlay = document.getElementById('practice-setup-overlay');
+  if (overlay) overlay.remove();
+}
+
+function initSetupSourceGrid() {
+  const grid = document.getElementById('setup-source-grid');
+  grid.innerHTML = '';
+  for (const key of Object.keys(vocabData)) {
+    const btn = document.createElement('button');
+    btn.className = 'source-btn';
+    btn.dataset.source = key;
+    const prog = getSourceProgress(key);
+    const pct = prog.total > 0 ? Math.round((prog.mastered / prog.total) * 100) : 0;
+    btn.innerHTML = `${key}<span class="count">${vocabData[key].length} words</span><div class="progress-indicator" style="width:${pct}%"></div>`;
+    btn.onclick = () => {
+      const src = btn.dataset.source;
+      if (state.selectedSources.has(src)) {
+        state.selectedSources.delete(src);
+        btn.classList.remove('selected');
+      } else {
+        state.selectedSources.add(src);
+        btn.classList.add('selected');
+      }
+      updateSetupWordCount();
+    };
+    grid.appendChild(btn);
+  }
+}
+
+function setupSelectAll(mode) {
+  const btns = document.querySelectorAll('#setup-source-grid .source-btn');
+  state.selectedSources.clear();
+  btns.forEach(b => b.classList.remove('selected'));
+  if (mode === 'all') {
+    btns.forEach(b => {
+      state.selectedSources.add(b.dataset.source);
+      b.classList.add('selected');
+    });
+  }
+  updateSetupWordCount();
+}
+
+function updateSetupWordCount() {
+  let count = 0;
+  state.selectedSources.forEach(src => { if (vocabData[src]) count += vocabData[src].length; });
+  const el = document.getElementById('setup-word-count');
+  const nextBtn = document.getElementById('setup-next-btn');
   if (count === 0) {
-    el.innerHTML = 'Select sources to begin';
-    startBtn.disabled = true;
-    sprintBtn.disabled = true;
-    speedBtn.disabled = true;
+    el.innerHTML = 'Select units to begin';
+    nextBtn.disabled = true;
   } else {
     el.innerHTML = `<strong>${count}</strong> words selected`;
-    startBtn.disabled = false;
-    sprintBtn.disabled = false;
-    speedBtn.disabled = false;
+    nextBtn.disabled = false;
+  }
+}
+
+function practiceSetupNext() {
+  document.getElementById('setup-step-1').style.display = 'none';
+  document.getElementById('setup-step-2').style.display = '';
+}
+
+function practiceSetupBack() {
+  document.getElementById('setup-step-2').style.display = 'none';
+  document.getElementById('setup-step-1').style.display = '';
+}
+
+function selectMode(btn) {
+  if (btn.classList.contains('disabled')) return;
+  document.querySelectorAll('.mode-card').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedMode = btn.dataset.mode;
+  // Show/hide type selection based on mode
+  const typeWrap = document.getElementById('type-select-wrap');
+  if (selectedMode === 'mc' || selectedMode === 'flashcards') {
+    typeWrap.style.display = 'none';
+  } else {
+    typeWrap.style.display = '';
+  }
+}
+
+function practiceSetupGo() {
+  closePracticeSetup();
+
+  if (selectedMode === 'mc') {
+    state.exerciseType = 'multiple-choice';
+  }
+  // exerciseType is already set by selectType() for other modes
+
+  switch (selectedMode) {
+    case 'sprint':
+      startSprint();
+      break;
+    case 'speed':
+      startSpeedRound();
+      break;
+    case 'flashcards':
+      // Phase 2 — not yet implemented
+      break;
+    case 'mc':
+    case 'full':
+    default:
+      startPractice();
+      break;
   }
 }
 
