@@ -4377,9 +4377,11 @@ function initFlashcardSwipe() {
     var card = getCard();
     if (card && Math.abs(deltaX) > 10) {
       card.style.transition = 'none';
-      var rotate = deltaX * 0.06;
+      // When flipped, rotateY(180deg) mirrors X axis, so negate visual movement
+      var visualDX = fcFlipped ? -deltaX : deltaX;
+      var rotate = visualDX * 0.06;
       var base = fcFlipped ? 'rotateY(180deg) ' : '';
-      card.style.transform = base + 'translateX(' + deltaX + 'px) rotate(' + rotate + 'deg)';
+      card.style.transform = base + 'translateX(' + visualDX + 'px) rotate(' + rotate + 'deg)';
     }
     var il = document.getElementById('swipe-indicator-left');
     var ir = document.getElementById('swipe-indicator-right');
@@ -4395,13 +4397,15 @@ function initFlashcardSwipe() {
     if (ir) ir.style.opacity = '0';
 
     if (Math.abs(deltaX) > 80) {
-      // Swipe — dismiss card
+      // Swipe — dismiss card. Visual direction must match finger direction
       didSwipe = true;
+      var visualDX = fcFlipped ? -deltaX : deltaX;
       if (card) {
         card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        card.style.transform = deltaX > 0 ? 'translateX(120%) rotate(15deg)' : 'translateX(-120%) rotate(-15deg)';
+        card.style.transform = (fcFlipped ? 'rotateY(180deg) ' : '') + (visualDX > 0 ? 'translateX(120%) rotate(15deg)' : 'translateX(-120%) rotate(-15deg)');
         card.style.opacity = '0';
       }
+      // Logical: deltaX > 0 = finger moved right = Got it
       setTimeout(deltaX > 0 ? flashcardGotIt : flashcardAgain, 300);
     } else if (didSwipe) {
       // Small swipe — snap back
