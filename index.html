@@ -435,6 +435,7 @@ h1 { display: none; }
 .task-type-label.context { background: rgba(96,165,250,0.12); color: var(--context-color); border: 1px solid rgba(96,165,250,0.15); }
 .task-type-label.definition, .task-type-label.definition-hard { background: rgba(251,191,36,0.1); color: var(--def-color); border: 1px solid rgba(251,191,36,0.12); }
 .task-type-label.translation { background: rgba(244,114,182,0.1); color: var(--trans-color); border: 1px solid rgba(244,114,182,0.12); }
+.task-type-label.collocation { background: rgba(20,184,166,0.12); color: #14b8a6; border: 1px solid rgba(20,184,166,0.15); }
 
 .quiz-prompt {
   font-size: 1.12rem; line-height: 1.7; margin-bottom: 1.4rem; color: var(--text);
@@ -2019,7 +2020,7 @@ const vocabData = {
 {w:"not even",g:"noch nicht einmal",d:"Used to say something surprising — less than you expected",s:"The test was so easy, but he got _____ one answer right -- zero out of ten!",cf:"not even",a:["not even"],mc:["at least","almost","not yet"]},
 {w:"suit",g:"Anzug",d:"A set of matching jacket and trousers for formal events",s:"My dad wears a _____ and tie when he goes to work.",a:["suits"],mc:["uniform","costume","outfit"]},
 {w:"unhappy",g:"unglücklich",d:"Not happy, feeling sad",s:"She was very _____ and could not smile at all because her best friend moved away.",a:[],mc:["unsure","uncomfortable","unfriendly"]},
-{w:"to waste",g:"verschwenden",d:"To use something badly or use more than you need",s:"Don't _____ food — eat what is on your plate.",a:["waste","wasted"],mc:["to save","to spend","to lose"]},
+{w:"to waste",g:"verschwenden",d:"To use something badly or use more than you need",s:"Don't _____ food — eat what is on your plate.",a:["waste","wasted"],mc:["to save","to spend","to lose"],col:[{phrase:"waste time",gap:"_____ time",answer:"waste"},{phrase:"waste money",gap:"waste _____",answer:"money"},{phrase:"a waste of time",gap:"a _____ of time",answer:"waste"}]},
 {w:"to feel",g:"sich fühlen",d:"To have a feeling or emotion inside you",s:"After the long day, I _____ very tired and just wanted to sleep.",cf:"felt",a:["feel","felt"],mc:["to seem","to think","to believe"]},
 {w:"to get tired of sth.",g:"etw. satt haben",d:"To not enjoy something any more because you did it too often",s:"I _____ tired of eating the same lunch every day and asked for something different.",cf:"got",a:["get tired of","got tired of","getting tired of"],mc:["to get used to sth.","to get excited about sth.","to get rid of sth."]},
 {w:"lyrics",g:"Liedtext",d:"The words of a song",s:"I love this song, but I can never remember the _____.",a:[],mc:["rhymes","verses","melodies"]},
@@ -2042,7 +2043,7 @@ const vocabData = {
 {w:"to buy sth.",g:"etw. kaufen",d:"To get something by paying money for it",s:"I want to _____ a present for my friend's birthday.",cf:"buy",a:["buy","bought"],mc:["to sell sth.","to borrow sth.","to order sth."]},
 {w:"to listen to music",g:"Musik hören",d:"To enjoy songs or melodies through your ears",s:"He always puts on his headphones to _____ on the way to school.",cf:"listen to music",a:["listen to music","listens to music","listening to music"],mc:["to play music","to download music","to record music"]},
 {w:"to try on sunglasses",g:"Sonnenbrillen anprobieren",d:"To put on a pair to see if they look good on you",s:"She _____ five different pairs of sunglasses in front of the mirror to see which looked best.",cf:"tried on",a:["try on sunglasses","tried on sunglasses"],mc:["to pick up sunglasses","to put on sunglasses","to take off sunglasses"]},
-{w:"to pay the bill",g:"die Rechnung bezahlen",d:"To give money for what you owe",s:"After dinner, my dad _____ at the restaurant.",cf:"paid the bill",a:["pay the bill","paid the bill"],mc:["to check the bill","to split the bill","to ask for the bill"]},
+{w:"to pay the bill",g:"die Rechnung bezahlen",d:"To give money for what you owe",s:"After dinner, my dad _____ at the restaurant.",cf:"paid the bill",a:["pay the bill","paid the bill"],mc:["to check the bill","to split the bill","to ask for the bill"],col:[{phrase:"split the bill",gap:"_____ the bill",answer:"split"},{phrase:"pay the bill",gap:"_____ the bill",answer:"pay"}]},
 {w:"to drink/eat sth.",g:"etw. trinken/essen",d:"To have food or a drink",s:"Would you like to _____ something at the café?",cf:"drink",a:["drink","eat","drank","ate"],mc:["to cook sth.","to serve sth.","to order sth."]},
 {w:"to look at sth.",g:"etw. ansehen",d:"To turn your eyes to see something",s:"We _____ the photos from our holiday last night.",cf:"looked at",a:["look at","looked at"],mc:["to look for sth.","to look after sth.","to look into sth."]},
 {w:"to talk on the mobile",g:"am Handy telefonieren",d:"To have a conversation on your phone",s:"Please don't _____ during class -- put your phone away.",cf:"talk on the mobile",a:["talk on the mobile","talking on the mobile"],mc:["to text on the mobile","to search on the mobile","to play on the mobile"]},
@@ -2078,8 +2079,8 @@ const vocabData = {
 {w:"laugh",g:"Lacher",d:"The sound you make when something is funny",s:"His joke got a big _____ from the whole class.",a:["laughs"],mc:["smile","grin","joke"]},
 {w:"note",g:"Geldschein",d:"A piece of paper money",s:"She found a €20 _____ on the ground near the bus stop.",a:["notes"],mc:["coin","receipt","cheque"]},
 {w:"per cent",g:"Prozent",d:"A part of a hundred, shown with the % sign",s:"About 80 _____ of the students passed the test.",cf:"per cent",a:["per cent","percent"],mc:["per year","per person","per hour"]},
-{w:"speech",g:"Rede, Ansprache",d:"A talk given to a group of people",s:"The headteacher gave a short _____ at the beginning of the school year.",a:["speeches"],mc:["lecture","conversation","debate"]},
-{w:"stage",g:"Bühne",d:"The raised area where actors or singers perform",s:"The band walked onto the _____ and the crowd cheered.",a:["stages"],mc:["scene","screen","studio"]},
+{w:"speech",g:"Rede, Ansprache",d:"A talk given to a group of people",s:"The headteacher gave a short _____ at the beginning of the school year.",a:["speeches"],mc:["lecture","conversation","debate"],col:[{phrase:"give a speech",gap:"_____ a speech",answer:"give"},{phrase:"make a speech",gap:"_____ a speech",answer:"make"}]},
+{w:"stage",g:"Bühne",d:"The raised area where actors or singers perform",s:"The band walked onto the _____ and the crowd cheered.",a:["stages"],mc:["scene","screen","studio"],col:[{phrase:"go on stage",gap:"go on _____",answer:"stage"},{phrase:"leave the stage",gap:"leave the _____",answer:"stage"}]},
 {w:"to try out",g:"ausprobieren",d:"To test something to see how it works or if you like it",s:"I want to _____ this new game — it looks really fun.",cf:"try out",a:["try out","tried out"],mc:["to find out","to carry out","to work out"]},
 ],
 "Unit 3": [
@@ -2104,10 +2105,10 @@ const vocabData = {
 {w:"to meet up with (people)",g:"sich mit (Leuten) treffen",d:"To see friends at a planned time and location",s:"I'm going to _____ with my friends at the café after school.",cf:"meet up",a:["meet up with","met up with"],mc:["to catch up with (people)","to keep up with (people)","to get along with (people)"]},
 {w:"to become",g:"werden",d:"To start to be something",s:"She wants to _____ a doctor when she grows up.",cf:"become",a:["become","became"],mc:["to remain","to appear","to belong"]},
 {w:"curious",g:"neugierig",d:"Wanting to know or learn more about something",s:"The _____ cat looked into the open box.",a:[],mc:["cautious","confused","nervous"]},
-{w:"decision",g:"Entscheidung",d:"A choice that you make about something",s:"Moving to a new school was a big _____ for our family.",a:["decisions"],mc:["opinion","suggestion","permission"]},
-{w:"experience",g:"Erfahrung",d:"Something that happens to you, or knowledge from doing things",s:"Visiting Paris was an amazing _____ for me.",a:["experiences"],mc:["experiment","adventure","memory"]},
+{w:"decision",g:"Entscheidung",d:"A choice that you make about something",s:"Moving to a new school was a big _____ for our family.",a:["decisions"],mc:["opinion","suggestion","permission"],col:[{phrase:"make a decision",gap:"_____ a decision",answer:"make"},{phrase:"difficult decision",gap:"a _____ decision",answer:"difficult"}]},
+{w:"experience",g:"Erfahrung",d:"Something that happens to you, or knowledge from doing things",s:"Visiting Paris was an amazing _____ for me.",a:["experiences"],mc:["experiment","adventure","memory"],col:[{phrase:"gain experience",gap:"_____ experience",answer:"gain"},{phrase:"amazing experience",gap:"an _____ experience",answer:"amazing"}]},
 {w:"to explore",g:"erkunden, erforschen",d:"To travel around a new place to learn about it",s:"We spent the afternoon _____ the old town.",cf:"exploring",a:["explore","explored","exploring"],mc:["to discover","to examine","to observe"]},
-{w:"journey",g:"Reise",d:"A trip from one place to another",s:"The _____ from Vienna to London takes about two hours by plane.",a:["journeys"],mc:["destination","voyage","distance"]},
+{w:"journey",g:"Reise",d:"A trip from one place to another",s:"The _____ from Vienna to London takes about two hours by plane.",a:["journeys"],mc:["destination","voyage","distance"],col:[{phrase:"go on a journey",gap:"go on a _____",answer:"journey"},{phrase:"long journey",gap:"a _____ journey",answer:"long"}]},
 {w:"on foot",g:"zu Fuß",d:"Walking, not using a car or bus",s:"The shop is very close — let's go _____.",cf:"on foot",a:["on foot"],mc:["by bike","by car","on board"]},
 {w:"painful",g:"schmerzhaft",d:"Causing pain, hurting",s:"Falling off my bike was very _____.",a:[],mc:["harmless","exhausting","uncomfortable"]},
 {w:"to reach",g:"(er-)reichen",d:"To arrive at a place or get to a point",s:"We _____ the top of the mountain just before it got dark.",cf:"reached",a:["reach","reached"],mc:["to approach","to leave","to pass"]},
@@ -2126,7 +2127,7 @@ const vocabData = {
 {w:"pretty",g:"hier: ziemlich",d:"Quite, fairly (not about looks here)",s:"The homework was _____ easy -- not super easy, but not really hard either.",a:[],mc:["quite","very","hardly"]},
 {w:"unfortunately",g:"leider",d:"Used to say you are sorry about something",s:"_____, the concert is sold out.",cf:"Unfortunately",a:["unfortunately"],mc:["luckily","hopefully","surprisingly"]},
 {w:"departure",g:"Abflug; Abfahrt",d:"The time when a plane, bus or train leaves",s:"Check the screen for the _____ time of your flight.",a:["departures"],mc:["arrival","delay","destination"]},
-{w:"flight",g:"Flug",d:"A trip in a plane from one place to another",s:"Our _____ to Rome leaves at half past eight in the morning.",a:["flights"],mc:["journey","voyage","transfer"]},
+{w:"flight",g:"Flug",d:"A trip in a plane from one place to another",s:"Our _____ to Rome leaves at half past eight in the morning.",a:["flights"],mc:["journey","voyage","transfer"],col:[{phrase:"catch a flight",gap:"_____ a flight",answer:"catch"},{phrase:"miss a flight",gap:"_____ a flight",answer:"miss"},{phrase:"book a flight",gap:"_____ a flight",answer:"book"}]},
 {w:"to make a reservation",g:"eine Reservierung vornehmen",d:"To book a table, room or seat in advance",s:"I'd like to _____ for two people at seven o'clock.",cf:"make a reservation",a:["make a reservation","made a reservation"],mc:["to cancel a reservation","to confirm a booking","to change a reservation"]},
 {w:"to note",g:"beachten, feststellen",d:"To notice or pay attention to something",s:"Please _____ that the library closes at five today.",a:["note","noted"],mc:["to notice","to ignore","to mention"]},
 {w:"to fix sth.",g:"etw. beheben, reparieren",d:"To repair something that is broken",s:"My dad can _____ almost anything in the house.",cf:"fix",a:["fix","fixed"],mc:["to break sth.","to build sth.","to replace sth."]},
@@ -2153,7 +2154,7 @@ const vocabData = {
 {w:"polar bear",g:"Eisbär",d:"A large white animal that lives in cold places near the Arctic",s:"The _____ walked slowly across the snow and ice.",cf:"polar bear",a:["polar bear","polar bears"],mc:["grizzly bear","brown bear","teddy bear"]},
 {w:"adorable",g:"bezaubernd, liebenswert",d:"Very cute and easy to love",s:"The new puppy in our family is so _____.",a:[],mc:["horrible","attractive","loveable"]},
 {w:"bite",g:"Biss",d:"When an animal uses its teeth to hurt you",s:"She had a red mark on her arm from a mosquito _____.",a:["bites"],mc:["sting","scratch","wound"]},
-{w:"to cause",g:"verursachen",d:"To make something happen, usually something bad",s:"The heavy rain _____ a big flood in the village.",cf:"caused",a:["cause","caused"],mc:["to prevent","to create","to produce"]},
+{w:"to cause",g:"verursachen",d:"To make something happen, usually something bad",s:"The heavy rain _____ a big flood in the village.",cf:"caused",a:["cause","caused"],mc:["to prevent","to create","to produce"],col:[{phrase:"cause damage",gap:"_____ damage",answer:"cause"},{phrase:"cause problems",gap:"cause _____",answer:"problems"}]},
 {w:"poison",g:"Gift",d:"A substance that can make you very ill or kill you",s:"Some frogs have _____ on their skin to keep enemies away.",a:["poisons"],mc:["venom","medicine","cure"]},
 {w:"rabies",g:"Tollwut",d:"A very dangerous disease that animals can give to humans by biting",s:"If a wild animal bites you, it might have _____.",a:[],mc:["measles","allergies","malaria"]},
 {w:"seal",g:"Robbe",d:"A sea animal with smooth fur that lives in cold water",s:"We saw a group of _____ lying on the rocks by the sea.",cf:"seals",a:["seal","seals"],mc:["otter","dolphin","walrus"]},
@@ -2161,8 +2162,8 @@ const vocabData = {
 {w:"to bite (off)",g:"(ab-)beißen",d:"To use your teeth to cut into something",s:"The dog tried to _____ a piece of the sausage.",cf:"bite",a:["bite","bit","bitten","bite off","bit off"],mc:["to chew (off)","to tear (off)","to snap (off)"]},
 {w:"lizard",g:"Eidechse",d:"A small animal with four legs, a long tail and cold blood",s:"A tiny green _____ was sitting on the warm stone.",a:["lizards"],mc:["frog","snake","gecko"]},
 {w:"to chase away",g:"verjagen",d:"To run after someone or something to make them leave",s:"The farmer's dog _____ the fox from the garden.",cf:"chased away",a:["chase away","chased away"],mc:["to scare away","to send away","to drive away"]},
-{w:"to complain",g:"sich beschweren",d:"To say you are not happy about something",s:"Some people always _____ about the school food.",cf:"complain",a:["complain","complained"],mc:["to explain","to apologise","to comment"]},
-{w:"injury",g:"Verletzung",d:"Damage to a part of your body",s:"She couldn't play football because of her knee _____.",a:["injuries"],mc:["illness","bruise","damage"]},
+{w:"to complain",g:"sich beschweren",d:"To say you are not happy about something",s:"Some people always _____ about the school food.",cf:"complain",a:["complain","complained"],mc:["to explain","to apologise","to comment"],col:[{phrase:"complain about",gap:"complain _____ the food",answer:"about"},{phrase:"make a complaint",gap:"make a _____",answer:"complaint"}]},
+{w:"injury",g:"Verletzung",d:"Damage to a part of your body",s:"She couldn't play football because of her knee _____.",a:["injuries"],mc:["illness","bruise","damage"],col:[{phrase:"serious injury",gap:"a _____ injury",answer:"serious"},{phrase:"suffer an injury",gap:"_____ an injury",answer:"suffer"}]},
 {w:"to lift",g:"aufheben",d:"To move something up from a lower place",s:"Can you help me _____ this heavy box onto the table?",a:["lift","lifted"],mc:["to drop","to push","to carry"]},
 {w:"to pull down",g:"hinunterziehen",d:"To move something or someone towards the ground",s:"The strong waves _____ the swimmer under the water.",cf:"pulled down",a:["pull down","pulled down"],mc:["to push up","to knock down","to put down"]},
 {w:"to accept",g:"akzeptieren",d:"To say yes to something or to take what is given",s:"I hope she will _____ my apology.",a:["accept","accepted"],mc:["to reject","to expect","to receive"]},
@@ -2180,7 +2181,7 @@ const vocabData = {
 {w:"victim",g:"Opfer",d:"A person who is hurt or harmed",s:"The _____ of the accident was taken to hospital.",a:["victims"],mc:["witness","survivor","suspect"]},
 {w:"to communicate",g:"kommunizieren",d:"To share information or talk with others",s:"Animals _____ with each other in many different ways.",cf:"communicate",a:["communicate","communicated"],mc:["to translate","to cooperate","to negotiate"]},
 {w:"audience",g:"Publikum",d:"The people who watch or listen to a show or speech",s:"The _____ clapped loudly after the concert.",a:["audiences"],mc:["spectator","orchestra","cast"]},
-{w:"environment",g:"Umwelt",d:"The natural world around us — air, water, land",s:"We should protect the _____ by using less plastic.",a:[],mc:["atmosphere","climate","habitat"]},
+{w:"environment",g:"Umwelt",d:"The natural world around us — air, water, land",s:"We should protect the _____ by using less plastic.",a:[],mc:["atmosphere","climate","habitat"],col:[{phrase:"protect the environment",gap:"_____ the environment",answer:"protect"},{phrase:"harm the environment",gap:"_____ the environment",answer:"harm"}]},
 {w:"Hands off!",g:"Finger weg!",d:"Don't touch!",s:"_____ That cake is for the party tonight!",cf:"Hands off",a:["Hands off"],mc:["Watch out!","Back off!","Stand up!"]},
 {w:"to inform",g:"informieren",d:"To tell someone about something important",s:"Please _____ the teacher if you are going to be late.",a:["inform","informed"],mc:["to confirm","to remind","to persuade"]},
 {w:"to lock sb. up",g:"jdn. einsperren",d:"To put someone in a room or cage and close the door",s:"The farmer _____ the chickens at night to keep them safe from foxes.",cf:"locks up",a:["lock up","locked up","locks up"],mc:["to let sb. out","to shut sb. up","to pick sb. up"]},
@@ -2254,7 +2255,7 @@ const vocabData = {
 {w:"raven",g:"Rabe",d:"A large black bird",s:"A _____ was sitting on the fence and looking at us.",a:["ravens"],mc:["pigeon","sparrow","eagle"]},
 {w:"to take a walk",g:"einen Spaziergang machen",d:"To go on a stroll, usually for pleasure",s:"Let's _____ in the park — the weather is lovely today.",cf:"take a walk",a:["take a walk","took a walk"],mc:["to take a break","to take a ride","to take a look"]},
 {w:"theatre",g:"Theater",d:"A building where you go to watch plays and shows",s:"We're going to the _____ tonight to see a musical.",a:["theatres","theater","theaters"],mc:["cinema","museum","opera"]},
-{w:"view",g:"Ausblick, Aussicht",d:"What you can see from a place",s:"The _____ from our hotel room was amazing — we could see the sea.",a:["views"],mc:["scene","sight","landscape"]},
+{w:"view",g:"Ausblick, Aussicht",d:"What you can see from a place",s:"The _____ from our hotel room was amazing — we could see the sea.",a:["views"],mc:["scene","sight","landscape"],col:[{phrase:"amazing view",gap:"an _____ view",answer:"amazing"},{phrase:"beautiful view",gap:"a _____ view",answer:"beautiful"}]},
 {w:"visitor",g:"Besucher/Besucherin",d:"A person who goes to see a place or another person",s:"The museum has thousands of _____ every year.",cf:"visitors",a:["visitor","visitors"],mc:["tourist","passenger","resident"]},
 {w:"thrilling",g:"aufregend",d:"Very exciting and a little bit scary",s:"The roller coaster ride was really _____!",a:[],mc:["terrifying","boring","amusing"]},
 {w:"approximately",g:"ungefähr",d:"Close to an exact number but not exact",s:"There are _____ 200 students in our school.",a:[],mc:["accurately","exactly","frequently"]},
@@ -2267,12 +2268,12 @@ const vocabData = {
 {w:"spectacular",g:"spektakulär",d:"Very impressive and beautiful to look at",s:"The fireworks show on New Year's Eve was _____.",a:[],mc:["ordinary","magnificent","incredible"]},
 {w:"tourist attraction",g:"Sehenswürdigkeit",d:"A place that many tourists visit",s:"The old castle is the most popular _____ in our town.",cf:"tourist attraction",a:["tourist attraction","tourist attractions"],mc:["tourist information","tourist guide","tourist destination"]},
 {w:"to experience",g:"erleben, erfahren",d:"To see, feel or do something, especially for the first time",s:"On this trip, you will _____ life on a real farm.",a:["experience","experienced"],mc:["to explore","to expect","to express"]},
-{w:"traffic",g:"Verkehr",d:"Cars, buses and other vehicles moving on a road",s:"There is always a lot of _____ in the city centre during rush hour.",a:[],mc:["transport","pollution","vehicle"]},
+{w:"traffic",g:"Verkehr",d:"Cars, buses and other vehicles moving on a road",s:"There is always a lot of _____ in the city centre during rush hour.",a:[],mc:["transport","pollution","vehicle"],col:[{phrase:"heavy traffic",gap:"_____ traffic",answer:"heavy"},{phrase:"traffic jam",gap:"traffic _____",answer:"jam"},{phrase:"stuck in traffic",gap:"stuck in _____",answer:"traffic"}]},
 {w:"multicultural",g:"multikulturell",d:"Having people from many different countries and cultures",s:"Vienna is a very _____ city with people from all over the world.",a:[],mc:["multilingual","international","traditional"]},
 {w:"contract",g:"Vertrag",d:"A written agreement between two people or groups",s:"Before you start the job, you need to sign a _____.",a:["contracts"],mc:["receipt","certificate","agreement"]},
 {w:"to lead",g:"leiten",d:"To be in charge of or to guide",s:"The tour guide will _____ us through the old part of the city.",a:["lead","led"],mc:["to follow","to guide","to manage"]},
 {w:"sugar",g:"Zucker",d:"A sweet white or brown substance used in food and drinks",s:"Do you take _____ in your tea?",a:[],mc:["flour","salt","honey"]},
-{w:"to earn (money)",g:"(Geld) verdienen",d:"To receive payment for work that you do",s:"She _____ some extra money by walking the neighbour's dog.",cf:"earns",a:["earn","earned","earns"],mc:["to spend (money)","to borrow (money)","to waste (money)"]},
+{w:"to earn (money)",g:"(Geld) verdienen",d:"To receive payment for work that you do",s:"She _____ some extra money by walking the neighbour's dog.",cf:"earns",a:["earn","earned","earns"],mc:["to spend (money)","to borrow (money)","to waste (money)"],col:[{phrase:"earn money",gap:"_____ money",answer:"earn"},{phrase:"earn a living",gap:"earn a _____",answer:"living"}]},
 {w:"to save up for",g:"ansparen",d:"To keep money so you can buy something later",s:"I'm _____ up for a new pair of trainers.",cf:"saving",a:["save up for","saved up for","saving up for"],mc:["to pay back for","to give up on","to look out for"]},
 {w:"to sign",g:"unterschreiben",d:"To write your name on a document",s:"Please _____ your name at the bottom of the form.",a:["sign","signed"],mc:["to stamp","to print","to seal"]},
 ],
@@ -2290,7 +2291,7 @@ const vocabData = {
 {w:"to move",g:"umziehen, übersiedeln",d:"To go and live in a different place",s:"We're going to _____ to a new flat next month.",cf:"move",a:["move","moved"],mc:["to travel","to settle","to leave"]},
 {w:"soft toy",g:"Stofftier",d:"A cuddly animal made of fabric and stuffing",s:"She sleeps with her favourite _____ every night -- a fluffy stuffed cat made of soft fabric.",cf:"soft toy",a:["soft toy","soft toys"],mc:["board game","doll's house","jigsaw puzzle"]},
 {w:"to step in",g:"hier: eingreifen, dazwischen gehen",d:"To help or do something when there is a problem",s:"When the two boys started fighting, the teacher had to _____.",cf:"step in",a:["step in","stepped in"],mc:["to step back","to step out","to stand by"]},
-{w:"relationship",g:"Beziehung",d:"The way two people feel about and behave towards each other",s:"A good _____ with your friends is very important.",a:["relationships"],mc:["friendship","partnership","membership"]},
+{w:"relationship",g:"Beziehung",d:"The way two people feel about and behave towards each other",s:"A good _____ with your friends is very important.",a:["relationships"],mc:["friendship","partnership","membership"],col:[{phrase:"close relationship",gap:"a _____ relationship",answer:"close"},{phrase:"good relationship",gap:"a _____ relationship",answer:"good"}]},
 {w:"to own",g:"besitzen",d:"To have something that is yours",s:"Does your family _____ a car?",a:["own","owned","owns"],mc:["to share","to borrow","to rent"]},
 {w:"childhood (no pl)",g:"Kindheit",d:"The time when you are a child",s:"My happiest _____ memories are from holidays at the lake.",cf:"childhood",a:["childhood"],mc:["adulthood","youth","motherhood"]},
 {w:"earring",g:"Ohrring",d:"A piece of jewellery you wear on your ear",s:"She lost one of her _____ at the swimming pool.",cf:"earrings",a:["earring","earrings"],mc:["necklace","bracelet","brooch"]},
@@ -2326,12 +2327,12 @@ const vocabData = {
 {w:"dish",g:"Gericht",d:"Food that has been prepared in a particular way",s:"My favourite _____ is pasta with tomato sauce.",a:["dishes"],mc:["meal","recipe","snack"]},
 {w:"fat",g:"Fett",d:"The oily substance in food or under the skin",s:"Too much _____ in your food is not good for your health.",a:["fats"],mc:["oil","protein","sugar"]},
 {w:"invention",g:"Erfindung",d:"Something new that someone has created",s:"The light bulb was an amazing _____.",a:["inventions"],mc:["discovery","experiment","creation"]},
-{w:"crowd",g:"Publikum, Menschenmenge",d:"A large group of people in one place",s:"A big _____ waited outside the cinema for the film to start.",a:["crowds"],mc:["audience","queue","gang"]},
+{w:"crowd",g:"Publikum, Menschenmenge",d:"A large group of people in one place",s:"A big _____ waited outside the cinema for the film to start.",a:["crowds"],mc:["audience","queue","gang"],col:[{phrase:"large crowd",gap:"a _____ crowd",answer:"large"},{phrase:"crowd of people",gap:"a crowd _____ people",answer:"of"}]},
 {w:"current",g:"(elektrischer) Strom",d:"The flow of electricity through a wire",s:"Be careful — there is a strong electric _____ in these wires.",a:["currents"],mc:["voltage","circuit","battery"]},
 {w:"to develop",g:"entwickeln",d:"To create something new over a period of time",s:"The team _____ a new app for learning languages.",cf:"developed",a:["develop","developed"],mc:["to produce","to establish","to maintain"]},
 {w:"electric (motor)",g:"elektrisch; (Elektro)motor",d:"Using or producing electricity",s:"My dad wants to buy a car with an _____ motor.",cf:"electric",a:["electric"],mc:["electronic","automatic","solar"]},
-{w:"energy",g:"Energie; Strom",d:"Power that makes machines work or keeps things moving",s:"Wind and sun can give us clean _____.",a:[],mc:["power","force","fuel"]},
-{w:"influence",g:"Einfluss",d:"The power to change what other people think or do",s:"Teachers have a big _____ on their students' lives.",a:["influences"],mc:["effect","opinion","advantage"]},
+{w:"energy",g:"Energie; Strom",d:"Power that makes machines work or keeps things moving",s:"Wind and sun can give us clean _____.",a:[],mc:["power","force","fuel"],col:[{phrase:"save energy",gap:"_____ energy",answer:"save"},{phrase:"clean energy",gap:"_____ energy",answer:"clean"},{phrase:"waste energy",gap:"_____ energy",answer:"waste"}]},
+{w:"influence",g:"Einfluss",d:"The power to change what other people think or do",s:"Teachers have a big _____ on their students' lives.",a:["influences"],mc:["effect","opinion","advantage"],col:[{phrase:"have an influence on",gap:"have an _____ on",answer:"influence"},{phrase:"strong influence",gap:"a _____ influence",answer:"strong"}]},
 {w:"inventor",g:"Erfinder/Erfinderin",d:"A person who creates something new",s:"She wants to be an _____ and make helpful machines.",a:["inventors"],mc:["engineer","scientist","designer"]},
 {w:"to invest",g:"investieren",d:"To spend money on something hoping to get more back",s:"He _____ all his savings in a small business.",cf:"invested",a:["invest","invested"],mc:["to donate","to earn","to afford"]},
 {w:"perhaps",g:"vielleicht, eventuell",d:"Maybe, possibly",s:"_____ we can go to the cinema this weekend.",cf:"Perhaps",a:["perhaps"],mc:["certainly","probably","definitely"]},
@@ -2422,13 +2423,13 @@ const vocabData = {
 {w:"quality",g:"Qualität",d:"How good or bad something is",s:"These shoes are good _____. They will last a long time.",a:[],mc:["quantity","value","ability"]},
 {w:"to be able to do",g:"fähig sein, etw. zu tun",d:"To have the skill or chance to do something",s:"After a lot of practice, she was _____ to swim 500 metres.",cf:"able",a:["be able to","able to"],mc:["to be allowed to do","to be willing to do","to be supposed to do"]},
 {w:"cottage",g:"kleines Landhaus, Ferienhaus",d:"A small house in the countryside",s:"We spent our summer holiday in a little _____ near a lake.",a:["cottages"],mc:["cabin","mansion","villa"]},
-{w:"compromise",g:"Kompromiss",d:"An agreement where both sides give up something",s:"They found a _____ — half the park stays and half becomes a playground.",a:["compromises"],mc:["agreement","argument","decision"]},
+{w:"compromise",g:"Kompromiss",d:"An agreement where both sides give up something",s:"They found a _____ — half the park stays and half becomes a playground.",a:["compromises"],mc:["agreement","argument","decision"],col:[{phrase:"reach a compromise",gap:"_____ a compromise",answer:"reach"},{phrase:"find a compromise",gap:"_____ a compromise",answer:"find"}]},
 {w:"Good point.",g:"Da ist was dran., Gutes Argument.",d:"A way to say someone has made a strong argument",s:"We should ask the parents too. — _____!",cf:"Good point",a:["Good point"],mc:["Good idea.","Good question.","Good effort."]},
 {w:"to take action",g:"etw. unternehmen, aktiv werden",d:"To do something about a problem instead of just talking",s:"If you want to change things, you need to _____.",cf:"take action",a:["take action","took action"],mc:["to take part","to take place","to take notice"]},
 {w:"town hall",g:"Rathaus, Gemeindeamt",d:"The building where the local government works",s:"The mayor works in the _____ in the centre of the town.",cf:"town hall",a:["town hall"],mc:["town centre","town square","town council"]},
 {w:"way out",g:"Ausweg",d:"A solution to a difficult situation",s:"Let's try to find a _____ of this problem together.",cf:"way out",a:["way out"],mc:["way in","way through","way forward"]},
 {w:"majority",g:"Mehrheit",d:"More than half of a group",s:"The _____ of students voted for the school trip to Salzburg.",a:["majorities"],mc:["minority","authority","community"]},
-{w:"argument",g:"Argument; hier: Streit",d:"A reason for or against something, or a fight with words",s:"She had a big _____ with her brother about the TV remote.",a:["arguments"],mc:["discussion","agreement","opinion"]},
+{w:"argument",g:"Argument; hier: Streit",d:"A reason for or against something, or a fight with words",s:"She had a big _____ with her brother about the TV remote.",a:["arguments"],mc:["discussion","agreement","opinion"],col:[{phrase:"have an argument",gap:"_____ an argument",answer:"have"},{phrase:"strong argument",gap:"a _____ argument",answer:"strong"}]},
 {w:"to protest",g:"protestieren",d:"To say or show that you disagree with something",s:"The students _____ against the new school rules.",cf:"protested",a:["protest","protested"],mc:["to complain","to support","to demonstrate"]},
 {w:"city council",g:"Stadtrat",d:"The group of people who make decisions for a town",s:"The _____ of our town met at the town hall and decided to build a new swimming pool.",cf:"city council",a:["city council"],mc:["city centre","city hall","city mayor"]},
 {w:"cloth bag",g:"Stofftasche",d:"A reusable container made from fabric, not plastic",s:"I always bring a _____ when I go shopping.",cf:"cloth bag",a:["cloth bag","cloth bags"],mc:["plastic bag","paper bag","school bag"]},
@@ -2441,11 +2442,11 @@ const vocabData = {
 {w:"to vote",g:"wählen",d:"To choose someone or something in an election",s:"In Austria, you can _____ when you are sixteen years old.",a:["vote","voted"],mc:["to elect","to decide","to support"]},
 {w:"to attend",g:"besuchen (Universität, Veranstaltung)",d:"To go to an event, school, or meeting",s:"All students must _____ the assembly on Monday morning.",a:["attend","attended"],mc:["to avoid","to organise","to cancel"]},
 {w:"to be equal",g:"gleichberechtigt sein",d:"To have the same rights and be treated the same way",s:"Everyone should be _____, no matter where they come from.",cf:"equal",a:["be equal","equal"],mc:["to be fair","to be similar","to be free"]},
-{w:"law",g:"Gesetz",d:"A rule made by the government that everyone must follow",s:"There is a _____ that says children must go to school.",a:["laws"],mc:["rule","right","duty"]},
+{w:"law",g:"Gesetz",d:"A rule made by the government that everyone must follow",s:"There is a _____ that says children must go to school.",a:["laws"],mc:["rule","right","duty"],col:[{phrase:"break the law",gap:"_____ the law",answer:"break"},{phrase:"against the law",gap:"against the _____",answer:"law"},{phrase:"pass a law",gap:"_____ a law",answer:"pass"}]},
 {w:"nowadays",g:"heutzutage",d:"At the present time, these days",s:"_____, almost everyone has a smartphone.",cf:"Nowadays",a:["nowadays"],mc:["recently","meanwhile","eventually"]},
 {w:"to treat",g:"behandeln",d:"To act towards someone in a certain way",s:"We should _____ everyone with kindness and respect.",a:["treat","treated"],mc:["to handle","to respect","to judge"]},
 {w:"to arrest",g:"Verhaftung, Festnahme",d:"To be taken by the police because of breaking a law",s:"The police _____ the man who stole the car.",cf:"arrested",a:["arrest","arrested"],mc:["to punish","to release","to accuse"]},
-{w:"education",g:"(Aus-)Bildung",d:"Learning at school or university",s:"A good _____ can help you find a better job.",a:[],mc:["examination","experience","explanation"]},
+{w:"education",g:"(Aus-)Bildung",d:"Learning at school or university",s:"A good _____ can help you find a better job.",a:[],mc:["examination","experience","explanation"],col:[{phrase:"good education",gap:"a _____ education",answer:"good"},{phrase:"get an education",gap:"_____ an education",answer:"get"}]},
 {w:"to speak out",g:"sich für etw./jdn. aussprechen, seine Meinung sagen",d:"To say publicly what you think about something important",s:"She _____ out against bullying at her school.",cf:"spoke",a:["speak out","spoke out"],mc:["to speak up","to stand out","to find out"]},
 {w:"to refuse",g:"(ver-)weigern",d:"To say no, to not do what someone asks",s:"He _____ to eat his vegetables because he didn't like them.",cf:"refused",a:["refuse","refused"],mc:["to reject","to regret","to agree"]},
 {w:"to close down",g:"schließen",d:"To stop a business or organisation permanently",s:"The old cinema _____ down last year because not enough people went.",cf:"closed",a:["close down","closed down"],mc:["to shut up","to break down","to slow down"]},
@@ -2513,13 +2514,13 @@ const vocabData = {
 {w:"to check doors",g:"Türen überprüfen",d:"To make sure all entrances are closed and safe",s:"Before you leave the house, always _____ to make sure they are all locked.",cf:"check doors",a:["check doors","check the doors"],mc:["to lock doors","to open doors","to close doors"]},
 {w:"to crawl low",g:"niedrig kriechen",d:"To move on your hands and knees close to the floor",s:"If there is smoke in a room, _____ to stay below it.",cf:"crawl low",a:["crawl low"],mc:["to duck down","to run fast","to lie flat"]},
 {w:"to stop, drop & roll",g:"stoppen, fallen und rollen",d:"A safety rule: stay still, go to the ground, and turn your body if you catch fire",s:"If your clothes are on fire, remember to _____.",cf:"stop, drop and roll",a:["stop, drop and roll","stop drop and roll"],mc:["to run and hide","to duck and cover","to crawl low"]},
-{w:"research",g:"Forschung, Recherche",d:"The careful study of a subject to find new facts",s:"Scientists are doing _____ to understand earthquakes better.",a:[],mc:["experiment","discovery","knowledge"]},
+{w:"research",g:"Forschung, Recherche",d:"The careful study of a subject to find new facts",s:"Scientists are doing _____ to understand earthquakes better.",a:[],mc:["experiment","discovery","knowledge"],col:[{phrase:"do research",gap:"_____ research",answer:"do"},{phrase:"carry out research",gap:"carry _____ research",answer:"out"}]},
 {w:"to be trapped",g:"gefangen sein, festsitzen",d:"To be stuck somewhere and unable to get out",s:"The cat was _____ in the tree and couldn't get down.",cf:"trapped",a:["be trapped","trapped"],mc:["to be rescued","to be lost","to be hidden"]},
 {w:"pressure",g:"Druck",d:"The force of pushing against something",s:"The _____ of the water broke through the dam.",a:[],mc:["weight","tension","temperature"]},
 {w:"surface",g:"Oberfläche",d:"The outside or top part of something",s:"The _____ of the lake was completely still and calm.",a:["surfaces"],mc:["bottom","edge","layer"]},
 {w:"undersea",g:"unter Wasser",d:"Below the surface of the sea",s:"There are _____ volcanoes deep in the ocean that we can't see.",a:[],mc:["underground","underwater","offshore"]},
 {w:"border",g:"Grenze",d:"The line that separates two countries",s:"We crossed the _____ into Germany by car.",a:["borders"],mc:["coast","region","frontier"]},
-{w:"damage",g:"Schaden",d:"Harm done to something so it is broken or doesn't work well",s:"The storm caused a lot of _____ to the roof of our school.",a:[],mc:["danger","disaster","repair"]},
+{w:"damage",g:"Schaden",d:"Harm done to something so it is broken or doesn't work well",s:"The storm caused a lot of _____ to the roof of our school.",a:[],mc:["danger","disaster","repair"],col:[{phrase:"cause damage",gap:"_____ damage",answer:"cause"},{phrase:"serious damage",gap:"_____ damage",answer:"serious"}]},
 {w:"to evacuate",g:"evakuieren",d:"To move people away from a dangerous place",s:"The police _____ all the people from the building.",cf:"evacuated",a:["evacuate","evacuated"],mc:["to investigate","to rescue","to shelter"]},
 {w:"to measure",g:"messen",d:"To find out the size, weight or amount of something",s:"We _____ the classroom to see how big it is.",cf:"measured",a:["measure","measured"],mc:["to weigh","to calculate","to estimate"]},
 {w:"region",g:"Region, Gebiet",d:"A large area of land",s:"This _____ of Austria is famous for its beautiful lakes.",a:["regions"],mc:["border","district","nation"]},
@@ -2709,6 +2710,7 @@ let state = {
   battleRoom: null, battleRole: null, battleData: null, battleRound: 0, battleAnswered: false,
   _inviteListener: null, _inviteChangeListener: null, _roomListener: null, _battleRoundTimer: null,
   cqRoom: null, cqRole: null, cqData: null, cqAnswered: false, cqTimerInterval: null, cqListener: null, cqCurrentQ: -1, cqServerOffset: 0,
+  colEntry: null,
   isSprint: false,
   isSpeedRound: false,
   isMultipleChoice: false,
@@ -4467,6 +4469,10 @@ function openPracticeSetup() {
             <span class="type-card-name">&#127757; Translation</span>
             <span class="type-card-desc">See the German word, type the English</span>
           </button>
+          <button class="type-card" data-type="collocation" onclick="selectType(this)">
+            <span class="type-card-name">🤝 Word Partners</span>
+            <span class="type-card-desc">Fill in the missing word in a collocation</span>
+          </button>
         </div>
       </div>
     </div>
@@ -5012,6 +5018,38 @@ function getMCAnswer(word, type) {
   return word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
 }
 
+const COLLOCATION_DISTRACTORS = ['make','do','take','have','get','give','keep','put','pay','set','break','catch','hold','run','come','find','reach','cause','earn','save','miss','meet','gain','suffer','launch','strong','serious','heavy','large','close','good','big','clean','difficult','tight','balanced','healthy','bad','annual','official','medical'];
+
+function renderCollocationMC(word, colEntry) {
+  const grid = document.getElementById('mc-grid');
+  const answerRow = document.getElementById('answer-row');
+  const actions = document.getElementById('quiz-actions');
+  grid.style.display = 'grid';
+  answerRow.style.display = 'none';
+  actions.style.display = 'none';
+  grid.innerHTML = '';
+
+  const correctAnswer = colEntry.answer;
+  // Pick 3 distractors from the pool, excluding the correct answer
+  const pool = COLLOCATION_DISTRACTORS.filter(d => d.toLowerCase() !== correctAnswer.toLowerCase());
+  shuffle(pool);
+  const distractors = pool.slice(0, 3);
+
+  const options = [
+    { text: correctAnswer, correct: true },
+    ...distractors.map(d => ({ text: d, correct: false }))
+  ];
+  shuffle(options);
+
+  for (const opt of options) {
+    const btn = document.createElement('button');
+    btn.className = 'mc-option';
+    btn.textContent = opt.text;
+    btn.onclick = () => handleMCClick(btn, opt.correct, word, 'mc-collocation', grid);
+    grid.appendChild(btn);
+  }
+}
+
 function renderMultipleChoice(word, type) {
   const grid = document.getElementById('mc-grid');
   const answerRow = document.getElementById('answer-row');
@@ -5102,11 +5140,11 @@ function getTaskType() {
   }
   // Handle array (custom multi-select) or single type
   const sel = state.exerciseType;
-  const pool = Array.isArray(sel) ? sel : sel === 'mix' ? ['context', 'context-hard', 'definition', 'definition-hard', 'translation'] : [sel];
+  const pool = Array.isArray(sel) ? sel : sel === 'mix' ? ['context', 'context-hard', 'definition', 'definition-hard', 'translation', 'collocation'] : [sel];
   // Expand MC entries to mc- prefixed types
   const expanded = [];
   for (const t of pool) {
-    if (t === 'multiple-choice') expanded.push('mc-context', 'mc-definition', 'mc-translation');
+    if (t === 'multiple-choice') expanded.push('mc-context', 'mc-definition', 'mc-translation', 'mc-collocation');
     else expanded.push(t);
   }
   return expanded[Math.floor(Math.random() * expanded.length)];
@@ -5167,9 +5205,16 @@ function showWord() {
     }
   }
   const word = state.words[state.currentIdx];
-  const type = getTaskType();
+  let type = getTaskType();
+  // Fallback: if collocation type but word has no col data, re-roll
+  if ((type === 'collocation' || type === 'mc-collocation') && (!word.col || word.col.length === 0)) {
+    const fallbacks = ['context', 'definition', 'translation'];
+    type = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  }
   state.currentType = type;
   state.answered = false;
+  // Pick and store a random collocation entry for this word
+  state.colEntry = (type === 'collocation' || type === 'mc-collocation') && word.col ? word.col[Math.floor(Math.random() * word.col.length)] : null;
 
   const isMC = type.startsWith('mc-');
   const pct = state.isSpeedRound ? 0 : (state.currentIdx / state.words.length) * 100;
@@ -5187,8 +5232,9 @@ function showWord() {
   const baseType = isMC ? type.replace('mc-', '') : type;
   const isContext = baseType === 'context' || baseType === 'context-hard';
   const isDef = baseType === 'definition' || baseType === 'definition-hard';
-  label.className = 'task-type-label ' + (isContext ? 'context' : isDef ? 'definition' : baseType);
-  label.textContent = isMC ? 'Choose the answer' : isContext ? 'Complete the sentence' : isDef ? 'Guess the word' : 'Translate to English';
+  const isCol = baseType === 'collocation';
+  label.className = 'task-type-label ' + (isContext ? 'context' : isDef ? 'definition' : isCol ? 'collocation' : baseType);
+  label.textContent = isCol ? 'Word Partners' : isMC ? 'Choose the answer' : isContext ? 'Complete the sentence' : isDef ? 'Guess the word' : 'Translate to English';
 
   const prompt = document.getElementById('quiz-prompt');
   if (isContext) {
@@ -5226,13 +5272,17 @@ function showWord() {
       // Hard mode: just the definition, no hints
       prompt.innerHTML = `<em>${word.d}</em>`;
     }
+  } else if (isCol && state.colEntry) {
+    prompt.innerHTML = state.colEntry.gap.replace('_____', '<span class="gap">_____</span>');
   } else {
     prompt.innerHTML = `<span class="german-word">${word.g}</span>`;
   }
 
   document.getElementById('source-tag').textContent = word.source;
 
-  if (isMC) {
+  if (isMC && isCol && state.colEntry) {
+    renderCollocationMC(word, state.colEntry);
+  } else if (isMC) {
     renderMultipleChoice(word, type);
   } else {
     const input = document.getElementById('answer-input');
@@ -5264,7 +5314,8 @@ function checkAnswer() {
   if (!userAnswer) return;
 
   const word = state.words[state.currentIdx];
-  const correct = isCorrect(userAnswer, word);
+  const isColType = state.currentType === 'collocation';
+  const correct = isColType && state.colEntry ? userAnswer.toLowerCase().trim() === state.colEntry.answer.toLowerCase().trim() : isCorrect(userAnswer, word);
   state.answered = true;
 
   const feedback = document.getElementById('feedback');
@@ -5295,8 +5346,10 @@ function checkAnswer() {
     if (qcard) { qcard.classList.remove('flash-correct','flash-wrong'); qcard.offsetHeight; qcard.classList.add('flash-wrong'); }
     const isCtx = state.currentType === 'context' || state.currentType === 'context-hard';
     const isDef = state.currentType === 'definition' || state.currentType === 'definition-hard';
+    const isColW = state.currentType === 'collocation';
     let displayAnswer;
-    if (isCtx) { displayAnswer = getContextForm(word); }
+    if (isColW && state.colEntry) { displayAnswer = state.colEntry.answer + ' <span style="font-weight:400;color:var(--muted);font-size:0.85em;">(' + state.colEntry.phrase + ')</span>'; }
+    else if (isCtx) { displayAnswer = getContextForm(word); }
     else if (isDef) {
       displayAnswer = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
       if (displayAnswer !== word.w) displayAnswer += ' <span style="font-weight:400;color:var(--muted);font-size:0.85em;">(' + word.w + ')</span>';
