@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <!-- v2.1 – 2026-03-26 · DomiVocab 3rd Grade · Battle modes fix -->
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme-mode') || 'light');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +16,35 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
-:root {
+:root, [data-theme="light"] {
+  --bg: #f0f7ff;
+  --bg2: #e8f1fc;
+  --card: #ffffff;
+  --card-border: rgba(59,130,246,0.15);
+  --card-hover: #f8fafc;
+  --card-solid: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #475569;
+  --muted: #94a3b8;
+  --accent: #2563eb;
+  --accent-light: #3b82f6;
+  --accent-glow: rgba(37,99,235,0.15);
+  --accent-deep: #1d4ed8;
+  --accent2: #d97706;
+  --accent2-glow: rgba(217,119,6,0.15);
+  --correct: #16a34a;
+  --correct-glow: rgba(22,163,74,0.12);
+  --wrong: #dc2626;
+  --wrong-glow: rgba(220,38,38,0.12);
+  --context-color: #0284c7;
+  --def-color: #b45309;
+  --trans-color: #be185d;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.1);
+}
+[data-theme="dark"] {
   --bg: #0b1120;
   --bg2: #111827;
   --card: rgba(255,255,255,0.045);
@@ -38,8 +67,6 @@
   --context-color: #38bdf8;
   --def-color: #fbbf24;
   --trans-color: #f472b6;
-  --radius: 14px;
-  --radius-lg: 20px;
   --shadow-card: 0 2px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(59,130,246,0.06);
   --shadow-elevated: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(59,130,246,0.1);
 }
@@ -49,13 +76,16 @@ button, input, select { touch-action: manipulation; }
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+[data-theme="dark"] body {
   background-image:
     radial-gradient(ellipse 100% 60% at 50% -30%, rgba(0,79,159,0.18), transparent 70%),
     radial-gradient(ellipse 80% 50% at 100% 100%, rgba(59,130,246,0.08), transparent 70%),
     radial-gradient(ellipse 50% 40% at 0% 80%, rgba(245,158,11,0.05), transparent);
   background-attachment: fixed;
-  color: var(--text);
-  min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -531,6 +561,23 @@ h1 { display: none; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ===== LIGHT MODE COMPONENT OVERRIDES ===== */
+[data-theme="light"] .btn-secondary { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: var(--text-secondary); }
+[data-theme="light"] .btn-secondary:hover { background: rgba(0,0,0,0.07); color: var(--text); border-color: rgba(0,0,0,0.15); }
+[data-theme="light"] .today-card { background: rgba(37,99,235,0.05); border-color: rgba(37,99,235,0.12); }
+[data-theme="light"] #weekly-goal-card { background: rgba(22,163,74,0.05); border-color: rgba(22,163,74,0.12); }
+[data-theme="light"] .badge-icon { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .avatar { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .source-btn { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .source-btn.selected { background: rgba(37,99,235,0.1); border-color: var(--accent); }
+[data-theme="light"] .mode-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .mode-card.selected { background: rgba(37,99,235,0.08); border-color: var(--accent); }
+[data-theme="light"] .type-card { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .type-card.selected { background: rgba(37,99,235,0.08); border-color: var(--accent); }
+[data-theme="light"] .answer-input { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.12); color: var(--text); }
+[data-theme="light"] .mc-option { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: var(--text); }
+[data-theme="light"] .cq-option { color: white; }
+
 /* Responsive — Mobile */
 @media (max-width: 600px) {
   .profile-card { padding: 0.7rem 0.8rem; }
@@ -711,7 +758,7 @@ body.playing .header-container { display: none; }
 .home-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; width: 100%; margin-top: 0.5rem; }
 .home-nav-grid .btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.7rem; padding: 0.6rem 0.3rem; }
 .home-nav-grid .btn span { font-size: 0.6rem; opacity: 0.8; }
-.home-nav-footer { display: flex; justify-content: center; margin-top: 0.4rem; }
+.home-nav-footer { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.4rem; }
 .home-nav-footer .btn { font-size: 0.72rem; padding: 0.5rem 1.2rem; }
 .mode-row { display: flex; gap: 0.5rem; }
 .mode-row .btn { flex: 1; }
@@ -1651,6 +1698,7 @@ body.playing .header-container { display: none; }
     <button class="btn btn-secondary btn-small" onclick="showWordReference()">📖<span>Words</span></button>
   </div>
   <div class="home-nav-footer">
+    <button id="theme-toggle-btn" onclick="toggleTheme()" class="btn btn-secondary btn-small">☀️ Light</button>
     <button id="sfx-toggle-btn" onclick="toggleSfx()" class="btn btn-secondary btn-small">🔊 Sound: ON</button>
   </div>
 </div>
@@ -2955,6 +3003,23 @@ function toggleSfx() {
   const btn = document.getElementById('sfx-toggle-btn');
   if (btn) btn.textContent = SFX.enabled ? '\uD83D\uDD0A Sound: ON' : '\uD83D\uDD07 Sound: OFF';
   localStorage.setItem('sfx-enabled', SFX.enabled ? '1' : '0');
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = newTheme === 'dark' ? '\uD83C\uDF19 Dark' : '\u2600\uFE0F Light';
+  localStorage.setItem('theme-mode', newTheme);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('theme-mode');
+  const theme = saved || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = theme === 'dark' ? '\uD83C\uDF19 Dark' : '\u2600\uFE0F Light';
 }
 
 const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
@@ -7543,6 +7608,7 @@ async function loadBattleHistory(filter) {
   }
   // Show section screen if no auto-login
   showScreen('section-screen');
+  initTheme();
 })();
 </script>
 
