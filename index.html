@@ -8096,8 +8096,98 @@ function renderGrammarTypeCards() {
 }
 
 function startGrammarByType(type) {
-  const items = grammarItems.filter(i => i.t === type);
-  if (items.length === 0) { alert('No exercises of this type yet.'); return; }
+  // Show structure filter overlay before starting
+  showTaskStructureFilter(type);
+}
+
+function showTaskStructureFilter(type) {
+  grammarPracticeReturnTo = null;
+  const typeNames = {
+    'gap-fill': 'Gap Fill', 'multiple-choice': 'Multiple Choice', 'error-correction': 'Error Hunt',
+    'transformation': 'Transform', 'translation': 'Translation', 'sentence-building': 'Sentence Builder',
+    'matching': 'Matching', 'context-picker': 'Context Picker', 'question-formation': 'Questions'
+  };
+
+  // Group items by structure for this type
+  const itemsByStruct = {};
+  grammarItems.filter(i => i.t === type).forEach(i => {
+    itemsByStruct[i.sid] = (itemsByStruct[i.sid] || 0) + 1;
+  });
+  const totalItems = Object.values(itemsByStruct).reduce((a, b) => a + b, 0);
+
+  // Group structures by unit
+  const unitMap = {};
+  grammarStructures.forEach(s => {
+    if (!itemsByStruct[s.id]) return;
+    if (!unitMap[s.u]) unitMap[s.u] = [];
+    unitMap[s.u].push(s);
+  });
+  const unitNums = Object.keys(unitMap).sort((a, b) => a - b);
+
+  let html = '<div class="format-overlay" onclick="if(event.target===this)this.remove()">';
+  html += '<div class="format-modal" style="position:relative;">';
+  html += '<button class="format-close-btn" onclick="this.closest(\'.format-overlay\').remove()">\u2715</button>';
+  html += '<h3>' + (typeNames[type] || type) + '</h3>';
+  html += '<div class="subtitle">' + totalItems + ' items across ' + Object.keys(itemsByStruct).length + ' topics</div>';
+
+  // All structures button
+  html += '<button class="format-sprint-btn" onclick="this.closest(\'.format-overlay\').remove(); launchTaskPractice(\'' + type + '\', null)">';
+  html += '<span class="sprint-icon">\uD83C\uDFC3</span>';
+  html += '<span class="sprint-info"><div>All Topics (' + totalItems + ' items)</div><div class="sprint-desc">10 random from all structures</div></span>';
+  html += '</button>';
+
+  // Structure selection
+  html += '<div class="format-section-label">Or pick specific topics</div>';
+  html += '<div id="task-struct-list" style="display:flex;flex-direction:column;gap:4px;max-height:40vh;overflow-y:auto;">';
+  unitNums.forEach(u => {
+    unitMap[u].forEach(s => {
+      const count = itemsByStruct[s.id] || 0;
+      html += '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:2px solid var(--card-border);border-radius:var(--radius);cursor:pointer;font-size:0.82rem;transition:border-color 0.15s;">';
+      html += '<input type="checkbox" class="task-struct-cb" value="' + s.id + '" onchange="updateTaskStartBtn(\'' + type + '\')" style="width:18px;height:18px;accent-color:var(--accent);">';
+      html += '<span style="flex:1;"><strong>U' + s.u + '</strong> ' + s.n + '</span>';
+      html += '<span style="font-size:0.72rem;color:var(--muted);">' + count + '</span>';
+      html += '</label>';
+    });
+  });
+  html += '</div>';
+
+  html += '<button class="format-start-btn" id="task-start-btn" disabled onclick="launchTaskFromFilter(\'' + type + '\')">Select topics to start</button>';
+
+  html += '</div></div>';
+
+  const overlay = document.createElement('div');
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay.firstElementChild);
+}
+
+function updateTaskStartBtn(type) {
+  const checked = document.querySelectorAll('.task-struct-cb:checked');
+  const btn = document.getElementById('task-start-btn');
+  if (checked.length > 0) {
+    let total = 0;
+    checked.forEach(cb => {
+      const count = grammarItems.filter(i => i.t === type && i.sid === cb.value).length;
+      total += count;
+    });
+    btn.disabled = false;
+    btn.textContent = 'Start (' + total + ' item' + (total !== 1 ? 's' : '') + ' from ' + checked.length + ' topic' + (checked.length !== 1 ? 's' : '') + ')';
+  } else {
+    btn.disabled = true;
+    btn.textContent = 'Select topics to start';
+  }
+}
+
+function launchTaskFromFilter(type) {
+  const checked = document.querySelectorAll('.task-struct-cb:checked');
+  const sids = Array.from(checked).map(cb => cb.value);
+  document.querySelector('.format-overlay')?.remove();
+  launchTaskPractice(type, sids.length > 0 ? sids : null);
+}
+
+function launchTaskPractice(type, structureIds) {
+  let items = grammarItems.filter(i => i.t === type);
+  if (structureIds) items = items.filter(i => structureIds.includes(i.sid));
+  if (items.length === 0) { alert('No exercises available.'); return; }
   const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 10);
   grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_type_' + type, practiceType: type };
   document.body.classList.add('playing');
