@@ -1614,6 +1614,34 @@ body.playing .header-container { display: none; }
 .grammar-hint-btn:hover, .grammar-hint-btn:active { border-color:var(--accent); color:var(--accent); }
 .grammar-hint-box { font-size:0.8rem; color:var(--accent2); background:var(--accent2-glow); border:1px solid rgba(245,158,11,0.2); border-radius:var(--radius); padding:0.6rem 0.8rem; margin-top:0.5rem; }
 
+/* ===== PRACTICE BUTTON (full-width) ===== */
+.grammar-practice-full-btn { display:block; width:100%; padding:12px 16px; margin:0.6rem 0; font-size:0.9rem; font-weight:700; color:white; background:var(--accent); border:none; border-radius:var(--radius); cursor:pointer; transition:all 0.15s; text-align:center; }
+.grammar-practice-full-btn:hover, .grammar-practice-full-btn:active { opacity:0.9; transform:translateY(-1px); }
+
+/* ===== FORMAT SELECTION OVERLAY ===== */
+.format-overlay { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; padding:1rem; }
+.format-modal { background:var(--bg); border-radius:16px; max-width:400px; width:100%; max-height:85vh; overflow-y:auto; padding:1.2rem; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.format-modal h3 { margin:0 0 4px; font-size:1.1rem; }
+.format-modal .subtitle { font-size:0.8rem; color:var(--muted); margin-bottom:1rem; }
+.format-sprint-btn { display:flex; align-items:center; gap:10px; width:100%; padding:14px 16px; background:var(--accent); color:white; border:none; border-radius:var(--radius); cursor:pointer; font-size:0.9rem; font-weight:700; margin-bottom:1rem; transition:all 0.15s; }
+.format-sprint-btn:hover { opacity:0.9; }
+.format-sprint-btn .sprint-icon { font-size:1.3rem; }
+.format-sprint-btn .sprint-info { text-align:left; }
+.format-sprint-btn .sprint-desc { font-size:0.72rem; font-weight:400; opacity:0.85; margin-top:2px; }
+.format-section-label { font-size:0.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.5rem; }
+.format-type-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:0.8rem; }
+.format-type-btn { display:flex; flex-direction:column; align-items:center; gap:2px; padding:10px 8px; background:var(--card); border:2px solid var(--card-border); border-radius:var(--radius); cursor:pointer; transition:all 0.15s; text-align:center; }
+.format-type-btn:hover { border-color:var(--accent); }
+.format-type-btn.selected { border-color:var(--accent); background:var(--accent-glow); }
+.format-type-btn.dimmed { opacity:0.45; }
+.format-type-btn .ft-icon { font-size:1.1rem; }
+.format-type-btn .ft-name { font-size:0.78rem; font-weight:600; }
+.format-type-btn .ft-count { font-size:0.68rem; color:var(--muted); }
+.format-start-btn { display:block; width:100%; padding:14px; font-size:0.95rem; font-weight:700; color:white; background:var(--accent); border:none; border-radius:var(--radius); cursor:pointer; transition:all 0.15s; margin-top:0.5rem; }
+.format-start-btn:hover { opacity:0.9; }
+.format-start-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.format-close-btn { position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--muted); }
+
 /* ===== SENTENCE BUILDING ===== */
 .sb-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:0.8rem; }
 .sb-chip { padding:10px 16px; background:var(--card); border:2px solid var(--card-border); border-radius:10px; font-size:0.88rem; font-weight:600; color:var(--text); cursor:pointer; transition:all 0.15s; user-select:none; }
@@ -8145,7 +8173,7 @@ function showGrammarTopics(unit) {
     else if (p.total >= 5 && p.accuracy >= 0.7) { stars = '⭐⭐☆'; badge = '<span class="grammar-topic-badge learning">Practising</span>'; }
     else if (p.total > 0) { stars = '⭐☆☆'; badge = '<span class="grammar-topic-badge learning">Learning</span>'; }
 
-    html += '<div class="grammar-topic-card" onclick="startGrammarExercise(\'' + s.id + '\')">' +
+    html += '<div class="grammar-topic-card" onclick="showGrammarFormatSelection(\'' + s.id + '\', \'topic\')">' +
       '<div class="grammar-topic-stars">' + stars + '</div>' +
       '<div class="grammar-topic-info">' +
         '<div class="grammar-topic-name">' + s.n + '</div>' +
@@ -8162,14 +8190,112 @@ function showGrammarTopics(unit) {
 // --- Grammar Exercise Engine ---
 let grammarSession = { items: [], index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: null };
 
-function startGrammarExercise(structureId) {
-  const items = grammarItems.filter(i => i.sid === structureId);
+// Track where practice was launched from for back-navigation
+var grammarPracticeReturnTo = null;
+
+function startGrammarExercise(structureId, filterTypes) {
+  let items = grammarItems.filter(i => i.sid === structureId);
+  if (filterTypes && filterTypes.length > 0) {
+    items = items.filter(i => filterTypes.includes(i.t));
+  }
   if (items.length === 0) { alert('No exercises available for this topic yet.'); return; }
-  // Shuffle and pick up to 10 items
   const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 10);
   grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: structureId };
   document.body.classList.add('playing');
   renderGrammarItem();
+}
+
+// --- Format Selection Overlay ---
+var _formatSelectedTypes = [];
+
+function showGrammarFormatSelection(structureId, returnTo) {
+  grammarPracticeReturnTo = returnTo || null;
+  _formatSelectedTypes = [];
+  const s = grammarStructures.find(st => st.id === structureId);
+  if (!s) return;
+  const allItems = grammarItems.filter(i => i.sid === structureId);
+  if (allItems.length === 0) { alert('No exercises available yet.'); return; }
+
+  // Count items per type
+  const typeConfig = {
+    'gap-fill': { icon: '\uD83D\uDCDD', name: 'Gap Fill' },
+    'multiple-choice': { icon: '\u26AA', name: 'MC' },
+    'error-correction': { icon: '\uD83D\uDD0D', name: 'Error Hunt' },
+    'transformation': { icon: '\uD83D\uDD04', name: 'Transform' },
+    'translation': { icon: '\uD83C\uDF0D', name: 'Translation' },
+    'sentence-building': { icon: '\uD83E\uDDE9', name: 'Sentence Builder' },
+    'matching': { icon: '\uD83D\uDD17', name: 'Matching' },
+    'context-picker': { icon: '\uD83C\uDFAF', name: 'Context Picker' },
+    'question-formation': { icon: '\u2753', name: 'Questions' }
+  };
+  const typeCounts = {};
+  allItems.forEach(i => { typeCounts[i.t] = (typeCounts[i.t] || 0) + 1; });
+
+  let html = '<div class="format-overlay" onclick="if(event.target===this)this.remove()">';
+  html += '<div class="format-modal" style="position:relative;">';
+  html += '<button class="format-close-btn" onclick="this.closest(\'.format-overlay\').remove()">\u2715</button>';
+  html += '<h3>' + s.n + '</h3>';
+  html += '<div class="subtitle">' + allItems.length + ' items available</div>';
+
+  // Sprint option
+  html += '<button class="format-sprint-btn" onclick="this.closest(\'.format-overlay\').remove(); startGrammarExercise(\'' + structureId + '\')">';
+  html += '<span class="sprint-icon">\uD83C\uDFC3</span>';
+  html += '<span class="sprint-info"><div>Sprint (10 random)</div><div class="sprint-desc">Mixed types, quick round</div></span>';
+  html += '</button>';
+
+  // Focus practice section
+  html += '<div class="format-section-label">\uD83C\uDFAF Focus Practice</div>';
+  html += '<div class="format-type-grid" id="format-type-grid">';
+  Object.keys(typeConfig).forEach(type => {
+    const count = typeCounts[type] || 0;
+    if (count === 0) return;
+    const cfg = typeConfig[type];
+    const dimmed = count < 2 ? ' dimmed' : '';
+    html += '<div class="format-type-btn' + dimmed + '" data-type="' + type + '" onclick="toggleFormatType(this, \'' + type + '\')">';
+    html += '<span class="ft-icon">' + cfg.icon + '</span>';
+    html += '<span class="ft-name">' + cfg.name + '</span>';
+    html += '<span class="ft-count">' + count + ' item' + (count !== 1 ? 's' : '') + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Start button (disabled until selection)
+  html += '<button class="format-start-btn" id="format-start-btn" disabled onclick="startFormatPractice(\'' + structureId + '\')">Select a type to start</button>';
+
+  html += '</div></div>';
+
+  const overlay = document.createElement('div');
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay.firstElementChild);
+}
+
+function toggleFormatType(btn, type) {
+  btn.classList.toggle('selected');
+  const idx = _formatSelectedTypes.indexOf(type);
+  if (idx >= 0) _formatSelectedTypes.splice(idx, 1);
+  else _formatSelectedTypes.push(type);
+
+  // Update start button
+  const startBtn = document.getElementById('format-start-btn');
+  if (_formatSelectedTypes.length > 0) {
+    // Count total items for selected types
+    const grid = btn.closest('.format-type-grid');
+    let total = 0;
+    _formatSelectedTypes.forEach(t => {
+      const b = grid.querySelector('[data-type="' + t + '"]');
+      if (b) total += parseInt(b.querySelector('.ft-count').textContent) || 0;
+    });
+    startBtn.disabled = false;
+    startBtn.textContent = 'Start (' + total + ' item' + (total !== 1 ? 's' : '') + ')';
+  } else {
+    startBtn.disabled = true;
+    startBtn.textContent = 'Select a type to start';
+  }
+}
+
+function startFormatPractice(structureId) {
+  document.querySelector('.format-overlay')?.remove();
+  startGrammarExercise(structureId, _formatSelectedTypes);
 }
 
 function startGrammarSmartReview(weakStructures) {
@@ -8649,7 +8775,15 @@ function exitGrammarPractice() {
   if (grammarSession.results.length > 0) {
     saveGrammarProgress();
   }
-  goHome();
+  returnFromGrammarPractice();
+}
+
+function returnFromGrammarPractice() {
+  if (grammarPracticeReturnTo === 'reference') {
+    showGrammarReference();
+  } else {
+    goHome();
+  }
 }
 
 // --- Grammar Results ---
@@ -8660,7 +8794,7 @@ function showGrammarResults() {
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
   const xp = grammarSession.xpEarned;
 
-  let html = '<div class="progress-nav"><button class="btn btn-secondary" onclick="goHome()">← Home</button><span class="nav-title">Results</span></div>';
+  let html = '<div class="progress-nav"><button class="btn btn-secondary" onclick="returnFromGrammarPractice()">← Back</button><span class="nav-title">Results</span></div>';
   html += '<div style="text-align:center;padding:1.5rem 0;">';
   html += '<div style="font-size:2rem;font-weight:900;margin-bottom:0.3rem;">' + (accuracy >= 80 ? '🎉' : accuracy >= 50 ? '💪' : '📚') + '</div>';
   html += '<div style="font-size:1.3rem;font-weight:800;color:var(--text);">' + accuracy + '% Correct</div>';
@@ -8682,14 +8816,16 @@ function showGrammarResults() {
   });
   html += '</div>';
 
-  // Practice again / Practice More / Home buttons
+  // Practice again / Practice More / Back / Home buttons
   html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:1rem;">';
   if (grammarSession.practiceType && !grammarSession.bonusRound) {
-    // Task-type practice: show "Practice More" for 5 extra items at 1.5× XP
-    html += '<button class="grammar-check-btn" onclick="startGrammarPracticeMore(\'' + grammarSession.practiceType + '\')">🔥 Practice More (+1.5× XP)</button>';
+    html += '<button class="grammar-check-btn" onclick="startGrammarPracticeMore(\'' + grammarSession.practiceType + '\')">\uD83D\uDD25 Practice More (+1.5\u00D7 XP)</button>';
   }
   if (grammarSession.structureId && !grammarSession.structureId.startsWith('_')) {
-    html += '<button class="grammar-check-btn" style="background:var(--card);color:var(--accent);border:2px solid var(--accent);" onclick="startGrammarExercise(\'' + grammarSession.structureId + '\')">Practice Again</button>';
+    html += '<button class="grammar-check-btn" style="background:var(--card);color:var(--accent);border:2px solid var(--accent);" onclick="showGrammarFormatSelection(\'' + grammarSession.structureId + '\', grammarPracticeReturnTo)">Practice Again</button>';
+  }
+  if (grammarPracticeReturnTo === 'reference') {
+    html += '<button class="btn btn-secondary" style="padding:12px;" onclick="showGrammarReference()">\u2190 Back to Reference</button>';
   }
   html += '<button class="btn btn-secondary" style="padding:12px;" onclick="goHome()">Home</button>';
   html += '</div>';
@@ -8807,8 +8943,10 @@ function showGrammarMap() {
 
 // --- Grammar Reference ---
 function showGrammarReference() {
+  const showDe = typeof SHOW_DE_FEEDBACK !== 'undefined' ? SHOW_DE_FEEDBACK : true;
   let html = '';
   grammarStructures.forEach(s => {
+    const practiceBtn = '<button class="grammar-practice-full-btn" onclick="showGrammarFormatSelection(\'' + s.id + '\', \'reference\')">\u25B6 Practice this</button>';
     html += '<div class="grammar-ref-card">';
     // Collapsed header: title + description
     html += '<div class="grammar-ref-header" onclick="toggleRefCard(this)">';
@@ -8820,12 +8958,21 @@ function showGrammarReference() {
     html += '</div>';
     // Expandable body
     html += '<div class="grammar-ref-body"><div class="grammar-ref-body-inner">';
+    // Practice button at TOP
+    html += practiceBtn;
+    // German description always shown
     html += '<p style="font-style:italic;color:var(--muted);font-size:0.72rem;margin-top:0.5rem;">' + s.nd + '</p>';
     s.rules.forEach(r => {
       html += '<h4>' + r.t + '</h4>';
-      html += '<p style="color:var(--muted);">' + r.td + '</p>';
+      // German rule text: only for M1/M2
+      if (showDe) html += '<p style="color:var(--muted);">' + r.td + '</p>';
       if (r.ex) r.ex.forEach(ex => {
-        html += '<div class="rule-example">\uD83C\uDDEC\uD83C\uDDE7 ' + ex.en + ' \u2014 \uD83C\uDDE9\uD83C\uDDEA ' + ex.de + '</div>';
+        // Example sentences: German translation only for M1/M2
+        if (showDe) {
+          html += '<div class="rule-example">\uD83C\uDDEC\uD83C\uDDE7 ' + ex.en + ' \u2014 \uD83C\uDDE9\uD83C\uDDEA ' + ex.de + '</div>';
+        } else {
+          html += '<div class="rule-example">' + ex.en + '</div>';
+        }
       });
     });
     if (s.errs && s.errs.length > 0) {
@@ -8834,7 +8981,8 @@ function showGrammarReference() {
         html += '<div class="rule-error"><span class="wrong">\u2717 ' + e.w + '</span> \u2192 <span class="right">\u2713 ' + e.c + '</span><br><span style="font-size:0.72rem;color:var(--muted);">' + e.d + '</span></div>';
       });
     }
-    html += '<div style="margin-top:0.6rem;"><button class="grammar-hint-btn" onclick="startGrammarExercise(\'' + s.id + '\')">\u25B6 Practice this</button></div>';
+    // Practice button at BOTTOM
+    html += practiceBtn;
     html += '</div></div>';
     html += '</div>';
   });
