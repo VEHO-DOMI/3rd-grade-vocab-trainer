@@ -7621,7 +7621,7 @@ function generateDuelQuestions(unitKey, count) {
     var correct = word.w.replace(/^to\s+/, '');
     var options;
     if (word.mc && word.mc.length >= 3) {
-      options = [correct].concat(word.mc.slice(0, 3));
+      options = [correct].concat(word.mc.slice(0, 3).map(function(w) { return w.replace(/^to\s+/, ''); }));
     } else {
       var all = [];
       for (var k in vocabData) { for (var j = 0; j < vocabData[k].length; j++) all.push(vocabData[k][j].w.replace(/^to\s+/, '')); }
