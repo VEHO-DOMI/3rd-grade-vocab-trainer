@@ -7940,12 +7940,17 @@ showHomeScreen = function() {
       practiceBtn.textContent = '\uD83C\uDFAF Start Practice';
       practiceBtn.onclick = openPracticeSetup;
     }
+    // Restore Words button (was Rules in grammar mode)
+    const wordsBtn = document.getElementById('home-words-btn');
+    if (wordsBtn) {
+      wordsBtn.textContent = '\uD83D\uDCD6 Words';
+      wordsBtn.onclick = function() { showWordReference(); };
+    }
     const navGrid = document.querySelector('.home-nav-grid');
     if (navGrid) {
       navGrid.innerHTML = '<button class="btn btn-secondary btn-small" onclick="showProgressMap()">\uD83D\uDDFA\uFE0F<span>Map</span></button>' +
         '<button class="btn btn-secondary btn-small" onclick="showProgressScreen()">\uD83D\uDCCA<span>Progress</span></button>' +
-        '<button class="btn btn-secondary btn-small" onclick="showLeaderboard()">\uD83C\uDFC6<span>Leaderboard</span></button>' +
-        '<button class="btn btn-secondary btn-small" onclick="showWordReference()">\uD83D\uDCD6<span>Words</span></button>';
+        '<button class="btn btn-secondary btn-small" onclick="showLeaderboard()">\uD83C\uDFC6<span>Leaderboard</span></button>';
     }
     // Update mode pill if present
     const pill = document.getElementById('mode-switch-pill');
@@ -7988,8 +7993,14 @@ function showGrammarHomeScreen() {
   // Update practice button
   const practiceBtn = document.querySelector('.btn-start-practice');
   if (practiceBtn) {
-    practiceBtn.textContent = '🧠 Start Grammar Practice';
+    practiceBtn.textContent = '\uD83E\uDDE0 Start Grammar Practice';
     practiceBtn.onclick = openGrammarPractice;
+  }
+  // Swap Words → Rules in action area
+  const wordsBtn = document.getElementById('home-words-btn');
+  if (wordsBtn) {
+    wordsBtn.textContent = '\uD83D\uDCDD Rules';
+    wordsBtn.onclick = function() { showGrammarReference(); };
   }
   // Smart review for grammar
   const reviewBtn = document.getElementById('review-btn');
@@ -8006,10 +8017,9 @@ function showGrammarHomeScreen() {
   // Update nav buttons
   const navGrid = document.querySelector('.home-nav-grid');
   if (navGrid) {
-    navGrid.innerHTML = '<button class="btn btn-secondary btn-small" onclick="showGrammarMap()">🗺️<span>Map</span></button>' +
-      '<button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊<span>Progress</span></button>' +
-      '<button class="btn btn-secondary btn-small" onclick="showLeaderboard()">🏆<span>Leaderboard</span></button>' +
-      '<button class="btn btn-secondary btn-small" onclick="showGrammarReference()">📝<span>Rules</span></button>';
+    navGrid.innerHTML = '<button class="btn btn-secondary btn-small" onclick="showGrammarMap()">\uD83D\uDDFA\uFE0F<span>Map</span></button>' +
+      '<button class="btn btn-secondary btn-small" onclick="showProgressScreen()">\uD83D\uDCCA<span>Progress</span></button>' +
+      '<button class="btn btn-secondary btn-small" onclick="showLeaderboard()">\uD83C\uDFC6<span>Leaderboard</span></button>';
   }
   // Add mode switch pill
   addModeSwitchPill();
