@@ -7955,6 +7955,7 @@ showHomeScreen = function() {
       pill.onclick = function() { showModeSelectScreen(); };
     }
     _origShowHomeScreen();
+    addModeSwitchPill();
   }
 };
 
@@ -8995,6 +8996,8 @@ async function saveGrammarProgress() {
   try {
     await studentsRef.doc(state.studentId).update(updateObj);
     state.studentData = { ...state.studentData, ...updateObj };
+    // Contribute to weekly class goal
+    if (typeof contributeToWeeklyGoal === 'function' && xp > 0) contributeToWeeklyGoal(xp);
     // Level-up detection
     const newLevel = getLevel(newGrammarXp, 'grammar').level;
     if (newLevel > oldLevel) {
