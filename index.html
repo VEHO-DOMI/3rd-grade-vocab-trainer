@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b1120">
-<title>DomiVocab – 3rd Grade</title>
+<title>DomiGo – 3rd Grade</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -39,10 +39,10 @@
   --context-color: #0284c7;
   --def-color: #1d4ed8;
   --trans-color: #6366f1;
-  --radius: 14px;
-  --radius-lg: 20px;
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.1);
+  --radius: 16px;
+  --radius-lg: 24px;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-elevated: 0 6px 20px rgba(0,0,0,0.12);
 }
 [data-theme="dark"] {
   --bg: #0b1120;
@@ -53,7 +53,7 @@
   --card-solid: #162033;
   --text: #eef0f6;
   --text-secondary: #a8b4c8;
-  --muted: #6b7a94;
+  --muted: #8899b0;
   --accent: #3b82f6;
   --accent-light: #60a5fa;
   --accent-glow: rgba(59,130,246,0.25);
@@ -79,6 +79,13 @@ body {
   color: var(--text);
   min-height: 100vh;
   transition: background 0.3s, color 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100dvh;
+  padding: calc(env(safe-area-inset-top) + 0.5rem) 0 calc(env(safe-area-inset-bottom) + 2.5rem);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
 }
 [data-theme="dark"] body {
   background-image:
@@ -86,19 +93,12 @@ body {
     radial-gradient(ellipse 80% 50% at 100% 100%, rgba(59,130,246,0.08), transparent 70%),
     radial-gradient(ellipse 50% 40% at 0% 80%, rgba(245,158,11,0.05), transparent);
   background-attachment: fixed;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: calc(env(safe-area-inset-top) + 0.5rem) 0 calc(env(safe-area-inset-bottom) + 2rem);
-  -webkit-font-smoothing: antialiased;
-  line-height: 1.5;
 }
 
 /* Typography */
 /* Header — DomiVocab branding */
 .header-container {
-  text-align: center; padding: 52px 32px 40px; position: relative; overflow: hidden; border-radius: 24px;
+  text-align: center; padding: 28px 24px 20px; position: relative; overflow: hidden; border-radius: 24px;
 }
 .header-glow {
   position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
@@ -106,22 +106,22 @@ body {
   background: radial-gradient(circle, rgba(37,99,235,0.12), transparent 70%);
 }
 .header-title {
-  font-family: 'Fredoka', sans-serif; font-size: 56px; font-weight: 700; margin: 0;
+  font-family: 'Fredoka', sans-serif; font-size: 48px; font-weight: 700; margin: 0;
   line-height: 1; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text; color: transparent; display: inline-block; letter-spacing: -1px;
   position: relative; background-image: linear-gradient(140deg, #3b82f6, #8ba4cc 50%, #d4943a 90%);
 }
 .header-tagline {
   font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 600;
-  letter-spacing: 5px; text-transform: uppercase; margin: 10px 0 0; color: rgba(255,255,255,0.28);
+  letter-spacing: 3px; text-transform: uppercase; margin: 6px 0 0; color: var(--muted); opacity: 0.7;
 }
 .header-grade {
-  font-family: 'Fredoka', sans-serif; font-size: 18px; font-weight: 600;
-  margin: 16px 0 0; color: rgba(255,255,255,0.42);
+  font-family: 'Fredoka', sans-serif; font-size: 16px; font-weight: 600;
+  margin: 8px 0 0; color: var(--accent);
 }
 .header-school {
-  font-family: 'Quicksand', sans-serif; font-size: 10.5px; font-weight: 500;
-  line-height: 1.6; margin: 14px 0 0; letter-spacing: 0.3px; color: rgba(255,255,255,0.16);
+  font-family: 'Quicksand', sans-serif; font-size: 9.5px; font-weight: 500;
+  line-height: 1.5; margin: 4px 0 0; letter-spacing: 0.3px; color: var(--muted); opacity: 0.5;
 }
 h1 { display: none; }
 .subtitle { display: none; }
@@ -194,9 +194,9 @@ h1 { display: none; }
 .profile-rank-pill { font-size: 0.72rem; padding: 3px 10px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
 .profile-badges-row { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
 .profile-badges-row .badge-icon { width: 28px; height: 28px; font-size: 16px; }
-.profile-logout-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+.profile-logout-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
 .profile-xp-bar { width: 100%; margin-top: 0.7rem; }
-.profile-xp-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.profile-xp-track { height: 8px; border-radius: 4px; background: var(--card-border); overflow: hidden; }
 .profile-xp-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; background: var(--accent); }
 .profile-xp-labels { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
 .logout-btn {
@@ -209,9 +209,9 @@ h1 { display: none; }
 .welcome-bar { display: none; }
 
 /* Stats bar */
-.stats-bar { display: flex; gap: 0.5rem; width: 100%; margin-bottom: 0.8rem; }
+.stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin-bottom: 0.8rem; }
 .stat-card {
-  flex: 1; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius);
+  flex: 1; background: var(--card); border: 1.5px solid var(--card-border); border-radius: var(--radius);
   padding: 0.75rem 0.5rem; text-align: center; backdrop-filter: blur(20px);
   box-shadow: var(--shadow-card); position: relative; overflow: hidden;
 }
@@ -223,10 +223,10 @@ h1 { display: none; }
 .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); }
 .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
 .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); }
-.stat-value { font-size: 1.4rem; font-weight: 900; color: var(--accent-light); letter-spacing: -0.02em; }
+.stat-value { font-size: 1.5rem; font-weight: 800; color: var(--accent-light); letter-spacing: -0.02em; font-family: 'Fredoka', sans-serif; }
 .stat-card:nth-child(2) .stat-value { color: var(--accent-light); }
 .stat-card:nth-child(3) .stat-value { color: var(--accent-light); }
-.stat-label { font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.2rem; font-weight: 600; }
+.stat-label { font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.2rem; font-weight: 700; }
 
 /* Source Selection */
 .source-section { margin-bottom: 0.8rem; }
@@ -428,8 +428,8 @@ h1 { display: none; }
 .btn-daily { background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: #fff; font-weight: 700; border: none; border-radius: var(--radius); padding: 0.6rem 1.5rem; cursor: pointer; font-size: 0.85rem; width: 100%; }
 .btn-daily:hover { filter: brightness(1.1); }
 
-.btn-review { background: var(--accent-glow); border: 1px solid var(--card-border); color: var(--accent-light); }
-.btn-review:hover { background: var(--accent-glow); border-color: var(--accent); opacity: 0.9; }
+.btn-review { background: var(--accent-glow); border: 1.5px solid var(--card-border); color: var(--accent); font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 0.8rem 0.6rem; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; }
+.btn-review:hover { border-color: var(--accent); opacity: 0.9; }
 
 #leaderboard-screen .progress-nav { margin-bottom: 1rem; }
 .lb-section-title { font-weight: 800; font-size: 0.85rem; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.08em; margin: 1.2rem 0 0.6rem; }
@@ -584,6 +584,11 @@ h1 { display: none; }
 [data-theme="light"] .battle-modal-bg { background: white; color: var(--text); }
 [data-theme="light"] .setup-step { background: white; }
 
+/* ===== NAIVE TYPOGRAPHY & POLISH ===== */
+.profile-name, .nav-title, h2, .card h3, .login-card h2, .lb-name { font-family: 'Fredoka', sans-serif; }
+.nav-title { font-size: 1rem; font-weight: 700; }
+.card { border-width: 1.5px; }
+
 /* Responsive — Mobile */
 @media (max-width: 600px) {
   .profile-card { padding: 0.7rem 0.8rem; }
@@ -716,7 +721,7 @@ h1 { display: none; }
   .source-btn { padding: 1rem 0.9rem; font-size: 0.92rem; }
   .type-grid { justify-content: center; }
   .home-actions { max-width: 640px; margin-left: auto; margin-right: auto; }
-  .home-actions-grid { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .home-actions-area { max-width: 640px; margin-left: auto; margin-right: auto; }
   .home-nav-grid { max-width: 640px; margin-left: auto; margin-right: auto; }
   .mode-row { max-width: 640px; margin-left: auto; margin-right: auto; }
   #wotd-card { width: 100%; }
@@ -759,12 +764,15 @@ body.playing .header-container { display: none; }
 .home-actions { width: 100%; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.2rem; }
 .home-actions-row { display: flex; gap: 0.5rem; }
 .home-actions-row .btn { flex: 1; }
-.home-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%; margin-bottom: 0.8rem; }
-.home-actions-grid .btn, .home-actions-grid .btn-battle { width: 100%; font-size: 0.82rem; padding: 0.7rem 0.5rem; }
-.home-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; width: 100%; margin-top: 0.5rem; }
-.home-nav-grid .btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.7rem; padding: 0.6rem 0.3rem; }
-.home-nav-grid .btn span { font-size: 0.6rem; opacity: 0.8; }
-.home-nav-footer { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.4rem; }
+.home-actions-area { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 0.6rem; }
+.home-actions-area .btn-start-practice { width: 100%; }
+.home-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.home-actions-row .btn, .home-actions-row .btn-battle, .home-actions-row .btn-review { width: 100%; font-size: 0.85rem; padding: 0.8rem 0.6rem; font-family: 'Fredoka', sans-serif; border-radius: var(--radius); }
+.home-nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-top: 0.5rem; margin-bottom: 0.8rem; }
+.home-nav-grid .btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.7rem; padding: 0.6rem 0.3rem; font-family: 'Fredoka', sans-serif; border-radius: var(--radius); background: var(--card); border: 1.5px solid var(--card-border); box-shadow: var(--shadow-card); color: var(--text); font-weight: 600; }
+.home-nav-grid .btn:hover { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
+.home-nav-grid .btn span { font-size: 0.68rem; font-family: 'Inter', sans-serif; font-weight: 600; opacity: 0.7; }
+.home-nav-footer { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.8rem; margin-bottom: 1.5rem; }
 .home-nav-footer .btn { font-size: 0.72rem; padding: 0.5rem 1.2rem; }
 .mode-row { display: flex; gap: 0.5rem; }
 .mode-row .btn { flex: 1; }
@@ -967,8 +975,8 @@ body.playing .header-container { display: none; }
 #rank-display { margin-bottom: 0.4rem !important; }
 
 /* Battle system */
-.btn-battle { width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;border:none;margin-top:8px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;transition:transform 0.1s,opacity 0.1s; }
-.btn-battle:hover { opacity:0.9; }
+.btn-battle { background: var(--card); border: 1.5px solid var(--card-border); color: var(--text-secondary); font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 0.8rem 0.6rem; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-card); }
+.btn-battle:hover { border-color: var(--accent); color: var(--accent); }
 .btn-battle:active { transform:scale(0.98); }
 .battle-modal-bg { background:#161d2e;color:rgba(255,255,255,0.9); }
 #battle-area { background:rgba(255,255,255,0.05);border-radius:14px; }
@@ -1683,8 +1691,8 @@ body.playing .header-container { display: none; }
 
 <div class="header-container">
   <div class="header-glow"></div>
-  <h1 class="header-title" style="display:inline-block;">DomiVocab</h1>
-  <p class="header-tagline">Learn · Play · Win</p>
+  <h1 class="header-title" style="display:inline-block;">DomiGo</h1>
+  <p class="header-tagline">English · Vocabulary & Grammar</p>
   <p class="header-grade">3rd Grade</p>
   <p class="header-school">VEHO – Gymnasium und wirtschaftskundliches<br>Realgymnasium der Dominikanerinnen</p>
 </div>
@@ -1820,11 +1828,16 @@ body.playing .header-container { display: none; }
     <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak 🔥</div></div>
   </div>
 
-  <div class="home-actions-grid">
+  <div class="home-actions-area">
     <button class="btn btn-primary btn-start-practice" onclick="openPracticeSetup()">🎯 Start Practice</button>
-    <button class="btn btn-review" id="review-btn" style="display:none;" onclick="startSmartReview()">🔄 Smart Review</button>
-    <button id="btn-battle" class="btn-battle" onclick="openBattleLobby()" style="display:none;">⚔️ Battle Arena</button>
-    <button class="btn-battle" onclick="openClassQuizJoin()" style="background:linear-gradient(135deg,var(--accent-light),var(--accent));">🎓 Class Quiz</button>
+    <div class="home-actions-row">
+      <button class="btn btn-review" id="review-btn" style="display:none;" onclick="startSmartReview()">🔄 Smart Review</button>
+      <button class="btn btn-secondary" id="home-words-btn" onclick="showWordReference()">📖 Words</button>
+    </div>
+    <div class="home-actions-row">
+      <button class="btn-battle" onclick="openClassQuizJoin()" style="background:linear-gradient(135deg,var(--accent-light),var(--accent));">🎓 Class Quiz</button>
+      <button id="btn-battle" class="btn-battle" onclick="openBattleLobby()" style="display:none;">⚔️ Battle Arena</button>
+    </div>
   </div>
 
   <div class="today-card" id="today-card" style="display:none;">
@@ -1865,7 +1878,6 @@ body.playing .header-container { display: none; }
     <button class="btn btn-secondary btn-small" onclick="showProgressMap()">🗺️<span>Map</span></button>
     <button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊<span>Progress</span></button>
     <button class="btn btn-secondary btn-small" onclick="showLeaderboard()">🏆<span>Leaderboard</span></button>
-    <button class="btn btn-secondary btn-small" onclick="showWordReference()">📖<span>Words</span></button>
   </div>
   <div class="home-nav-footer">
     <button id="theme-toggle-btn" onclick="toggleTheme()" class="btn btn-secondary btn-small">☀️ Light</button>
@@ -3201,7 +3213,7 @@ function initTheme() {
 
 const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
 const BADGE_DEFS = [
-  { id:'first-session', icon:'⭐', name:'First Steps', desc:'Complete your first session', check:(d)=>(d.totalSessions||0)>=1 },
+  { id:'first-session', icon:'\uD83C\uDF1F', name:'First Steps', desc:'Complete your first session', check:(d)=>(d.totalSessions||0)>=1 },
   { id:'ten-sessions', icon:'🔥', name:'On Fire', desc:'Complete 10 sessions', check:(d)=>(d.totalSessions||0)>=10 },
   { id:'fifty-sessions', icon:'🚀', name:'Unstoppable', desc:'Complete 50 sessions', check:(d)=>(d.totalSessions||0)>=50 },
   { id:'mastered-10', icon:'🧠', name:'Quick Learner', desc:'Master 10 words', check:(d,m)=>m>=10 },
@@ -3209,18 +3221,18 @@ const BADGE_DEFS = [
   { id:'mastered-100', icon:'🏆', name:'Vocabulary Champion', desc:'Master 100 words', check:(d,m)=>m>=100 },
   { id:'mastered-all', icon:'👑', name:'Master of All', desc:'Master every single word', check:(d,m)=>{ let t=0; for(const s of Object.values(vocabData)) t+=s.length; return m>=t; }},
   { id:'perfect-round', icon:'💯', name:'Flawless', desc:'Score 10/10 or higher in one round', check:(d,m,r)=>r&&r.length>=10&&r.every(x=>x.correct) },
-  { id:'streak-3', icon:'🔥', name:'3-Day Streak', desc:'Practice 3 days in a row', check:(d)=>(d.streak||0)>=3 },
+  { id:'streak-3', icon:'\uD83D\uDCC5', name:'3-Day Streak', desc:'Practice 3 days in a row', check:(d)=>(d.streak||0)>=3 },
   { id:'streak-7', icon:'⚡', name:'Weekly Warrior', desc:'Practice 7 days in a row', check:(d)=>(d.streak||0)>=7 },
   { id:'all-types', icon:'🎨', name:'Explorer', desc:'Try all 5 exercise types', check:(d)=>(d.exerciseTypesUsed||[]).length>=5 },
   { id:'daily-first', icon:'🌅', name:'Daily Challenger', desc:'Complete your first daily challenge', check:(d)=>Object.keys(d.dailyChallengeLog||{}).length>=1 },
   { id:'daily-perfect', icon:'✨', name:'Daily Genius', desc:'Score 100% on a daily challenge', check:(d)=>Object.values(d.dailyChallengeLog||{}).some(v=>v.pct===100) },
-  { id:'speed-demon', icon:'⚡', name:'Speed Demon', desc:'Get 15+ correct in a Speed Round', check:(d)=>(d.bestSpeedRound||0)>=15 },
+  { id:'speed-demon', icon:'\uD83D\uDCA8', name:'Speed Demon', desc:'Get 15+ correct in a Speed Round', check:(d)=>(d.bestSpeedRound||0)>=15 },
   { id:'sprinter', icon:'🏃', name:'Sprinter', desc:'Complete 10 sprints', check:(d)=>(d.totalSprints||0)>=10 },
   { id:'sharp-eye', icon:'👁️', name:'Sharp Eye', desc:'Get 20+ correct in Multiple Choice', check:(d)=>(d.bestMCStreak||0)>=20 },
   { id:'context-ace', icon:'🎯', name:'Context Ace', desc:'Score 90%+ on a context-hard session (min 10 words)', check:(d,m,r)=>r&&r.length>=10&&r.filter(x=>x.type==='context-hard').length>=10&&r.filter(x=>x.type==='context-hard'&&x.correct).length/r.filter(x=>x.type==='context-hard').length>=0.9 },
   { id:'definition-master', icon:'📖', name:'Definition Master', desc:'Score 90%+ on a definition-hard session (min 10 words)', check:(d,m,r)=>r&&r.length>=10&&r.filter(x=>x.type==='definition-hard').length>=10&&r.filter(x=>x.type==='definition-hard'&&x.correct).length/r.filter(x=>x.type==='definition-hard').length>=0.9 },
   { id:'giant-killer', icon:'🗡️', name:'Giant Killer', desc:'Win a battle against someone ranked higher', check:(d)=>(d.giantKills||0)>=1 },
-  { id:'variety-pack', icon:'🎨', name:'Variety Pack', desc:'Use all 5 exercise types in one day', check:(d)=>(d.dailyVarietyAchieved||0)>=1 },
+  { id:'variety-pack', icon:'\uD83C\uDFAA', name:'Variety Pack', desc:'Use all 5 exercise types in one day', check:(d)=>(d.dailyVarietyAchieved||0)>=1 },
   { id:'comeback-kid', icon:'🔄', name:'Comeback Kid', desc:'Score 100% on a retry-wrong session', check:(d)=>(d.perfectRetries||0)>=1 },
   { id:'review-warrior', icon:'🛡️', name:'Review Warrior', desc:'Complete 5 Smart Review sessions', check:(d)=>(d.smartReviewCount||0)>=5 },
   { id:'full-sweep', icon:'🧹', name:'Full Sweep', desc:'Practice every single unit at least once', check:(d)=>{ const used = new Set(d.unitsAttempted||[]); return used.size >= Object.keys(vocabData).length; }},
@@ -5894,6 +5906,7 @@ function goHome() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 // Keyboard
