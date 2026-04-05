@@ -4202,7 +4202,7 @@ function renderBattleHistory() {
     return;
   }
   const modeLabels = {translation:'Translation',definition:'Definition',context:'Context'};
-  const resultEmoji = {win:'&#127942;',loss:'&#128170;',draw:'&#129309;'};
+  const resultEmoji = {win:'\uD83C\uDFC6',loss:'\uD83D\uDCAA',draw:'\uD83E\uDD1D'};
   const resultColor = {win:'var(--correct)',loss:'var(--wrong)',draw:'var(--muted)'};
   list.innerHTML = state.battleHistory.map(b => {
     const d = new Date(b.date);
@@ -5218,7 +5218,7 @@ async function saveFlashcardProgress(word) {
   const slug = slugify(word.source);
   try {
     const docRef = studentsRef.doc(state.studentId).collection('progress').doc(slug);
-    const key = 'words.' + word.w.replace(/\./g, '·') + '.lastSeen';
+    const key = 'words.' + word.w.replace(/\./g, '\u00b7') + '.lastSeen';
     await docRef.set({ [key]: new Date().toISOString() }, { merge: true });
   } catch(e) { console.error('Flashcard progress save error:', e); }
 }
@@ -6399,7 +6399,7 @@ function renderBattleResults(data) {
   xpEarned += myScore * 15;
   state.xp = (state.xp || 0) + xpEarned;
   const area = document.getElementById('battle-area');
-  if (area) area.innerHTML = '<div style="text-align:center;padding:20px;"><div style="font-size:48px;margin-bottom:12px;">' + (iWon ? '&#127942;' : isDraw ? '&#129309;' : '&#128170;') + '</div><div style="font-size:24px;font-weight:700;margin-bottom:4px;">' + (iWon ? 'Victory!' : isDraw ? 'Draw!' : escapeHtml(opName) + ' wins!') + '</div><div style="font-size:16px;opacity:0.7;margin-bottom:16px;">' + myScore + ' \u2013 ' + opScore + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:24px;">+' + xpEarned + ' XP earned</div><button onclick="leaveBattle()" class="btn btn-primary" style="padding:10px 28px;">Back to Home</button></div>';
+  if (area) area.innerHTML = '<div style="text-align:center;padding:20px;"><div style="font-size:48px;margin-bottom:12px;">' + (iWon ? '\uD83C\uDFC6' : isDraw ? '\uD83E\uDD1D' : '\uD83D\uDCAA') + '</div><div style="font-size:24px;font-weight:700;margin-bottom:4px;">' + (iWon ? 'Victory!' : isDraw ? 'Draw!' : escapeHtml(opName) + ' wins!') + '</div><div style="font-size:16px;opacity:0.7;margin-bottom:16px;">' + myScore + ' \u2013 ' + opScore + '</div><div style="font-size:14px;opacity:0.6;margin-bottom:24px;">+' + xpEarned + ' XP earned</div><button onclick="leaveBattle()" class="btn btn-primary" style="padding:10px 28px;">Back to Home</button></div>';
   if (typeof SFX !== 'undefined') SFX.play(iWon ? 'levelup' : 'correct');
   saveBattleResults(data, xpEarned);
 }
@@ -7847,49 +7847,157 @@ async function loadBattleHistory(filter) {
 
   try {
     var slug = state.studentId;
-    if (!slug || !studentsRef) {
-      list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);">Not logged in.</div>';
-      return;
-    }
-    var snap;
-    try {
-      snap = await studentsRef.doc(slug).collection('battleHistory').orderBy('date', 'desc').limit(50).get();
-    } catch(indexErr) {
-      snap = await studentsRef.doc(slug).collection('battleHistory').limit(50).get();
-    }
+    var snap = await studentsRef.doc(slug).collection('battleHistory').orderBy('date', 'desc').limit(50).get();
     var items = [];
     snap.forEach(function(doc) { items.push(doc.data()); });
 
-    if (filter === 'live') items = items.filter(function(i) { return !i.type || i.type === 'live' || i.type === 'none'; });
+    if (filter === 'live') items = items.filter(function(i) { return !i.type || i.type === 'live'; });
     if (filter === 'duel') items = items.filter(function(i) { return i.type === 'duel'; });
     if (filter === 'grammar-duel') items = items.filter(function(i) { return i.type === 'grammar-duel'; });
 
     if (items.length === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);">No battles found.</div>';
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);">No battles yet.</div>';
       return;
     }
 
-    // Sort client-side if orderBy failed
-    items.sort(function(a, b) {
-      return (b.date || '').localeCompare(a.date || '');
-    });
-
     list.innerHTML = items.map(function(b) {
-      var icon = b.result === 'win' ? '&#127942;' : b.result === 'draw' ? '&#129309;' : '&#128170;';
+      var icon = b.result === 'win' ? '🏆' : b.result === 'draw' ? '🤝' : '💪';
       var color = b.result === 'win' ? 'var(--correct)' : b.result === 'loss' ? 'var(--wrong)' : 'var(--muted)';
       var date = b.date ? new Date(b.date).toLocaleDateString('en-GB', {day:'numeric',month:'short'}) : '';
-      var typeLabel = b.type === 'grammar-duel' ? 'Grammar Duel' : b.type === 'duel' ? 'Word Duel' : b.mode ? ({translation:'Translation',definition:'Definition',context:'Context'}[b.mode] || 'Battle') : 'Live Battle';
+      var typeLabel = b.type === 'grammar-duel' ? 'Grammar Duel' : b.type === 'duel' ? 'Word Duel' : b.mode ? ({translation:'Translation',definition:'Definition',context:'Context'}[b.mode] || 'Battle') : 'Battle';
       return '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--card-border);">' +
         '<div><div style="font-weight:600;">' + icon + ' vs ' + escapeHtml(b.opponent || 'Unknown') + '</div>' +
-        '<div style="font-size:0.75rem;color:var(--muted);">' + typeLabel + ' \u00b7 ' + date + '</div></div>' +
-        '<div style="text-align:right;"><div style="font-weight:700;color:' + color + ';">' + (b.myScore || 0) + '–' + (b.theirScore || 0) + '</div>' +
+        '<div style="font-size:0.75rem;color:var(--muted);">' + typeLabel + ' · ' + date + '</div></div>' +
+        '<div style="text-align:right;"><div style="font-weight:700;color:' + color + ';">' + (b.myScore || 0) + ' - ' + (b.theirScore || 0) + '</div>' +
         '<div style="font-size:0.7rem;color:var(--muted);">+' + (b.xpEarned || 0) + ' XP</div></div></div>';
     }).join('');
   } catch (e) {
     console.error('Load battle history error:', e);
-    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);">Error: ' + e.message + '</div>';
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);">Error loading history.</div>';
   }
 }
+
+// ===== INIT =====
+(async function() {
+  SFX.init();
+  if (localStorage.getItem('sfx-enabled') === '0') { SFX.enabled = false; }
+  const sfxBtn = document.getElementById('sfx-toggle-btn');
+  if (sfxBtn) sfxBtn.textContent = SFX.enabled ? '\uD83D\uDD0A Sound: ON' : '\uD83D\uDD07 Sound: OFF';
+  initSectionScreen();
+
+  // Check for saved session (auto-login with section)
+  const savedSection = localStorage.getItem(LS_KEY + '-section');
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved && savedSection) {
+    try {
+      setClassId(savedSection);
+      const { id, name, pin } = JSON.parse(saved);
+      if (id && pin) {
+        const doc = await studentsRef.doc(id).get();
+        if (doc.exists && doc.data().pin === pin) {
+          state.studentId = id;
+          state.studentName = name;
+          state.studentData = doc.data();
+          if (!state.studentData.avatarId) {
+            const newAv = await getAvailableAvatar();
+            state.avatarId = newAv;
+            state.studentData.avatarId = newAv;
+            await studentsRef.doc(id).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp(), avatarId: newAv });
+          } else {
+            state.avatarId = state.studentData.avatarId;
+            await studentsRef.doc(id).update({ lastActive: firebase.firestore.FieldValue.serverTimestamp() });
+          }
+          await loadProgress();
+          loadWeeklyGoal();
+          preloadAvatars();
+          updateAllAvatars();
+          // Restore saved mode and go straight to home
+
+          const savedMode = localStorage.getItem(LS_KEY + '-mode');
+
+          if (savedMode) {
+
+            state.mode = savedMode;
+
+            if (savedMode === 'grammar') loadGrammarData();
+
+            showHomeScreen();
+
+          } else {
+
+            showModeSelectScreen();
+
+          }
+          return;
+        }
+      }
+    } catch (e) { console.error('Auto-login error:', e); }
+    localStorage.removeItem(LS_KEY);
+  }
+  // Show section screen if no auto-login
+  showScreen('section-screen');
+  initTheme();
+})();
+
+const SHOW_DE_FEEDBACK = false;
+
+const GRAMMAR_LEVELS = [
+  {level:1,xp:0,name:'Rule Noob',zone:'bronze',vibe:'just spawned in'},
+  {level:2,xp:50,name:'Comma Kid',zone:'bronze',vibe:'finding the basics'},
+  {level:3,xp:120,name:'Tense Cadet',zone:'bronze',vibe:'past, present, future...'},
+  {level:4,xp:220,name:'Sentence Slicer',zone:'bronze',vibe:'chopping up sentences'},
+  {level:5,xp:350,name:'Grammar Gremlin',zone:'bronze',vibe:'causing chaos with rules'},
+  {level:6,xp:500,name:'Clause Cruncher',zone:'silver',vibe:'eating clauses for breakfast'},
+  {level:7,xp:700,name:'Syntax Sniper',zone:'silver',vibe:'every shot hits'},
+  {level:8,xp:950,name:'Rule Breaker',zone:'silver',vibe:'knows rules to break them'},
+  {level:9,xp:1250,name:'Grammar Gladiator',zone:'silver',vibe:'arena-tested'},
+  {level:10,xp:1600,name:'Tense Titan',zone:'silver',vibe:'master of time'},
+  {level:11,xp:2000,name:'Error Assassin',zone:'gold',vibe:'hunts mistakes for fun'},
+  {level:12,xp:2700,name:'Grammar Goat',zone:'gold',vibe:'greatest of all time'},
+  {level:13,xp:3500,name:'Sentence Sorcerer',zone:'gold',vibe:'casting grammar spells'},
+  {level:14,xp:5000,name:'Punctuation Pirate',zone:'gold',vibe:'stealing commas everywhere'},
+  {level:15,xp:6500,name:'Rule Overlord',zone:'gold',vibe:'all rules bow to you'},
+  {level:16,xp:8000,name:'Grammar Dragon',zone:'diamond',vibe:'breathing grammar fire'},
+  {level:17,xp:11000,name:'Clause Commander',zone:'diamond',vibe:'commanding the syntax fleet'},
+  {level:18,xp:15000,name:'Grammar Galaxy',zone:'diamond',vibe:'a universe of rules'},
+  {level:19,xp:20000,name:'Language Lich',zone:'diamond',vibe:'undying grammar power'},
+  {level:20,xp:30000,name:'Grammar God',zone:'diamond',vibe:'GG'},
+  {level:21,xp:30000,name:'Grammar God',zone:'prestige',prestige:1,vibe:'prestige unlocked'},
+  {level:22,xp:45000,name:'Grammar God',zone:'prestige',prestige:2,vibe:'rising legend'},
+  {level:23,xp:65000,name:'Grammar God',zone:'prestige',prestige:3,vibe:'elite status'},
+  {level:24,xp:90000,name:'Grammar God',zone:'prestige',prestige:4,vibe:'mythic tier'},
+  {level:25,xp:120000,name:'Grammar God',zone:'prestige',prestige:5,vibe:'ultimate master'},
+];
+
+const GRAMMAR_BADGE_DEFS = [
+  { id:'g-first-session', icon:'🧠', name:'Grammar Rookie', desc:'Complete your first grammar session', check:(d)=>(d.grammarSessions||0)>=1 },
+  { id:'g-ten-sessions', icon:'🔥', name:'Grammar Grinder', desc:'Complete 10 grammar sessions', check:(d)=>(d.grammarSessions||0)>=10 },
+  { id:'g-fifty-sessions', icon:'🚀', name:'Grammar Machine', desc:'Complete 50 grammar sessions', check:(d)=>(d.grammarSessions||0)>=50 },
+  { id:'g-perfect-10', icon:'💯', name:'Perfect 10', desc:'Get 10/10 in a grammar session', check:(d,m,r)=>r&&r.length>=10&&r.every(x=>x.correct) },
+  { id:'g-streak-3', icon:'\uD83D\uDCC5', name:'3-Day Grammar Streak', desc:'Practice grammar 3 days in a row', check:(d)=>(d.grammarStreak||0)>=3 },
+  { id:'g-streak-7', icon:'⚡', name:'Grammar Week', desc:'Practice grammar 7 days in a row', check:(d)=>(d.grammarStreak||0)>=7 },
+  { id:'g-mastered-5', icon:'\uD83C\uDF1F', name:'Rule Learner', desc:'Master 5 grammar structures', check:(d,m)=>m>=5 },
+  { id:'g-mastered-15', icon:'📚', name:'Grammar Scholar', desc:'Master 15 grammar structures', check:(d,m)=>m>=15 },
+  { id:'g-mastered-all', icon:'👑', name:'Grammar Crown', desc:'Master all 18 grammar structures', check:(d,m)=>m>=18 },
+  { id:'g-accuracy-80', icon:'🎯', name:'Sharpshooter', desc:'Reach 80% overall grammar accuracy (min 50 answers)', check:(d)=>(d.grammarAnswered||0)>=50&&(d.grammarCorrect||0)/(d.grammarAnswered||1)>=0.8 },
+  { id:'g-accuracy-95', icon:'💎', name:'Precision Master', desc:'Reach 95% overall grammar accuracy (min 100 answers)', check:(d)=>(d.grammarAnswered||0)>=100&&(d.grammarCorrect||0)/(d.grammarAnswered||1)>=0.95 },
+  { id:'g-tense-tamer', icon:'⏰', name:'Tense Tamer', desc:'Master all tense structures', check:(d)=>{ const p=d.grammarProgress||{}; const tenseIds=['m3-u2-past-continuous','m3-u3-past-continuous-vs-simple','m3-u8-present-perfect-vs-past-simple','m3-u9-present-perfect-for-since','m3-u10-present-perfect-continuous','m3-u11-passive-voice']; return tenseIds.every(id=>{const s=p[id]; return s&&s.accuracy>=0.9&&s.total>=15;}); }},
+  { id:'g-error-hunter', icon:'🔍', name:'Error Hunter', desc:'Get 5 error-correction items right in a row', check:(d)=>(d.grammarEcStreak||0)>=5 },
+  { id:'g-translator', icon:'🌍', name:'Translator', desc:'Get 10 translation items right in a row', check:(d)=>(d.grammarTrStreak||0)>=10 },
+  { id:'g-all-units', icon:'🗺️', name:'Grammar Explorer', desc:'Practice at least one structure from every unit', check:(d)=>{ const p=d.grammarProgress||{}; const units=new Set(); Object.keys(p).forEach(k=>{const m=k.match(/m3-u(\d+)/); if(m)units.add(m[1]);}); return units.size>=14; }},
+  { id:'g-100-answers', icon:'💪', name:'Century', desc:'Answer 100 grammar questions', check:(d)=>(d.grammarAnswered||0)>=100 },
+  { id:'g-500-answers', icon:'🏋️', name:'Grammar Athlete', desc:'Answer 500 grammar questions', check:(d)=>(d.grammarAnswered||0)>=500 },
+  { id:'g-prestige-1', icon:'⭐', name:'Grammar Prestige I', desc:'Reach Grammar God (30,000 XP)', check:(d)=>(d.grammarXp||0)>=30000 },
+  { id:'g-daily-first', icon:'\uD83C\uDF05', name:'Daily Grammar Challenger', desc:'Complete your first grammar daily challenge', check:(d)=>Object.keys(d.grammarDailyChallengeLog||{}).length>=1 },
+  { id:'g-daily-perfect', icon:'\u2728', name:'Daily Grammar Genius', desc:'Score 100% on a grammar daily challenge', check:(d)=>Object.values(d.grammarDailyChallengeLog||{}).some(v=>v.pct===100) },
+];
+
+if (!state.mode) state.mode = 'vocab';
+
+// --- Grammar data (minified) --- loaded dynamically below
+let grammarStructures = [];
+let grammarItems = [];
+let grammarDataLoaded = false;
 
 function loadGrammarData() {
   if (grammarDataLoaded) return;
