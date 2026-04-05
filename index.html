@@ -10597,7 +10597,17 @@ var campaignCharacters = {
 
 // ── 3. Prologue Scenes (data filled separately) ────────────────────────────
 // Each scene: { speaker:'narrator', text:'...', emotion:'' }
-var prologueScenes = [];
+var prologueScenes = [
+  {speaker:'narrator', text:'Tuesday. 10:47 a.m. The hallway of Bundesgymnasium 14 smells like floor cleaner and cheap coffee from the teachers\' room. Outside, Vienna is grey. Inside, it\'s greyer. Someone\'s phone buzzes. A locker door slams. A teacher says "Quiet, please" to nobody in particular. This is the most boring day of the most boring week. Nothing ever happens here. But today, something does.', emotion:''},
+  {speaker:'narrator', text:'You are sitting on the bench near the water fountain. Your usual spot. You have a notebook open, but you\'re not writing. You\'re watching. You always watch. You notice things other people miss \u2014 the way someone laughs too hard, the way someone checks their phone under the desk. You don\'t talk much in groups. But you listen. And right now, you\'re listening to your three closest friends argue about something ridiculous.', emotion:''},
+  {speaker:'narrator', text:'Leah is already talking. She is always already talking. Today her oversized tortoiseshell glasses are slightly crooked. Her dark curls are escaping from their messy bun, held by a neon green scrunchie. Her cropped denim jacket has a new pin on it \u2014 a tiny graph going up. Her phone screen shows a spreadsheet. She made it herself. It lists every Austrian YouTube channel with more than 5,000 subscribers. "Did you know," she says, pushing her glasses up with one finger, "that the fastest-growing channel got 10,000 subscribers in one week? One. Week." Nobody asked. Leah does not wait to be asked.', emotion:'excited'},
+  {speaker:'narrator', text:'Leo doesn\'t look up. He almost never looks up. His black hair falls over one eye. His matte black headphones sit around his neck, still playing something \u2014 you can hear the tiny ghost of a beat. His fingers move across his phone screen, editing a photo. He makes everything look cinematic. A picture of a sandwich. A picture of rain on a window. He posted one last week and got forty-three likes. For Leo, this is a lot. He speaks without raising his eyes. "Subscribers don\'t matter if the content is bad." Three seconds of silence. Then Leah explodes.', emotion:''},
+  {speaker:'narrator', text:'"Content? CONTENT? I have a whole plan for content!" Leah waves her phone like a flag. Leo pushes his hair back. It falls forward again immediately. And between them sits Ben. Sandy-blond hair pointing in four directions. Orange puffer vest over a green T-shirt. Freckles everywhere. He\'s eating an apple and smiling at both of them like he\'s watching tennis. "I think YouTube is cool," Ben says. His accent is strong. His grammar is creative. His enthusiasm is enormous. Ben moved here from Salzburg two years ago. His English teacher gave him a C minus last term. He doesn\'t care. He has opinions about everything and the confidence to share all of them.', emotion:''},
+  {speaker:'narrator', text:'Then it happens. Ben holds up his phone. "Look. Look at this." The screen shows a YouTube video. The channel name is "Sara explains." The thumbnail is clean, minimal, beautiful. And the girl in it \u2014 you recognise her. Sara. Grade 7B. Tall. Long dark hair with that single streak of silver-blonde. She\'s in the hallway sometimes, walking past like she\'s in a different film than everyone else. Calm. Composed. A little bit untouchable. Her video has 14,000 views. She goes to your school. She sits three classrooms away. And fourteen thousand people watched her explain the history of Vienna\'s coffeehouses.', emotion:''},
+  {speaker:'narrator', text:'The bench goes quiet. Leah takes Ben\'s phone. She watches fifteen seconds. Then she looks up. Her eyes are wide behind those tortoiseshell frames. You know this look. This is the look she gets before a big idea. "We could do this," she says. Her voice is different now. Not loud. Serious. "The four of us. A channel. About interesting things. Facts. Stories. Mysteries. We could actually do this." Leo stops editing his photo. He looks at Leah. Then at you. "We don\'t have a camera," he says. "I have a camera," he adds, two seconds later. Ben grins. The gap between his front teeth shows. "I want to be in front of the camera. I am very good at talking."', emotion:''},
+  {speaker:'narrator', text:'You look at your three friends. Leah is already making a new spreadsheet. Leo is googling "best microphone under 30 euro." Ben is practising his intro to an invisible audience. And you \u2014 you feel something. A small, warm pull in your chest. This could be fun. This could be something. "We need a name," you say. It\'s the first thing you\'ve said in twenty minutes. Everyone looks at you. "Fourteen," Leah says instantly. "We\'re in the 14th district. There are four of us. It\'s perfect." Nobody argues. Some things just fit.', emotion:''},
+  {speaker:'narrator', text:'That afternoon, Leo designs a logo on his laptop. It\'s simple. Clean. A number 14 in white on black, with a thin line underneath. Leah creates an account. Username: @fourteenchannel. Ben records a test video of himself saying "Hello, I am Ben, and this is Fourteen!" eleven times. Each one is different. Each one has at least one grammar mistake. Each one is strangely perfect. You sit with your notebook and write down ideas for the first episode. The page fills up fast. FOURTEEN is born on a boring Tuesday. It doesn\'t feel boring anymore.', emotion:''}
+];
 
 // ── Campaign Levels placeholder (data filled separately) ───────────────────
 var campaignLevels = [];
@@ -10693,13 +10703,13 @@ function showCampaignMap() {
     }
   }
 
-  // Subscriber count (thematic: each level adds subs)
-  var totalSubs = 0;
+  // Subscriber count: show the subscriber milestone from the highest completed level
+  var totalSubs = '0';
   for (var s = 0; s < levels.length; s++) {
     var sLid = 'L' + String(s + 1).padStart(2, '0');
     var sLd = cp.levels ? cp.levels[sLid] : null;
-    if (sLd && sLd.completed) {
-      totalSubs += (levels[s].subsGain || 0);
+    if (sLd && sLd.completed && levels[s].subscribers) {
+      totalSubs = levels[s].subscribers;
     }
   }
 
@@ -10707,7 +10717,7 @@ function showCampaignMap() {
   var headerHtml = '<div class="campaign-map-header">' +
     '<div class="map-title" style="font-size:1.6rem;font-weight:900;letter-spacing:-0.5px;">FOURTEEN</div>' +
     '<div class="map-subtitle" style="font-size:0.82rem;color:var(--muted);">' +
-      '\uD83D\uDCF9 ' + totalSubs.toLocaleString() + ' subscribers \u00B7 ' +
+      '\uD83D\uDCF9 ' + totalSubs + ' subscribers \u00B7 ' +
       completedCount + '/' + levels.length + ' episodes' +
     '</div>' +
     '<div class="map-stats"><span>\u2B50 ' + totalStars + '</span><span>\u2728 ' + totalXP + ' XP</span></div>' +
@@ -12097,26 +12107,22 @@ var campaignLevels = [
     subscribers: "47",
 
     storyA: [
-      {speaker:"narrator", text:"School cafeteria. Leah holds her phone up. On screen: Sara from 7B \u2014 half a million views. The group stares."},
-      {speaker:"leah", text:"We could do that."},
-      {speaker:"leo", text:"But something real. Not talking at a camera about nothing."},
-      {speaker:"narrator", text:"You lean forward. \u201CWhat if we teach stuff from class? Music, animals, London \u2014 but make it interesting?\u201D Ben grins: \u201CI\u2019m in. But you know my English is... you know.\u201D They name the channel FOURTEEN."}
+      {speaker:"narrator", text:"Saturday morning. Your room looks different today. Leo moved the desk lamp to the left. He put a white sheet behind your chair. Leah's sister's ring light stands in the corner like a small glowing moon. \"Lighting is everything,\" Leo says. He adjusts the camera on the tripod. His messenger bag sits by the door, covered in stickers. He looks almost happy. This is Leo happy \u2014 quiet, focused, making tiny changes that nobody else can see."},
+      {speaker:"narrator", text:"The plan is simple. Episode one: music. Four segments, four people. Leah talks about streaming numbers. You explain how music goes viral. Leo covers music in film. And Ben \u2014 Ben gets the history of pop music. Leah printed the schedule. It has colours and time slots. \"We have exactly two hours,\" she says. \"My sister needs the ring light back by three.\" She pushes her glasses up. Her phone is recording the behind-the-scenes. Always thinking about content."},
+      {speaker:"leah", text:"Okay. I go first. Then you. Then Leo. Ben, you're last because your segment is the longest. Everyone ready? Leo, is the camera on? It IS on, right?"},
+      {speaker:"narrator", text:"Leah is perfect on camera. Of course she is. She talks about numbers like they're exciting gossip. You go next. You're nervous, but it's okay. You stick to your notes. Leo does his part in one take, voice low and steady. Then it's Ben's turn. He stands up. He smooths his orange vest. He takes a deep breath. His script is on the table. He doesn't look at it. \"I don't need the paper,\" he says. \"I know this.\" He smiles. You smile back. You don't know yet that this moment matters."}
     ],
 
     storyB: [
-      {speaker:"narrator", text:"They film in your room. Ring light on. Phone on a tripod. Each person presents a music fact. Ben goes last."},
-      {speaker:"ben", text:"The Beatles was... no, were... the most famous band. They play... played... many concerts."},
-      {speaker:"narrator", text:"Leah giggles. Leo keeps filming."},
-      {speaker:"leo", text:"Should we keep Ben\u2019s mistakes? It\u2019s kind of charming."},
-      {speaker:"narrator", text:"They upload. Leah checks the screen."},
-      {speaker:"leah", text:"47 views. It\u2019s a start."}
+      {speaker:"narrator", text:"Ben starts talking. And he's \u2014 alive. His hands move. His eyes are bright. He tells the story of pop music like he's telling you a secret. But. \"The Beatles was the most famous band in the 1960s.\" Was, not were. \"They have changed music forever.\" Present perfect where he means past simple. \"Their songs was heard by millions.\" He doesn't notice. He keeps going, passionate and crooked and completely himself. When he finishes, he bows. Actually bows. Leah claps."},
+      {speaker:"narrator", text:"That evening, Leo edits. You sit next to him and watch. His laptop screen glows in the dark room. He cuts. He adjusts colour. He adds music underneath \u2014 something soft and electronic from his own playlist. When he reaches Ben's segment, he slows down. He watches it twice. \"His mistakes,\" Leo says quietly. He doesn't finish the sentence. \"What about them?\" you ask. \"They make it feel real.\" Leo looks at the screen. \"People will like this.\" He says it like a fact, not a feeling."},
+      {speaker:"narrator", text:"Sunday night. 9:14 p.m. Leah presses upload. The four of you are on a video call. Nobody speaks for three seconds. Then Leah screams. Not because anything happened. Just because it's real. It's online. Anyone can see it. By Monday morning, the video has 47 views. Forty-seven. Leah screenshots the number and sends it to the group chat with twelve exclamation marks. \"That's like a whole classroom!\" Ben writes. \"Almost two classrooms!\" he adds. You do the maths. He's wrong. It doesn't matter."}
     ],
 
     completion: [
-      {speaker:"leah", text:"Episode 1 is live! 47 views isn\u2019t much, but everyone starts somewhere."},
-      {speaker:"ben", text:"Did people like my part?"},
-      {speaker:"leo", text:"They loved it."},
-      {speaker:"narrator", text:"You smile. This is going to be fun."}
+      {speaker:"narrator", text:"At lunch on Monday, the four of you sit together. Leah refreshes the view count every ninety seconds. Leo eats his sandwich and pretends he doesn't care, but his eyes flick to Leah's screen. Ben has watched the video four times already. His own segment. He laughs at himself each time. \"My face looks funny when I say 'Beatles',\" he says. He's not embarrassed. He's proud."},
+      {speaker:"ben", text:"Did people like my part? I think my part was good. I talked very naturally. Next time I will be even better. Can we make episode two this weekend?"},
+      {speaker:"narrator", text:"Leah puts her arm around Ben's shoulder. Leo nods. You look at them \u2014 Leah already planning, Leo already thinking about camera angles, Ben already dreaming about episode two. The four of you, together, making something. It's small. It's new. It's yours. You don't know yet where this goes. Right now, it just feels warm."}
     ],
 
     tasks: [
@@ -12236,21 +12242,21 @@ var campaignLevels = [
     subscribers: "3,200",
 
     storyA: [
-      {speaker:"narrator", text:"Episode 2: coincidences. You found a wild story \u2014 in 1898, a novel predicted the Titanic disaster. The ship in the book was called the Titan."},
-      {speaker:"ben", text:"While the ship was sinking... people was... were... trying to escape."},
-      {speaker:"narrator", text:"Leah writes it down. Leo films. They post it that evening."}
+      {speaker:"narrator", text:"The number sits in the group chat like a trophy. 47 views. Leah sends a new screenshot every morning. 52. 58. 61. By Wednesday it hits 74. \"We need episode two,\" Leah says at lunch. She already has a folder on her phone called \"EP2 IDEAS.\" She opens it. There are eleven ideas. She ranked them. \"Coincidences,\" she says. \"People love coincidences. Strange things that really happened. True stories.\" Leo raises one eyebrow. This means yes."},
+      {speaker:"leah", text:"The Titanic. There was a book written fourteen years before the Titanic sank. It described almost the exact same disaster. Same size ship. Same month. Same iceberg. The book was called \"Futility.\" I mean \u2014 come on. That is content GOLD."},
+      {speaker:"narrator", text:"You split the segments again. Leah takes the Titanic coincidence. You cover twin studies. Leo explains the Baader-Meinhof effect \u2014 when you learn a new word and suddenly see it everywhere. And Ben gets Abraham Lincoln and John F. Kennedy. The famous list of parallels between the two presidents. Ben loves it. \"This is crazy!\" he says, reading the notes. \"Lincoln and Kennedy! So many same things!\" He practises on the bus home. He sends a voice message to the group at 11 p.m. In it, he whispers his intro because his parents are asleep."}
     ],
 
     storyB: [
-      {speaker:"narrator", text:"Next morning. Leah refreshes the page. 3,200 views overnight."},
-      {speaker:"leah", text:"People share the parts where Ben messes up. That\u2019s what gets clicks."},
-      {speaker:"narrator", text:"Ben scrolls through the comments. He smiles. He thinks people like him."}
+      {speaker:"narrator", text:"The video goes up on Sunday at 8 p.m. You check the count before bed. 89 views. Not bad. You fall asleep. In the morning, you pick up your phone. You blink. You check again. 3,200 views. Three thousand two hundred. Leah has sent forty-seven messages to the group chat. Forty-seven. \"WHAT IS HAPPENING,\" she writes. Then a row of numbers. Then \"I'M NOT OKAY.\" Leo sends a single emoji. A small flame. For Leo, this is a standing ovation."},
+      {speaker:"narrator", text:"The comments. There are comments now. Real people writing real words. \"Love this channel!\" \"The Titanic story is wild.\" \"More please!\" But some comments are different. \"The blond guy is hilarious \uD83D\uDE02.\" \"Is he doing the mistakes on purpose? Comedy gold.\" \"Ben is the best part lol.\" You read them twice. Your stomach does something small and strange. They're nice comments. But they're not laughing with Ben. You're not sure Ben sees the difference."},
+      {speaker:"leah", text:"Okay. I checked every number. I checked watch time, I checked drop-off points, I checked replay rates. Ben's segment has the highest engagement. By far. People rewatch his part. They comment on his part. The algorithm pushes his part. This is \u2014 this is huge. Ben is our secret weapon."},
+      {speaker:"narrator", text:"You're walking home. Your headphones are in but no music is playing. You think about the comments. You think about Leah's analytics screen, the graph spiking exactly where Ben says \"Lincoln and Kennedy was both shot on a Friday.\" Was instead of were. The spike is sharp and clear. People rewatched that moment. You want to feel happy. The channel is growing. But something sits in your chest. Small. Quiet. Like a stone you accidentally swallowed. You tell yourself it's nothing."}
     ],
 
     completion: [
-      {speaker:"leah", text:"3,200 views! The algorithm is picking us up!"},
-      {speaker:"ben", text:"Everyone loves the coincidences. And my presenting!"},
-      {speaker:"narrator", text:"You say nothing. Something doesn\u2019t feel right."}
+      {speaker:"ben", text:"3,200 people! That is like our whole school times ten! I can't believe it. People really liked the coincidences. I think I explained Lincoln and Kennedy very good. My English teacher will be so surprised!"},
+      {speaker:"narrator", text:"In the group chat, everyone sends congratulations. Fire emojis. Heart emojis. Screenshots of the view count at different times. But underneath the celebration, there's a new conversation. It's just between Leah, Leo, and you. Ben isn't in it. Leah created it at 7:43 a.m. She called it \"Strategy.\" You stare at the group name for a long time before you open it."}
     ],
 
     tasks: [
@@ -12351,20 +12357,22 @@ var campaignLevels = [
     subscribers: "11,000",
 
     storyA: [
-      {speaker:"narrator", text:"Episode 3: adventure. You found stories about James Holman, the blind explorer, and Mary Kingsley, who travelled alone through West Africa."},
-      {speaker:"ben", text:"During I was on the bus, I fell asleep. Before we arriving, it started to rain."},
-      {speaker:"narrator", text:"Leah and Leo look at each other. Ben doesn\u2019t notice. They film it all."}
+      {speaker:"narrator", text:"Episode three. Adventure and travel. Leah has a list of explorers. Mary Kingsley \u2014 a Victorian woman who travelled alone through West Africa. James Holman \u2014 a blind man who walked around the entire world in the 1800s. The stories are amazing. You get excited despite the stone in your chest. This could be the best episode yet. Leo is already planning camera angles. He wants to use maps as backgrounds. \"Cinematic,\" he says. High praise from Leo."},
+      {speaker:"narrator", text:"Ben's segment is about James Holman. His script is ready. Leah wrote it. You notice something. The sentences are longer than before. More complex. \"While Holman was travelling through Siberia, the Russian government arrested him.\" \"During his journey across Africa, he documented species that European scientists had never seen before.\" While. During. Time connectors that trip up even good English speakers. You look at Leah. She's watching her spreadsheet. Her face shows nothing."},
+      {speaker:"narrator", text:"Filming day. Ben reads through his script once, moving his lips. Then he puts it down. \"Ready!\" He smiles that gap-toothed smile. Leo points the camera. Leah watches from behind her phone. Ben starts. \"While Holman was travel \u2014 travelling through Siberia...\" He stumbles. Starts again. Gets further. \"During his journey across Africa, he documented species that scientists have never \u2014 had never saw before.\" Have instead of had. Saw instead of seen. While and during tangle in his mouth. He keeps going. He always keeps going. That's the thing about Ben. He never stops."}
     ],
 
     storyB: [
-      {speaker:"narrator", text:"11,000 views. The channel is growing fast. Leah calls a group meeting."},
-      {speaker:"leah", text:"I have an idea. What if we give Ben harder scripts? The mistakes get more views."},
-      {speaker:"narrator", text:"Nobody says no. But nobody feels good about it either."}
+      {speaker:"narrator", text:"Tuesday evening. Leo opens his laptop in the library. You sit next to him. He pulls up the analytics dashboard. He doesn't say anything at first. He just turns the screen toward you. There are two lines on the graph. One is average engagement for all segments. It's steady, normal. The other line is Ben's segments. It spikes to five times higher. Five times. Leo taps the screen with one finger. \"This is not an accident anymore,\" he says."},
+      {speaker:"leah", text:"Listen. I have an idea. What if \u2014 and hear me out \u2014 what if we give Ben the hardest parts? The most complex grammar, the longest sentences. Not to be mean. Because it works. The audience loves it. He loves being on camera. Everyone wins. We just... lean into what's already happening. That's all."},
+      {speaker:"narrator", text:"The four of you \u2014 minus Ben \u2014 sit in the \"Strategy\" chat. Leah's message glows on your screen. Leo replies first. \"The footage is better when he struggles. That's just true.\" You type something. Delete it. Type again. \"But he doesn't know. He thinks he's good at this.\" Send. Three dots appear. Leah is typing. \"He IS good at this. He's the most watchable person on the channel. We're not hurting him. We're featuring him.\" You stare at the screen. You want to say no. Instead you type: \"Okay. But we should be careful.\" It's not a no. You know it's not a no."},
+      {speaker:"narrator", text:"The decision is made. Not with a vote. Not with a dramatic moment. It happens the way bad decisions always happen \u2014 quietly, with everyone looking at their shoes. Leah adds a note to her spreadsheet: \"Ben = complex scripts.\" Leo saves a new editing template: longer cuts on Ben's mistakes, subtle zoom on his face when he stumbles. You close the chat. You put your phone face-down on your desk. The stone in your chest is heavier now. It has a name, but you're not ready to say it."}
     ],
 
     completion: [
-      {speaker:"narrator", text:"From now on, they plan Ben\u2019s lines. The scripts get harder on purpose."},
-      {speaker:"narrator", text:"Nobody feels good about it. Nobody stops it."}
+      {speaker:"ben", text:"Hey! I just wanted to say \u2014 I think my English is getting better!! The scripts are harder now but I keep practising. I watched my part back and I think I sound more natural every time. Thank you for giving me the cool stories. \uD83D\uDE0A You guys are the best team."},
+      {speaker:"narrator", text:"The message sits in the main group chat. Four grey ticks. Everyone has read it. Nobody replies for twelve minutes. Then Leah sends a heart. Leo sends a thumbs up. You type \"You're doing great, Ben.\" Your finger hesitates over the send button for five full seconds. You send it. It's true. And it's a lie. And the worst part is \u2014 you don't know which one hurts more."},
+      {speaker:"narrator", text:"From now on, nothing is accidental. Every script is chosen carefully. Every \"difficult\" sentence is placed on purpose. Every mistake in the final cut is a decision someone made. The channel grows. The views climb. And Ben practises his lines on the bus, in the bathroom mirror, before bed. He works so hard. He has no idea."}
     ],
 
     tasks: [
