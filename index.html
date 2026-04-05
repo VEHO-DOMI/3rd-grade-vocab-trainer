@@ -8022,17 +8022,9 @@ function showModeSelectScreen() {
   const gxp = d.grammarXp || 0;
   const glv = getLevel(gxp, 'grammar');
   document.getElementById('mode-grammar-stats').textContent = 'Lv ' + glv.level + ' · ' + gxp.toLocaleString() + ' XP';
-  // Campaign stats (M1 only)
+  // Campaign card (placeholder)
   var campaignCard = document.getElementById('mode-campaign-card');
-  if (campaignCard) {
-    campaignCard.style.display = '';
-  };
-      var cLevels = (cp.levels ? Object.keys(cp.levels).filter(function(k) { return cp.levels[k].completed; }).length : 0);
-      document.getElementById('mode-campaign-stats').textContent = cLevels + '/15 Levels';
-    } else {
-      campaignCard.style.display = 'none';
-    }
-  }
+  if (campaignCard) campaignCard.style.display = '';
   showScreen('mode-select-screen');
   // Load top 3 leaderboards for both modes
   loadModeSelectLeaderboards();
