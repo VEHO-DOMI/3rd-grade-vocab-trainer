@@ -1654,13 +1654,13 @@ body.playing .header-container { display: none; }
       </button>
       
     </div>
-      <button id="mode-campaign-card" class="mode-select-card mode-select-card-campaign" onclick="selectAppMode('campaign')" style="width:100%;max-width:100%;display:flex;flex-direction:row;align-items:center;gap:0.8rem;padding:0.7rem 1rem;text-align:left;margin-top:0.5rem;display:none;">
-        <div style="font-size:1.5rem;flex-shrink:0;">&#9876;&#65039;</div>
+      <button id="mode-campaign-card" class="mode-select-card mode-select-card-campaign" onclick="alert('Story Mode coming soon!')" style="width:100%;max-width:100%;display:flex;flex-direction:row;align-items:center;gap:0.8rem;padding:0.7rem 1rem;text-align:left;margin-top:0.5rem;opacity:0.5;display:none;">
+        <div style="font-size:1.5rem;flex-shrink:0;">&#128218;</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:800;font-size:0.95rem;">Campaign</div>
-          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">Story & Adventure</div>
+          <div style="font-weight:800;font-size:0.95rem;">Story Mode</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">Campaign: Coming Soon</div>
         </div>
-        <div class="mode-select-stats" id="mode-campaign-stats" style="flex-shrink:0;font-size:0.7rem;white-space:nowrap;">0/15 Levels</div>
+        <div class="mode-select-stats" id="mode-campaign-stats" style="flex-shrink:0;font-size:0.7rem;white-space:nowrap;" style="flex-shrink:0;font-size:0.7rem;white-space:nowrap;">Coming Soon</div>
       </button>
 
     <div id="mode-leaderboards" style="margin-top:1rem;"></div>
@@ -8025,9 +8025,8 @@ function showModeSelectScreen() {
   // Campaign stats (M1 only)
   var campaignCard = document.getElementById('mode-campaign-card');
   if (campaignCard) {
-    if (typeof campaignLevels !== 'undefined' && campaignLevels.length > 0) {
-      campaignCard.style.display = '';
-      var cp = d.campaignProgress || {};
+    campaignCard.style.display = '';
+  };
       var cLevels = (cp.levels ? Object.keys(cp.levels).filter(function(k) { return cp.levels[k].completed; }).length : 0);
       document.getElementById('mode-campaign-stats').textContent = cLevels + '/15 Levels';
     } else {
