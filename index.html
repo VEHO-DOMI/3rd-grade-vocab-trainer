@@ -2766,6 +2766,9 @@ body.playing .header-container { display: none; }
     <span class="nav-title">FOURTEEN</span>
   </div>
   <div class="campaign-map-header" id="campaign-map-header"></div>
+  <div style="text-align:center;margin-bottom:0.5rem;">
+    <button class="btn btn-secondary" onclick="replayPrologue()" style="font-size:0.75rem;padding:0.4rem 0.8rem;">&#127916; Watch Prologue</button>
+  </div>
   <div class="campaign-map" id="campaign-map-container">
     <div class="campaign-path" id="campaign-path"></div>
   </div>
@@ -2773,6 +2776,10 @@ body.playing .header-container { display: none; }
 
 <!-- CAMPAIGN STORY SCREEN -->
 <div id="campaign-story-screen" class="screen">
+  <div class="progress-nav" style="margin-bottom:0.5rem;">
+    <button class="btn btn-secondary" onclick="confirmQuitLevel()" style="font-size:0.75rem;padding:0.3rem 0.6rem;">&#10005; Quit</button>
+    <span class="nav-title" id="campaign-story-episode-title"></span>
+  </div>
   <div class="campaign-story-card">
     <div class="campaign-story-speaker" id="campaign-story-speaker"></div>
     <div class="campaign-story-text" id="campaign-story-content"></div>
@@ -2782,6 +2789,10 @@ body.playing .header-container { display: none; }
 
 <!-- CAMPAIGN TASK SCREEN -->
 <div id="campaign-task-screen" class="screen">
+  <div class="progress-nav" style="margin-bottom:0.3rem;">
+    <button class="btn btn-secondary" onclick="confirmQuitLevel()" style="font-size:0.75rem;padding:0.3rem 0.6rem;">&#10005; Quit</button>
+    <span class="nav-title" id="campaign-task-episode-title"></span>
+  </div>
   <div class="campaign-task-progress" id="campaign-task-progress">
     <span id="campaign-task-label">Task 1/3</span>
     <div class="campaign-task-progress-bar"><div class="campaign-task-progress-fill" id="campaign-task-progress-fill" style="width:0%"></div></div>
@@ -2795,6 +2806,10 @@ body.playing .header-container { display: none; }
 
 <!-- CAMPAIGN READING SCREEN -->
 <div id="campaign-reading-screen" class="screen">
+  <div class="progress-nav" style="margin-bottom:0.3rem;">
+    <button class="btn btn-secondary" onclick="confirmQuitLevel()" style="font-size:0.75rem;padding:0.3rem 0.6rem;">&#10005; Quit</button>
+    <span class="nav-title">Reading</span>
+  </div>
   <div class="campaign-task-progress">
     <span>Reading</span>
     <span id="campaign-reading-xp" style="font-weight:700;color:var(--accent);font-size:0.82rem;">0 XP</span>
@@ -10675,6 +10690,24 @@ function finishPrologue() {
   showCampaignMap();
 }
 
+// ── 3b. Replay Prologue & Quit Level ──────────────────────────────────────
+
+function replayPrologue() {
+  campaignState.prologueScene = 0;
+  campaignState.prologueWatched = false;
+  showPrologue();
+}
+
+function confirmQuitLevel() {
+  if (confirm('Quit this episode and return to the map? Your progress in this episode will be lost.')) {
+    campaignState.currentLevel = null;
+    campaignState.currentTaskIndex = 0;
+    campaignState.currentItemIndex = 0;
+    campaignState.levelXP = 0;
+    showCampaignMap();
+  }
+}
+
 // ── 4. Campaign Map ────────────────────────────────────────────────────────
 
 function showCampaignMap() {
@@ -10833,6 +10866,14 @@ function startCampaignLevel(levelIndex) {
   campaignState.hintUsed = false;
   campaignState._storyBShown = false;
   campaignState._taskBriefingShown = false;
+
+  // Set episode title in quit bars
+  var epTitle = (lv.episodeTitle || lv.levelName || 'Episode');
+  var titleEls = [
+    document.getElementById('campaign-story-episode-title'),
+    document.getElementById('campaign-task-episode-title')
+  ];
+  titleEls.forEach(function(el) { if (el) el.textContent = epTitle; });
 
   // Show Story A if present
   if (lv.storyA && lv.storyA.length > 0) {
