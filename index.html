@@ -2495,11 +2495,17 @@ body.playing .header-container { display: none; }
 .yt-status { font-size:0.75rem; color:#606060; }
 [data-theme="dark"] .yt-status { color:#aaa; }
 
-.yt-thumbnail-wrap { position:relative; border-radius:10px; overflow:hidden; background:#000; margin-bottom:0.6rem; aspect-ratio:16/9; }
-.yt-thumbnail { width:100%; height:100%; object-fit:cover; display:block; }
-.yt-play-badge {
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:3rem; text-shadow:0 2px 10px rgba(0,0,0,0.5); pointer-events:none;
+.yt-thumbnail-wrap {
+  position:relative; border-radius:10px; overflow:hidden;
+  background:transparent; margin:0 auto 0.6rem;
+  max-width:100%;
+  display:flex; align-items:center; justify-content:center;
+}
+.yt-thumbnail {
+  width:auto; height:auto;
+  max-width:100%; max-height:360px;
+  display:block;
+  object-fit:contain;
 }
 .yt-episode-title { font-weight:700; font-size:1rem; margin:0.3rem 0 0.6rem; color:#0f0f0f; }
 [data-theme="dark"] .yt-episode-title { color:#f1f1f1; }
@@ -2534,22 +2540,23 @@ body.playing .header-container { display: none; }
 .campaign-star.fill-anim { animation: starPop 0.5s cubic-bezier(0.2,0.9,0.3,1.4) both; }
 @keyframes starPop { 0% { opacity:0; transform:scale(0.2); } 60% { opacity:1; transform:scale(1.3); } 100% { transform:scale(1); } }
 
-.yt-stat-card-slot:empty { display:none; }
-.yt-stat-card-slot { margin:0.8rem 0 0.4rem; }
-.yt-stats-wall-card {
-  background:linear-gradient(135deg, #E8F5E9, #F1F8E9);
-  border:2px solid #66BB6A;
-  border-radius:10px; padding:0.7rem;
-  animation: statCardIn 0.6s cubic-bezier(0.2,0.9,0.3,1.2) 0.5s both;
-  display:flex; gap:0.6rem; align-items:center;
+.yt-stat-card-caption:empty { display:none; }
+.yt-stat-card-caption {
+  margin:0.6rem 0 0.2rem; padding:0.5rem 0.7rem;
+  background:rgba(0,0,0,0.03); border-radius:8px;
+  border-left:3px solid #66BB6A;
+  animation: statCardIn 0.6s cubic-bezier(0.2,0.9,0.3,1.2) 0.4s both;
 }
-.yt-stats-wall-card img { width:60px; height:60px; object-fit:cover; border-radius:6px; flex-shrink:0; }
-.yt-stats-wall-card .wall-title { font-weight:700; font-size:0.85rem; color:#1B5E20; }
-.yt-stats-wall-card .wall-desc { font-size:0.72rem; color:#2E7D32; line-height:1.35; }
-[data-theme="dark"] .yt-stats-wall-card { background:linear-gradient(135deg, rgba(102,187,106,0.15), rgba(165,214,167,0.1)); border-color:#66BB6A; }
-[data-theme="dark"] .yt-stats-wall-card .wall-title { color:#A5D6A7; }
-[data-theme="dark"] .yt-stats-wall-card .wall-desc { color:#C5E1A5; }
-@keyframes statCardIn { 0% { opacity:0; transform:translateY(15px) scale(0.9); } 100% { opacity:1; transform:none; } }
+.yt-stat-card-caption .wall-title { font-weight:700; font-size:0.85rem; color:#0f0f0f; }
+.yt-stat-card-caption .wall-desc { font-size:0.72rem; color:#555; line-height:1.4; margin-top:0.15rem; }
+[data-theme="dark"] .yt-stat-card-caption { background:rgba(255,255,255,0.04); }
+[data-theme="dark"] .yt-stat-card-caption .wall-title { color:#f1f1f1; }
+[data-theme="dark"] .yt-stat-card-caption .wall-desc { color:#bbb; }
+/* Vibe-based border colours for the caption */
+.vibe-shock .yt-stat-card-caption { border-left-color:#E53935; }
+.vibe-reflection .yt-stat-card-caption { border-left-color:#78909C; }
+.vibe-redemption .yt-stat-card-caption { border-left-color:#FF6B35; }
+@keyframes statCardIn { 0% { opacity:0; transform:translateY(10px); } 100% { opacity:1; transform:none; } }
 
 .yt-buttons { display:flex; flex-direction:column; gap:0.4rem; margin-top:0.6rem; }
 
@@ -2987,15 +2994,14 @@ body.playing .header-container { display: none; }
   <div class="yt-confetti-layer" id="yt-confetti-layer"></div>
   <div class="yt-upload-card" id="yt-upload-card">
     <div class="yt-upload-header">
-      <div class="yt-avatar">\u25B6</div>
+      <div class="yt-avatar">&#9654;</div>
       <div class="yt-channel-info">
         <div class="yt-channel-name">FOURTEEN</div>
         <div class="yt-status" id="yt-status-line">Episode uploaded!</div>
       </div>
     </div>
-    <div class="yt-thumbnail-wrap">
+    <div class="yt-thumbnail-wrap" id="yt-thumbnail-wrap">
       <img class="yt-thumbnail" id="yt-thumbnail" alt="" onerror="this.style.display='none'">
-      <div class="yt-play-badge">\u25B6</div>
     </div>
     <div class="yt-episode-title" id="yt-episode-title"></div>
     <div class="yt-stats-grid" id="yt-stats-grid"></div>
@@ -3004,9 +3010,9 @@ body.playing .header-container { display: none; }
       <span class="yt-total-value" id="yt-total-subs">0 subscribers</span>
     </div>
     <div class="yt-stars-row" id="campaign-results-stars"></div>
-    <div class="yt-stat-card-slot" id="yt-stat-card-slot"></div>
+    <div class="yt-stat-card-caption" id="yt-stat-card-caption"></div>
     <div class="yt-buttons">
-      <button class="btn" id="campaign-next-btn" onclick="showNextLevelOrMap()">Next Episode \u2192</button>
+      <button class="btn" id="campaign-next-btn" onclick="showNextLevelOrMap()">Next Episode &#8594;</button>
       <button class="btn btn-secondary" onclick="showCampaignMap()">Back to Map</button>
     </div>
   </div>
@@ -11363,13 +11369,33 @@ function showCampaignResults() {
     statusEl.textContent = statusText;
   }
 
-  // Thumbnail (use completion scene image if available)
+  // Look up the Stats Wall card for this level — used for both the thumbnail image AND the caption
+  var earnedStat = null;
+  if (typeof campaignYouTubeStats !== 'undefined') {
+    for (var ec = 0; ec < campaignYouTubeStats.length; ec++) {
+      if (campaignYouTubeStats[ec].level === levelIdx + 1) {
+        earnedStat = campaignYouTubeStats[ec];
+        break;
+      }
+    }
+  }
+
+  // Thumbnail: use the Stats Wall image at its natural aspect ratio (no crop).
+  // Fallback chain: stat wall image → completion scene → storyA scene.
   var thumb = document.getElementById('yt-thumbnail');
+  var thumbWrap = document.getElementById('yt-thumbnail-wrap');
   if (thumb) {
     var thumbSrc = '';
-    if (lv.sceneImages && lv.sceneImages.completion) thumbSrc = lv.sceneImages.completion;
+    if (earnedStat && earnedStat.img) thumbSrc = earnedStat.img;
+    else if (lv.sceneImages && lv.sceneImages.completion) thumbSrc = lv.sceneImages.completion;
     else if (lv.sceneImages && lv.sceneImages.storyA) thumbSrc = lv.sceneImages.storyA;
-    thumb.src = thumbSrc;
+    if (thumbSrc) {
+      thumb.style.display = 'block';
+      thumb.src = thumbSrc;
+      if (thumbWrap) thumbWrap.style.display = '';
+    } else {
+      if (thumbWrap) thumbWrap.style.display = 'none';
+    }
   }
 
   // Episode title
@@ -11419,31 +11445,15 @@ function showCampaignResults() {
     starsContainer.innerHTML = starsHtml;
   }
 
-  // Newly earned stats wall card
-  var slotEl = document.getElementById('yt-stat-card-slot');
-  if (slotEl) {
-    slotEl.innerHTML = '';
-    if (typeof campaignYouTubeStats !== 'undefined') {
-      var earned = null;
-      for (var c = 0; c < campaignYouTubeStats.length; c++) {
-        if (campaignYouTubeStats[c].level === levelIdx + 1) {
-          earned = campaignYouTubeStats[c];
-          break;
-        }
-      }
-      if (earned) {
-        var imgHtml = earned.img
-          ? '<img src="' + earned.img + '" alt="" onerror="this.style.display=\'none\';">'
-          : '';
-        slotEl.innerHTML =
-          '<div class="yt-stats-wall-card">' +
-            imgHtml +
-            '<div>' +
-              '<div class="wall-title">\uD83D\uDCCA ' + escapeHtml(earned.title) + '</div>' +
-              '<div class="wall-desc">' + escapeHtml(earned.desc) + '</div>' +
-            '</div>' +
-          '</div>';
-      }
+  // Stat card caption (title + desc text only — the image is already the thumbnail above)
+  var captionEl = document.getElementById('yt-stat-card-caption');
+  if (captionEl) {
+    if (earnedStat) {
+      captionEl.innerHTML =
+        '<div class="wall-title">\uD83D\uDCCA ' + escapeHtml(earnedStat.title) + '</div>' +
+        '<div class="wall-desc">' + escapeHtml(earnedStat.desc) + '</div>';
+    } else {
+      captionEl.innerHTML = '';
     }
   }
 
