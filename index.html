@@ -1608,13 +1608,16 @@ body.playing .header-container { display: none; }
 .campaign-path {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 0;
-  padding: 0 1rem;
+  padding: 0 0.3rem;
+  width: 100%;
 }
 .campaign-node-row {
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
   position: relative;
 }
 .campaign-node-info {
@@ -1622,6 +1625,8 @@ body.playing .header-container { display: none; }
   flex-direction: column;
   align-items: center;
   gap: 0.15rem;
+  width: 100%;
+  max-width: 100%;
 }
 .campaign-node {
   width: 52px;
@@ -2460,6 +2465,163 @@ body.playing .header-container { display: none; }
 }
 
 
+/* === YouTube Upload Complete Card === */
+#campaign-results-screen { padding: 0.8rem 0.5rem; position:relative; overflow-x:hidden; }
+.yt-confetti-layer { position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+.yt-upload-card {
+  position:relative; z-index:2;
+  max-width:440px; margin:0 auto;
+  background:#ffffff;
+  border:1px solid #e5e5e5;
+  border-radius:14px;
+  padding:1rem;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+  animation: ytCardIn 0.5s cubic-bezier(0.2,0.9,0.3,1.2);
+}
+[data-theme="dark"] .yt-upload-card {
+  background:#1f1f1f; border-color:#333; box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+@keyframes ytCardIn { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:none; } }
+
+.yt-upload-header { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.8rem; }
+.yt-avatar {
+  width:40px; height:40px; border-radius:50%;
+  background:#ff0000; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; font-weight:700; flex-shrink:0;
+}
+.yt-channel-name { font-weight:700; font-size:0.95rem; color:#0f0f0f; }
+[data-theme="dark"] .yt-channel-name { color:#f1f1f1; }
+.yt-status { font-size:0.75rem; color:#606060; }
+[data-theme="dark"] .yt-status { color:#aaa; }
+
+.yt-thumbnail-wrap { position:relative; border-radius:10px; overflow:hidden; background:#000; margin-bottom:0.6rem; aspect-ratio:16/9; }
+.yt-thumbnail { width:100%; height:100%; object-fit:cover; display:block; }
+.yt-play-badge {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:3rem; text-shadow:0 2px 10px rgba(0,0,0,0.5); pointer-events:none;
+}
+.yt-episode-title { font-weight:700; font-size:1rem; margin:0.3rem 0 0.6rem; color:#0f0f0f; }
+[data-theme="dark"] .yt-episode-title { color:#f1f1f1; }
+
+.yt-stats-grid {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:0.4rem; margin:0.6rem 0;
+}
+.yt-stat {
+  background:#f2f2f2; border-radius:8px; padding:0.5rem 0.3rem; text-align:center;
+}
+[data-theme="dark"] .yt-stat { background:#2a2a2a; }
+.yt-stat-icon { font-size:1.1rem; }
+.yt-stat-value { font-weight:800; font-size:0.85rem; color:#0f0f0f; display:block; }
+[data-theme="dark"] .yt-stat-value { color:#f1f1f1; }
+.yt-stat-label { font-size:0.6rem; color:#606060; text-transform:uppercase; letter-spacing:0.3px; }
+[data-theme="dark"] .yt-stat-label { color:#aaa; }
+
+.yt-total-bar {
+  background:linear-gradient(135deg, #FFF8E1, #FFECB3);
+  border:1px solid #FFC107; border-radius:8px;
+  padding:0.6rem 0.8rem; margin:0.6rem 0;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.yt-total-label { font-size:0.72rem; font-weight:600; color:#795548; text-transform:uppercase; letter-spacing:0.5px; }
+.yt-total-value { font-weight:800; font-size:1rem; color:#3E2723; }
+[data-theme="dark"] .yt-total-bar { background:linear-gradient(135deg, #3E2723, #4E342E); border-color:#FF8F00; }
+[data-theme="dark"] .yt-total-label { color:#FFCC80; }
+[data-theme="dark"] .yt-total-value { color:#FFE0B2; }
+
+.yt-stars-row { display:flex; justify-content:center; gap:0.4rem; margin:0.6rem 0; }
+.yt-stars-row .campaign-star { font-size:1.8rem; }
+.campaign-star.fill-anim { animation: starPop 0.5s cubic-bezier(0.2,0.9,0.3,1.4) both; }
+@keyframes starPop { 0% { opacity:0; transform:scale(0.2); } 60% { opacity:1; transform:scale(1.3); } 100% { transform:scale(1); } }
+
+.yt-stat-card-slot:empty { display:none; }
+.yt-stat-card-slot { margin:0.8rem 0 0.4rem; }
+.yt-stats-wall-card {
+  background:linear-gradient(135deg, #E8F5E9, #F1F8E9);
+  border:2px solid #66BB6A;
+  border-radius:10px; padding:0.7rem;
+  animation: statCardIn 0.6s cubic-bezier(0.2,0.9,0.3,1.2) 0.5s both;
+  display:flex; gap:0.6rem; align-items:center;
+}
+.yt-stats-wall-card img { width:60px; height:60px; object-fit:cover; border-radius:6px; flex-shrink:0; }
+.yt-stats-wall-card .wall-title { font-weight:700; font-size:0.85rem; color:#1B5E20; }
+.yt-stats-wall-card .wall-desc { font-size:0.72rem; color:#2E7D32; line-height:1.35; }
+[data-theme="dark"] .yt-stats-wall-card { background:linear-gradient(135deg, rgba(102,187,106,0.15), rgba(165,214,167,0.1)); border-color:#66BB6A; }
+[data-theme="dark"] .yt-stats-wall-card .wall-title { color:#A5D6A7; }
+[data-theme="dark"] .yt-stats-wall-card .wall-desc { color:#C5E1A5; }
+@keyframes statCardIn { 0% { opacity:0; transform:translateY(15px) scale(0.9); } 100% { opacity:1; transform:none; } }
+
+.yt-buttons { display:flex; flex-direction:column; gap:0.4rem; margin-top:0.6rem; }
+
+/* Vibe: celebration (L01-L11) - default styles above */
+/* Vibe: shock (L12) - channel frozen */
+.yt-upload-card.vibe-shock { border-color:#E53935; background:#FAFAFA; }
+.yt-upload-card.vibe-shock .yt-avatar { background:#757575; }
+.yt-upload-card.vibe-shock .yt-total-bar { background:linear-gradient(135deg, #ECEFF1, #CFD8DC); border-color:#607D8B; }
+.yt-upload-card.vibe-shock .yt-total-label { color:#455A64; }
+.yt-upload-card.vibe-shock .yt-total-value { color:#263238; }
+.yt-upload-card.vibe-shock .yt-stats-wall-card { background:linear-gradient(135deg, #FFEBEE, #FFCDD2); border-color:#E57373; }
+.yt-upload-card.vibe-shock .yt-stats-wall-card .wall-title { color:#B71C1C; }
+.yt-upload-card.vibe-shock .yt-stats-wall-card .wall-desc { color:#C62828; }
+[data-theme="dark"] .yt-upload-card.vibe-shock { background:#1a1a1a; border-color:#E53935; }
+
+/* Vibe: reflection (L13) - quieter tones */
+.yt-upload-card.vibe-reflection { border-color:#78909C; background:#FAFAFA; }
+.yt-upload-card.vibe-reflection .yt-avatar { background:#546E7A; }
+.yt-upload-card.vibe-reflection .yt-total-bar { background:linear-gradient(135deg, #ECEFF1, #B0BEC5); border-color:#78909C; }
+.yt-upload-card.vibe-reflection .yt-total-value { color:#263238; }
+[data-theme="dark"] .yt-upload-card.vibe-reflection { background:#1a1a1a; }
+
+/* Vibe: redemption (L14) - red/gold warm */
+.yt-upload-card.vibe-redemption {
+  border-color:#FF6B35;
+  background:linear-gradient(180deg, #FFF8E1 0%, #FFFFFF 40%);
+}
+.yt-upload-card.vibe-redemption .yt-avatar { background:linear-gradient(135deg, #FF6B35, #C9A84C); }
+.yt-upload-card.vibe-redemption .yt-total-bar { background:linear-gradient(135deg, #FFD700, #FFA726); border-color:#FF6B35; }
+.yt-upload-card.vibe-redemption .yt-total-value { color:#4E1A05; }
+[data-theme="dark"] .yt-upload-card.vibe-redemption { background:linear-gradient(180deg, #3E2723 0%, #1a1a1a 40%); }
+
+/* Confetti animation */
+.confetti-piece {
+  position:absolute; width:8px; height:14px; opacity:0;
+  animation: confettiFall 3.5s linear forwards;
+}
+@keyframes confettiFall {
+  0% { transform:translateY(-40px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+}
+
+/* === Stats Wall === */
+#campaign-stats-wall-screen { padding: 0.8rem 0.6rem; }
+.stats-wall-list { display:flex; flex-direction:column; gap:0.6rem; max-width:500px; margin:0 auto; padding-bottom:2rem; }
+.stats-wall-item {
+  display:flex; gap:0.8rem; align-items:center;
+  background:var(--card); border:1.5px solid var(--card-border);
+  border-radius:12px; padding:0.7rem;
+  transition: all 0.2s;
+}
+.stats-wall-item.unlocked.positive { border-color:#4CAF50; background:linear-gradient(135deg, rgba(76,175,80,0.08), var(--card)); }
+.stats-wall-item.unlocked.warning  { border-color:#FFA726; background:linear-gradient(135deg, rgba(255,167,38,0.08), var(--card)); }
+.stats-wall-item.unlocked.dark     { border-color:#757575; background:linear-gradient(135deg, rgba(97,97,97,0.08), var(--card)); }
+.stats-wall-item.unlocked.redemption { border-color:#FF6B35; background:linear-gradient(135deg, rgba(255,107,53,0.12), var(--card)); }
+.stats-wall-item.locked { opacity:0.35; }
+.stats-wall-img {
+  width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;
+  background:#f0f0f0;
+}
+.stats-wall-lock {
+  width:70px; height:70px; border-radius:8px;
+  background:var(--card-border); color:var(--muted);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.8rem; flex-shrink:0;
+  border:2px dashed var(--muted);
+}
+.stats-wall-body { flex:1; min-width:0; }
+.stats-wall-title { font-weight:700; font-size:0.88rem; color:var(--text); }
+.stats-wall-desc { font-size:0.72rem; color:var(--muted); line-height:1.35; margin-top:0.2rem; }
+.stats-wall-level { font-size:0.65rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px; }
+
 /* === FOURTEEN CAMPAIGN - Additional Styles === */
 
 /* Character avatar badge in story */
@@ -2766,8 +2928,9 @@ body.playing .header-container { display: none; }
     <span class="nav-title">FOURTEEN</span>
   </div>
   <div class="campaign-map-header" id="campaign-map-header"></div>
-  <div style="text-align:center;margin-bottom:0.5rem;">
+  <div style="text-align:center;margin-bottom:0.5rem;display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
     <button class="btn btn-secondary" onclick="replayPrologue()" style="font-size:0.75rem;padding:0.4rem 0.8rem;">&#127916; Watch Prologue</button>
+    <button class="btn btn-secondary" onclick="showYouTubeStatsWall()" style="font-size:0.75rem;padding:0.4rem 0.8rem;">&#128202; Stats Wall</button>
   </div>
   <div class="campaign-map" id="campaign-map-container">
     <div class="campaign-path" id="campaign-path"></div>
@@ -2821,16 +2984,42 @@ body.playing .header-container { display: none; }
 
 <!-- CAMPAIGN RESULTS SCREEN -->
 <div id="campaign-results-screen" class="screen">
-  <div style="text-align:center;padding:1rem;">
-    <h2 id="campaign-results-title" style="margin:0 0 0.5rem;">Episode Complete!</h2>
-    <div class="campaign-stars-display" id="campaign-results-stars"></div>
-    <div class="campaign-xp-breakdown" id="campaign-xp-breakdown"></div>
-    <div id="campaign-comic-area" style="margin:0.8rem 0;"></div>
-    <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.8rem;">
-      <button class="btn" id="campaign-next-btn" onclick="showNextLevelOrMap()">Next Episode</button>
+  <div class="yt-confetti-layer" id="yt-confetti-layer"></div>
+  <div class="yt-upload-card" id="yt-upload-card">
+    <div class="yt-upload-header">
+      <div class="yt-avatar">\u25B6</div>
+      <div class="yt-channel-info">
+        <div class="yt-channel-name">FOURTEEN</div>
+        <div class="yt-status" id="yt-status-line">Episode uploaded!</div>
+      </div>
+    </div>
+    <div class="yt-thumbnail-wrap">
+      <img class="yt-thumbnail" id="yt-thumbnail" alt="" onerror="this.style.display='none'">
+      <div class="yt-play-badge">\u25B6</div>
+    </div>
+    <div class="yt-episode-title" id="yt-episode-title"></div>
+    <div class="yt-stats-grid" id="yt-stats-grid"></div>
+    <div class="yt-total-bar">
+      <span class="yt-total-label">Channel total</span>
+      <span class="yt-total-value" id="yt-total-subs">0 subscribers</span>
+    </div>
+    <div class="yt-stars-row" id="campaign-results-stars"></div>
+    <div class="yt-stat-card-slot" id="yt-stat-card-slot"></div>
+    <div class="yt-buttons">
+      <button class="btn" id="campaign-next-btn" onclick="showNextLevelOrMap()">Next Episode \u2192</button>
       <button class="btn btn-secondary" onclick="showCampaignMap()">Back to Map</button>
     </div>
   </div>
+</div>
+
+<!-- CAMPAIGN YOUTUBE STATS WALL SCREEN -->
+<div id="campaign-stats-wall-screen" class="screen">
+  <div class="progress-nav">
+    <button class="btn btn-secondary" onclick="showCampaignMap()">&#8592; Back</button>
+    <span class="nav-title">&#128202; Stats Wall</span>
+  </div>
+  <div class="stats-wall-subtitle" id="stats-wall-subtitle" style="text-align:center;font-size:0.78rem;color:var(--muted);margin:0.4rem 0 0.8rem;"></div>
+  <div class="stats-wall-list" id="stats-wall-list"></div>
 </div>
 
 <!-- GRAMMAR TOPIC SELECT SCREEN -->
@@ -10610,6 +10799,38 @@ var campaignCharacters = {
   narrator: { name: '',         emoji: '\uD83D\uDCD6', color: '#888',    initials: ''   }
 };
 
+// Context-aware avatar picker. levelIdx is 0-based (L01=0). phase is 'storyA','storyB','completion'.
+function getCharAvatar(speaker, levelIdx, phase) {
+  if (levelIdx === null || typeof levelIdx === 'undefined') levelIdx = 0;
+  if (speaker === 'leah') {
+    if (levelIdx >= 11) return 'campaign/char-leah-guilty.jpg';     // L12-L14
+    if (levelIdx <= 6)  return 'campaign/char-leah-excited.jpg';    // L01-L07
+    return 'campaign/char-leah-neutral.jpg';                        // L08-L11
+  }
+  if (speaker === 'leo') {
+    if (levelIdx >= 10) return 'campaign/char-leo-guilty.jpg';      // L11-L14
+    if (levelIdx <= 7)  return 'campaign/char-leo-filming.jpg';     // L01-L08
+    return 'campaign/char-leo-neutral.jpg';                         // L09-L10
+  }
+  if (speaker === 'ben') {
+    if (levelIdx === 11) return 'campaign/char-ben-confrontation.jpg'; // L12 confrontation
+    if (levelIdx === 13) return 'campaign/char-ben-brave.jpg';         // L14 brave
+    if (levelIdx >= 8)   return 'campaign/char-ben-hurt.jpg';          // L09-L11, L13 hurt
+    if (levelIdx >= 3)   return 'campaign/char-ben-presenting.jpg';    // L04-L08 on-camera
+    return 'campaign/char-ben-happy.jpg';                              // L01-L03 default
+  }
+  if (speaker === 'sara') {
+    if (levelIdx >= 12) return 'campaign/char-sara-warm.jpg';       // L13-L14 mentoring
+    if (levelIdx === 9) return 'campaign/char-sara-serious.jpg';    // L10 bench meeting
+    if (levelIdx === 5) return 'campaign/char-sara-serious.jpg';    // L06 DM
+    return 'campaign/char-sara-distant.jpg';                        // L04 first mention
+  }
+  if (speaker === 'you') {
+    return phase === 'storyB' ? 'campaign/char-you-side.jpg' : 'campaign/char-you-back.jpg';
+  }
+  return null;
+}
+
 // ── 3. Prologue Scenes (data filled separately) ────────────────────────────
 // Each scene: { speaker:'narrator', text:'...', emotion:'' }
 var prologueScenes = [
@@ -10621,7 +10842,25 @@ var prologueScenes = [
   {speaker:'narrator', text:'Then it happens. Ben holds up his phone. "Look. Look at this." The screen shows a YouTube video. The channel name is "Sara explains." The thumbnail is clean, minimal, beautiful. And the girl in it \u2014 you recognise her. Sara. Grade 7B. Tall. Long dark hair with that single streak of silver-blonde. She\'s in the hallway sometimes, walking past like she\'s in a different film than everyone else. Calm. Composed. A little bit untouchable. Her video has 14,000 views. She goes to your school. She sits three classrooms away. And fourteen thousand people watched her explain the history of Vienna\'s coffeehouses.', emotion:'', image:'campaign/prologue-06.jpg'},
   {speaker:'narrator', text:'The bench goes quiet. Leah takes Ben\'s phone. She watches fifteen seconds. Then she looks up. Her eyes are wide behind those tortoiseshell frames. You know this look. This is the look she gets before a big idea. "We could do this," she says. Her voice is different now. Not loud. Serious. "The four of us. A channel. About interesting things. Facts. Stories. Mysteries. We could actually do this." Leo stops editing his photo. He looks at Leah. Then at you. "We don\'t have a camera," he says. "I have a camera," he adds, two seconds later. Ben grins. The gap between his front teeth shows. "I want to be in front of the camera. I am very good at talking."', emotion:'', image:'campaign/prologue-07.jpg'},
   {speaker:'narrator', text:'You look at your three friends. Leah is already making a new spreadsheet. Leo is googling "best microphone under 30 euro." Ben is practising his intro to an invisible audience. And you \u2014 you feel something. A small, warm pull in your chest. This could be fun. This could be something. "We need a name," you say. It\'s the first thing you\'ve said in twenty minutes. Everyone looks at you. "Fourteen," Leah says instantly. "We\'re in the 14th district. There are four of us. It\'s perfect." Nobody argues. Some things just fit.', emotion:'', image:'campaign/prologue-08.jpg'},
-  {speaker:'narrator', text:'That afternoon, Leo designs a logo on his laptop. It\'s simple. Clean. A number 14 in white on black, with a thin line underneath. Leah creates an account. Username: @fourteenchannel. Ben records a test video of himself saying "Hello, I am Ben, and this is Fourteen!" eleven times. Each one is different. Each one has at least one grammar mistake. Each one is strangely perfect. You sit with your notebook and write down ideas for the first episode. The page fills up fast. FOURTEEN is born on a boring Tuesday. It doesn\'t feel boring anymore.', emotion:'', image:'campaign/prologue-08.jpg'}
+  {speaker:'narrator', text:'That afternoon, Leo designs a logo on his laptop. It\'s simple. Clean. A number 14 in white on black, with a thin line underneath. Leah creates an account. Username: @fourteenchannel. Ben records a test video of himself saying "Hello, I am Ben, and this is Fourteen!" eleven times. Each one is different. Each one has at least one grammar mistake. Each one is strangely perfect. You sit with your notebook and write down ideas for the first episode. The page fills up fast. FOURTEEN is born on a boring Tuesday. It doesn\'t feel boring anymore.', emotion:'', image:'campaign/prologue-09.jpg'}
+];
+
+// ── YouTube Stats Wall: collection cards earned per level ─────────────────
+var campaignYouTubeStats = [
+  {level:1,  img:'campaign/stats/stat-01.jpg', title:'Your First 4 Subs',    desc:'The four of you subscribed to your own channel. It counts.',                        vibe:'positive'},
+  {level:2,  img:'campaign/stats/stat-02.jpg', title:'First Viral Moment',   desc:'47 subscribers. People are watching. And they\u2019re laughing at Ben.',               vibe:'positive'},
+  {level:3,  img:'campaign/stats/stat-03.jpg', title:'Steady Growth',        desc:'180 subs. The algorithm is starting to notice you.',                                vibe:'positive'},
+  {level:4,  img:'campaign/stats/stat-04.jpg', title:'Sara Liked It',        desc:'850 subs. A like from @sara.explains. Everyone screams.',                           vibe:'positive'},
+  {level:5,  img:'campaign/stats/stat-05.jpg', title:'Grammar Fix Brand',    desc:'2,400 subs. The segment becomes your signature. Ben becomes the punchline.',       vibe:'positive'},
+  {level:6,  img:'campaign/stats/stat-06.jpg', title:'London Trending',      desc:'6,500 subs. Sara\u2019s DM is burning in your pocket.',                                vibe:'warning'},
+  {level:7,  img:'campaign/stats/stat-07.jpg', title:'Friendship Episode',   desc:'12,000 subs. The hypocrisy is deafening.',                                          vibe:'warning'},
+  {level:8,  img:'campaign/stats/stat-08.jpg', title:'Sponsorship Offer',    desc:'22,000 subs. A company wants to buy the channel.',                                  vibe:'warning'},
+  {level:9,  img:'campaign/stats/stat-09.jpg', title:'Ben Pushes Back',      desc:'31,000 subs. The cracks are showing.',                                              vibe:'warning'},
+  {level:10, img:'campaign/stats/stat-10.jpg', title:'Sara\u2019s Warning',  desc:'42,000 subs. \u201CCould you still look Ben in the eye?\u201D',                        vibe:'warning'},
+  {level:11, img:'campaign/stats/stat-11.jpg', title:'The Compilation',      desc:'58,000 subs. 200K views on someone else\u2019s TikTok of Ben\u2019s fails.',            vibe:'warning'},
+  {level:12, img:'campaign/stats/stat-12.jpg', title:'Channel Frozen',       desc:'71,000 subs. Ben walked out. Nobody\u2019s filming.',                                   vibe:'dark'},
+  {level:13, img:'campaign/stats/stat-13.jpg', title:'63K and Falling',      desc:'Unsubs rolling in. Sara visits. The group reflects.',                               vibe:'dark'},
+  {level:14, img:'campaign/stats/stat-14.jpg', title:'Going LIVE',           desc:'89,000 subs. For real this time. Mistakes and all.',                                vibe:'redemption'}
 ];
 
 // ── Campaign Levels placeholder (data filled separately) ───────────────────
@@ -10665,13 +10904,20 @@ function renderPrologueScene() {
 
   var imgHtml = scene.image ? '<img src="' + scene.image + '" alt="" class="prologue-scene-img" style="width:100%;border-radius:10px;margin-bottom:0.8rem;" onerror="this.style.display=\'none\'">' : '';
 
+  var backHtml = campaignState.prologueScene > 0
+    ? '<button class="btn btn-secondary" onclick="prevPrologueScene()" style="margin-top:1rem;margin-right:0.4rem;">\u2190 Back</button>'
+    : '';
+
   container.innerHTML = skipHtml +
     '<div class="prologue-scene">' +
       imgHtml +
       '<div class="prologue-speaker">' + speakerEmoji + ' ' + speakerName + '</div>' +
       '<div class="prologue-text' + emotionClass + '">' + escapeHtml(scene.text) + '</div>' +
       dotsHtml +
-      '<button class="btn campaign-story-btn" onclick="advancePrologueScene()" style="margin-top:1rem;">Continue</button>' +
+      '<div style="display:flex;gap:0.4rem;margin-top:1rem;">' +
+        backHtml +
+        '<button class="btn campaign-story-btn" onclick="advancePrologueScene()" style="flex:1;">Continue</button>' +
+      '</div>' +
     '</div>';
 }
 
@@ -10680,6 +10926,13 @@ function advancePrologueScene() {
   if (campaignState.prologueScene >= prologueScenes.length) {
     finishPrologue();
   } else {
+    renderPrologueScene();
+  }
+}
+
+function prevPrologueScene() {
+  if (campaignState.prologueScene > 0) {
+    campaignState.prologueScene--;
     renderPrologueScene();
   }
 }
@@ -10696,6 +10949,58 @@ function replayPrologue() {
   campaignState.prologueScene = 0;
   campaignState.prologueWatched = false;
   showPrologue();
+}
+
+function showYouTubeStatsWall() {
+  var cp = getCampaignProgress();
+  var completedLevels = [];
+  if (cp && cp.levels) {
+    for (var k in cp.levels) {
+      if (cp.levels[k] && cp.levels[k].completed) {
+        completedLevels.push(parseInt(k.substring(1), 10));
+      }
+    }
+  }
+  var listEl = document.getElementById('stats-wall-list');
+  var subEl = document.getElementById('stats-wall-subtitle');
+  if (!listEl) return;
+  var stats = (typeof campaignYouTubeStats !== 'undefined') ? campaignYouTubeStats : [];
+  var unlockedCount = 0;
+  for (var s = 0; s < stats.length; s++) {
+    if (completedLevels.indexOf(stats[s].level) !== -1) unlockedCount++;
+  }
+  if (subEl) {
+    subEl.textContent = unlockedCount + ' of ' + stats.length + ' stats unlocked';
+  }
+  var html = '';
+  for (var i = 0; i < stats.length; i++) {
+    var item = stats[i];
+    var unlocked = completedLevels.indexOf(item.level) !== -1;
+    if (unlocked) {
+      var imgHtml = item.img
+        ? '<img class="stats-wall-img" src="' + item.img + '" alt="" onerror="this.outerHTML=\'<div class=\\\'stats-wall-lock\\\'>\uD83D\uDCCA</div>\';">'
+        : '<div class="stats-wall-lock">\uD83D\uDCCA</div>';
+      html += '<div class="stats-wall-item unlocked ' + (item.vibe || 'positive') + '">' +
+        imgHtml +
+        '<div class="stats-wall-body">' +
+          '<div class="stats-wall-level">EP ' + item.level + '</div>' +
+          '<div class="stats-wall-title">' + escapeHtml(item.title) + '</div>' +
+          '<div class="stats-wall-desc">' + escapeHtml(item.desc) + '</div>' +
+        '</div>' +
+      '</div>';
+    } else {
+      html += '<div class="stats-wall-item locked">' +
+        '<div class="stats-wall-lock">\uD83D\uDD12</div>' +
+        '<div class="stats-wall-body">' +
+          '<div class="stats-wall-level">EP ' + item.level + '</div>' +
+          '<div class="stats-wall-title">Locked</div>' +
+          '<div class="stats-wall-desc">Complete Episode ' + item.level + ' to unlock.</div>' +
+        '</div>' +
+      '</div>';
+    }
+  }
+  listEl.innerHTML = html;
+  showScreen('campaign-stats-wall-screen');
 }
 
 function confirmQuitLevel() {
@@ -10739,24 +11044,30 @@ function showCampaignMap() {
     }
   }
 
-  // Subscriber count: show the subscriber milestone from the highest completed level
-  var totalSubs = '0';
+  // Subscriber count: numeric from highest completed level. LIVE badge only after L14 done.
+  var totalSubsNum = 0;
+  var showLiveBadge = false;
   for (var s = 0; s < levels.length; s++) {
     var sLid = 'L' + String(s + 1).padStart(2, '0');
     var sLd = cp.levels ? cp.levels[sLid] : null;
-    if (sLd && sLd.completed && levels[s].subscribers) {
-      totalSubs = levels[s].subscribers;
+    if (sLd && sLd.completed) {
+      if (typeof levels[s].subsAtEnd === 'number') totalSubsNum = levels[s].subsAtEnd;
+      if (s === 13) showLiveBadge = true;
     }
   }
+  var totalSubs = totalSubsNum.toLocaleString();
+  var liveBadgeHtml = showLiveBadge
+    ? ' <span style="background:#ff0000;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;">\uD83D\uDD34 LIVE</span>'
+    : '';
 
   // Header
   var headerHtml = '<div class="campaign-map-header">' +
-    '<div class="map-title" style="font-size:1.6rem;font-weight:900;letter-spacing:-0.5px;">FOURTEEN</div>' +
+    '<div class="map-title" style="font-size:1.6rem;font-weight:900;letter-spacing:-0.5px;">FOURTEEN' + liveBadgeHtml + '</div>' +
     '<div class="map-subtitle" style="font-size:0.82rem;color:var(--muted);">' +
       '\uD83D\uDCF9 ' + totalSubs + ' subscribers \u00B7 ' +
       completedCount + '/' + levels.length + ' episodes' +
     '</div>' +
-    '<div class="map-stats"><span>\u2B50 ' + totalStars + '</span><span>\u2728 ' + totalXP + ' XP</span></div>' +
+    '<div class="map-stats"><span>\u2B50 ' + totalStars + '</span></div>' +
   '</div>';
 
   // Act divider positions
@@ -10859,6 +11170,10 @@ function startCampaignLevel(levelIndex) {
   campaignState.vocabXP = 0;
   campaignState.grammarXP = 0;
   campaignState.readingXP = 0;
+  campaignState.sessionSubs = 0;
+  campaignState.sessionViews = 0;
+  campaignState.sessionLikes = 0;
+  campaignState.sessionComments = 0;
   campaignState.taskResults = [];
   campaignState.hintTaps = {};
   campaignState.readingQuestionIndex = 0;
@@ -10913,17 +11228,12 @@ function renderStoryBeat() {
 
   if (!speakerArea || !content || !btn) return;
 
-  // Character badge with colour + avatar image
-  var charAvatars = {
-    leah: 'campaign/char-leah-avatar.jpg',
-    leo: 'campaign/char-leo-avatar.jpg',
-    ben: 'campaign/char-ben-happy.jpg',
-    sara: 'campaign/char-sara-avatar.jpg'
-  };
+  // Character badge with colour + context-aware avatar image
+  var avatarSrc = getCharAvatar(speakerKey, campaignState.currentLevel, campaignState._storyPhase);
   var badgeHtml = '';
   if (ch.name) {
-    var avatarInner = charAvatars[speakerKey]
-      ? '<img src="' + charAvatars[speakerKey] + '" class="campaign-speaker-avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" onerror="this.outerHTML=\'<div style=\\\'width:36px;height:36px;border-radius:50%;background:' + ch.color + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;\\\'>' + ch.initials + '</div>\'">'
+    var avatarInner = avatarSrc
+      ? '<img src="' + avatarSrc + '" class="campaign-speaker-avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" onerror="this.outerHTML=\'<div style=\\\'width:36px;height:36px;border-radius:50%;background:' + ch.color + ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;\\\'>' + ch.initials + '</div>\'">'
       : '<div style="width:36px;height:36px;border-radius:50%;background:' + ch.color +
         ';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;">' +
         ch.initials + '</div>';
@@ -10940,16 +11250,26 @@ function renderStoryBeat() {
 
   // Scene image on first beat of each story phase
   var sceneImgHtml = '';
-  if (idx === 0) {
-    var lv = campaignLevels[campaignState.currentLevel];
-    var phase = campaignState._storyPhase || '';
-    if (lv && lv.sceneImages && lv.sceneImages[phase]) {
-      sceneImgHtml = '<img src="' + lv.sceneImages[phase] + '" alt="" class="campaign-scene-img" style="width:100%;border-radius:12px;margin-bottom:0.8rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);" onerror="this.style.display=\'none\'">';
-    }
+  var lvBeat = campaignLevels[campaignState.currentLevel];
+  var phaseBeat = campaignState._storyPhase || '';
+
+  // Scene image: show at imageBeat index if specified, otherwise at beat 0 (default)
+  var targetBeat = 0;
+  if (lvBeat && lvBeat.imageBeat && typeof lvBeat.imageBeat[phaseBeat] === 'number') {
+    targetBeat = lvBeat.imageBeat[phaseBeat];
+  }
+  if (idx === targetBeat && lvBeat && lvBeat.sceneImages && lvBeat.sceneImages[phaseBeat]) {
+    sceneImgHtml = '<img src="' + lvBeat.sceneImages[phaseBeat] + '" alt="" class="campaign-scene-img" style="width:100%;border-radius:12px;margin-bottom:0.8rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);" onerror="this.style.display=\'none\'">';
+  }
+
+  // Inline image (per-beat social media screen, etc.)
+  var inlineImgHtml = '';
+  if (beat.inlineImage) {
+    inlineImgHtml = '<img src="' + beat.inlineImage + '" alt="" class="campaign-inline-img" style="width:100%;max-width:320px;display:block;margin:0.6rem auto;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.15);" onerror="this.style.display=\'none\'">';
   }
 
   content.innerHTML = sceneImgHtml + '<div style="font-size:0.92rem;line-height:1.65;color:var(--text);animation:fadeIn 0.3s ease;">' +
-    escapeHtml(text) + '</div>';
+    escapeHtml(text) + '</div>' + inlineImgHtml;
 
   var isLast = (idx >= beats.length - 1);
   btn.textContent = isLast ? 'Continue' : 'Continue';
@@ -10993,84 +11313,149 @@ function advanceCampaignTask() {
 
 // ── 5c. Results Screen ─────────────────────────────────────────────────────
 
+function pickResultsVibe(levelIdx) {
+  // L12 = shock, L13 = reflection, L14 = redemption, rest = celebration
+  if (levelIdx === 11) return 'shock';
+  if (levelIdx === 12) return 'reflection';
+  if (levelIdx === 13) return 'redemption';
+  return 'celebration';
+}
+
+function renderConfetti(vibe) {
+  var layer = document.getElementById('yt-confetti-layer');
+  if (!layer) return;
+  layer.innerHTML = '';
+  if (vibe === 'shock' || vibe === 'reflection') return; // no confetti
+  var colours = (vibe === 'redemption')
+    ? ['#FFD700','#FF6B35','#C9A84C','#FFA726','#E53935']
+    : ['#4CAF50','#2196F3','#F9A825','#E91E63','#9C27B0','#FF9800'];
+  for (var i = 0; i < 40; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random() * 100) + '%';
+    piece.style.background = colours[i % colours.length];
+    piece.style.animationDelay = (Math.random() * 0.8) + 's';
+    piece.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+    piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+    layer.appendChild(piece);
+  }
+}
+
 function showCampaignResults() {
   var lv = campaignLevels[campaignState.currentLevel];
   var stars = campaignState.earnedStars || 0;
+  var levelIdx = campaignState.currentLevel;
+  var vibe = pickResultsVibe(levelIdx);
 
-  // Banner
-  var banner = document.getElementById('campaign-results-banner');
-  if (banner) {
-    banner.textContent = 'EP ' + (campaignState.currentLevel + 1) + ': ' +
-      (lv.levelName || 'Episode') + ' \u2014 Complete!';
+  // Apply vibe class to card
+  var card = document.getElementById('yt-upload-card');
+  if (card) {
+    card.className = 'yt-upload-card vibe-' + vibe;
   }
 
-  // Stars with animation
+  // Status line per vibe
+  var statusEl = document.getElementById('yt-status-line');
+  if (statusEl) {
+    var statusText = 'Episode ' + (levelIdx + 1) + ' uploaded!';
+    if (vibe === 'shock') statusText = 'The channel is paused...';
+    else if (vibe === 'reflection') statusText = 'Reflecting\u2026';
+    else if (vibe === 'redemption') statusText = 'We went LIVE. For real.';
+    statusEl.textContent = statusText;
+  }
+
+  // Thumbnail (use completion scene image if available)
+  var thumb = document.getElementById('yt-thumbnail');
+  if (thumb) {
+    var thumbSrc = '';
+    if (lv.sceneImages && lv.sceneImages.completion) thumbSrc = lv.sceneImages.completion;
+    else if (lv.sceneImages && lv.sceneImages.storyA) thumbSrc = lv.sceneImages.storyA;
+    thumb.src = thumbSrc;
+  }
+
+  // Episode title
+  var epTitleEl = document.getElementById('yt-episode-title');
+  if (epTitleEl) {
+    epTitleEl.textContent = 'EP ' + (levelIdx + 1) + ': ' + (lv.levelName || 'Episode');
+  }
+
+  // Stats grid — session engagement
+  var statsGrid = document.getElementById('yt-stats-grid');
+  if (statsGrid) {
+    statsGrid.innerHTML =
+      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDC64</div><span class="yt-stat-value">+' + (campaignState.sessionSubs || 0) + '</span><div class="yt-stat-label">subs</div></div>' +
+      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDC41\uFE0F</div><span class="yt-stat-value">+' + (campaignState.sessionViews || 0) + '</span><div class="yt-stat-label">views</div></div>' +
+      '<div class="yt-stat"><div class="yt-stat-icon">\u2764\uFE0F</div><span class="yt-stat-value">+' + (campaignState.sessionLikes || 0) + '</span><div class="yt-stat-label">likes</div></div>' +
+      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDCAC</div><span class="yt-stat-value">+' + (campaignState.sessionComments || 0) + '</span><div class="yt-stat-label">comments</div></div>';
+  }
+
+  // Total channel subscribers (from this level's subsAtEnd)
+  var totalEl = document.getElementById('yt-total-subs');
+  if (totalEl && typeof lv.subsAtEnd === 'number') {
+    var target = lv.subsAtEnd;
+    var current = 0;
+    totalEl.textContent = '0 subscribers';
+    setTimeout(function() {
+      var step = Math.max(1, Math.ceil(target / 40));
+      var interval = setInterval(function() {
+        current += step;
+        if (current >= target) { current = target; clearInterval(interval); }
+        totalEl.textContent = current.toLocaleString() + ' subscribers';
+      }, 30);
+    }, 600);
+  }
+
+  // Stars
   var starsContainer = document.getElementById('campaign-results-stars');
   if (starsContainer) {
     var starsHtml = '';
     for (var i = 0; i < 3; i++) {
       if (i < stars) {
         starsHtml += '<div class="campaign-star fill-anim" style="animation-delay:' +
-          (0.3 + i * 0.5) + 's;">\u2B50</div>';
+          (0.3 + i * 0.4) + 's;">\u2B50</div>';
       } else {
-        starsHtml += '<div class="campaign-star">\u2606</div>';
+        starsHtml += '<div class="campaign-star" style="opacity:0.25;">\u2606</div>';
       }
     }
     starsContainer.innerHTML = starsHtml;
   }
 
-  // XP breakdown
-  var breakdownEl = document.getElementById('campaign-xp-breakdown');
-  if (breakdownEl) {
-    var breakdown = '';
-    if (campaignState.vocabXP > 0) {
-      breakdown += '<div class="campaign-xp-row"><span>\uD83D\uDCDA Vocab</span><span>+' +
-        campaignState.vocabXP + ' XP</span></div>';
-    }
-    if (campaignState.grammarXP > 0) {
-      breakdown += '<div class="campaign-xp-row"><span>\uD83D\uDCDD Grammar</span><span>+' +
-        campaignState.grammarXP + ' XP</span></div>';
-    }
-    if (campaignState.readingXP > 0) {
-      breakdown += '<div class="campaign-xp-row"><span>\uD83D\uDCD6 Reading</span><span>+' +
-        campaignState.readingXP + ' XP</span></div>';
-    }
-    breakdown += '<div class="campaign-xp-row" style="font-weight:700;border-top:1px solid var(--card-border);padding-top:0.4rem;">' +
-      '<span>\u2728 Total</span><span id="campaign-total-xp-counter">' +
-      campaignState.levelXP + ' XP</span></div>';
-    breakdownEl.innerHTML = breakdown;
-
-    // Animate XP counter
-    var totalEl = document.getElementById('campaign-total-xp-counter');
-    if (totalEl) {
-      var targetXP = campaignState.levelXP;
-      var currentXP = 0;
-      setTimeout(function() {
-        var interval = setInterval(function() {
-          currentXP += Math.max(1, Math.ceil(targetXP / 30));
-          if (currentXP >= targetXP) { currentXP = targetXP; clearInterval(interval); }
-          totalEl.textContent = currentXP + ' XP';
-        }, 40);
-      }, 800);
+  // Newly earned stats wall card
+  var slotEl = document.getElementById('yt-stat-card-slot');
+  if (slotEl) {
+    slotEl.innerHTML = '';
+    if (typeof campaignYouTubeStats !== 'undefined') {
+      var earned = null;
+      for (var c = 0; c < campaignYouTubeStats.length; c++) {
+        if (campaignYouTubeStats[c].level === levelIdx + 1) {
+          earned = campaignYouTubeStats[c];
+          break;
+        }
+      }
+      if (earned) {
+        var imgHtml = earned.img
+          ? '<img src="' + earned.img + '" alt="" onerror="this.style.display=\'none\';">'
+          : '';
+        slotEl.innerHTML =
+          '<div class="yt-stats-wall-card">' +
+            imgHtml +
+            '<div>' +
+              '<div class="wall-title">\uD83D\uDCCA ' + escapeHtml(earned.title) + '</div>' +
+              '<div class="wall-desc">' + escapeHtml(earned.desc) + '</div>' +
+            '</div>' +
+          '</div>';
+      }
     }
   }
 
-  // Comic description
-  var comicBtn = document.getElementById('campaign-comic-btn');
-  if (comicBtn) {
-    comicBtn.style.display = (lv.comicDescription) ? '' : 'none';
-  }
-
-  // Completion message
-  var msgEl = document.getElementById('campaign-completion-message');
-  if (msgEl) msgEl.textContent = '';
-
-  // Next level button
+  // Next button
   var nextBtn = document.getElementById('campaign-next-btn');
-  var nextIdx = campaignState.currentLevel + 1;
+  var nextIdx = levelIdx + 1;
   if (nextBtn) {
     nextBtn.style.display = (nextIdx < campaignLevels.length) ? '' : 'none';
   }
+
+  // Confetti
+  renderConfetti(vibe);
 
   // Save progress
   saveCampaignProgress(stars);
@@ -11965,6 +12350,36 @@ function updateComboStreak(isCorrect) {
   }
 }
 
+// ── Social Engagement Rewards (replaces XP popups) ────────────────────────
+
+function generateSocialReward(xp, comboMult) {
+  // Weighted random: views are most common, subscribers rarest
+  var types = [
+    {type:'subscribers', icon:'\uD83D\uDC64', weight:1, multiplier:0.25, colour:'#E53935'},
+    {type:'views',       icon:'\uD83D\uDC41\uFE0F', weight:5, multiplier:3.0, colour:'#1E88E5'},
+    {type:'likes',       icon:'\u2764\uFE0F', weight:3, multiplier:1.0, colour:'#D81B60'},
+    {type:'comments',    icon:'\uD83D\uDCAC', weight:2, multiplier:0.5, colour:'#8E24AA'}
+  ];
+  var totalWeight = 0;
+  for (var i = 0; i < types.length; i++) totalWeight += types[i].weight;
+  var r = Math.random() * totalWeight;
+  var pick = types[0];
+  var acc = 0;
+  for (var j = 0; j < types.length; j++) {
+    acc += types[j].weight;
+    if (r <= acc) { pick = types[j]; break; }
+  }
+  var amount = Math.max(1, Math.round(xp * pick.multiplier * (comboMult || 1)));
+  return {type:pick.type, icon:pick.icon, amount:amount, colour:pick.colour};
+}
+
+function addToSessionSocial(reward) {
+  campaignState.sessionSubs     = (campaignState.sessionSubs     || 0) + (reward.type==='subscribers' ? reward.amount : 0);
+  campaignState.sessionViews    = (campaignState.sessionViews    || 0) + (reward.type==='views'       ? reward.amount : 0);
+  campaignState.sessionLikes    = (campaignState.sessionLikes    || 0) + (reward.type==='likes'       ? reward.amount : 0);
+  campaignState.sessionComments = (campaignState.sessionComments || 0) + (reward.type==='comments'    ? reward.amount : 0);
+}
+
 // ── Feedback & Continue ────────────────────────────────────────────────────
 
 function showCampaignFeedback(result, correctAnswer, xp) {
@@ -11978,35 +12393,56 @@ function showCampaignFeedback(result, correctAnswer, xp) {
   }
 
   var cls = result.isCorrect ? 'correct' : (result.isClose ? 'close' : 'wrong');
-  var comboHtml = '';
-  if (campaignState.comboStreak >= 3 && result.isCorrect) {
-    comboHtml = ' <span style="color:#F9A825;font-weight:700;">\uD83D\uDD25 ' + campaignState.comboStreak + 'x streak!</span>';
+
+  // Combo tier from existing COMBO_TIERS
+  var comboMult = 1;
+  var comboLabel = '';
+  if (typeof getComboTier === 'function') {
+    var tier = getComboTier(campaignState.comboStreak);
+    comboMult = tier.mult || 1;
+    comboLabel = tier.label || '';
   }
 
-  var msg = result.isCorrect
-    ? ('Correct! +' + xp + ' XP' + comboHtml)
-    : (result.isClose
-      ? ('Almost! The answer is: ' + escapeHtml(correctAnswer))
-      : ('The answer is: ' + escapeHtml(correctAnswer)));
+  var reward = null;
+  var msg = '';
+  if (result.isCorrect) {
+    reward = generateSocialReward(xp, comboMult);
+    addToSessionSocial(reward);
+    var comboHtml = '';
+    if (campaignState.comboStreak >= 3) {
+      comboHtml = ' <span style="color:#F9A825;font-weight:700;">\uD83D\uDD25 ' + campaignState.comboStreak + 'x streak' + (comboLabel ? ' \u00B7 ' + comboLabel : '') + '</span>';
+    }
+    msg = 'Nice! ' + reward.icon + ' <strong style="color:' + reward.colour + ';">+' + reward.amount + ' ' + reward.type + '</strong>' + comboHtml;
+  } else if (result.isClose) {
+    msg = 'Almost! The answer is: ' + escapeHtml(correctAnswer);
+  } else {
+    msg = 'The answer is: ' + escapeHtml(correctAnswer);
+  }
 
   feedback.innerHTML = '<div class="campaign-feedback ' + cls + '">' + msg + '</div>' +
     '<button class="btn" onclick="nextCampaignItem()" style="margin-top:0.5rem;width:100%;">Next</button>';
 
   var xpEl = document.getElementById('campaign-task-xp');
-  if (xpEl) xpEl.textContent = campaignState.levelXP + ' XP';
+  if (xpEl) {
+    // Show running session engagement instead of raw XP
+    var totalEngagement = (campaignState.sessionSubs || 0) + (campaignState.sessionViews || 0) + (campaignState.sessionLikes || 0) + (campaignState.sessionComments || 0);
+    xpEl.textContent = totalEngagement + ' engagement';
+  }
 
-  // XP fly-up animation
-  if (xp > 0) {
+  // Fly-up popup (themed)
+  if (reward) {
     var flyUp = document.createElement('div');
     flyUp.className = 'campaign-xp-fly';
-    flyUp.textContent = '+' + xp + ' XP';
+    flyUp.innerHTML = reward.icon + ' +' + reward.amount + ' ' + reward.type;
     flyUp.style.right = '1rem';
     flyUp.style.top = '0.5rem';
+    flyUp.style.color = reward.colour;
+    flyUp.style.fontWeight = '700';
     var taskProgress = document.getElementById('campaign-task-progress');
     if (taskProgress) {
       taskProgress.style.position = 'relative';
       taskProgress.appendChild(flyUp);
-      setTimeout(function() { flyUp.remove(); }, 1000);
+      setTimeout(function() { flyUp.remove(); }, 1200);
     }
   }
 }
@@ -12170,7 +12606,8 @@ var campaignLevels = [
     episodeTitle: "Episode 1: Music",
     unitNumber: 1,
     grammar: "Revision: present simple, past simple, present perfect",
-    subscribers: "47",
+    subsAtEnd: 4,
+    subscribers: "4",
     sceneImages:{storyA:'campaign/ch01-storyA.jpg',storyB:'campaign/ch01-storyB.jpg',completion:'campaign/ch01-completion.jpg'},
     socialImages:{upload:'campaign/ch01-social-upload.jpg'},
 
@@ -12184,7 +12621,7 @@ var campaignLevels = [
     storyB: [
       {speaker:"narrator", text:"Ben starts talking. And he's \u2014 alive. His hands move. His eyes are bright. He tells the story of pop music like he's telling you a secret. But. \"The Beatles was the most famous band in the 1960s.\" Was, not were. \"They have changed music forever.\" Present perfect where he means past simple. \"Their songs was heard by millions.\" He doesn't notice. He keeps going, passionate and crooked and completely himself. When he finishes, he bows. Actually bows. Leah claps."},
       {speaker:"narrator", text:"That evening, Leo edits. You sit next to him and watch. His laptop screen glows in the dark room. He cuts. He adjusts colour. He adds music underneath \u2014 something soft and electronic from his own playlist. When he reaches Ben's segment, he slows down. He watches it twice. \"His mistakes,\" Leo says quietly. He doesn't finish the sentence. \"What about them?\" you ask. \"They make it feel real.\" Leo looks at the screen. \"People will like this.\" He says it like a fact, not a feeling."},
-      {speaker:"narrator", text:"Sunday night. 9:14 p.m. Leah presses upload. The four of you are on a video call. Nobody speaks for three seconds. Then Leah screams. Not because anything happened. Just because it's real. It's online. Anyone can see it. By Monday morning, the video has 47 views. Forty-seven. Leah screenshots the number and sends it to the group chat with twelve exclamation marks. \"That's like a whole classroom!\" Ben writes. \"Almost two classrooms!\" he adds. You do the maths. He's wrong. It doesn't matter."}
+      {speaker:"narrator", text:"Sunday night. 9:14 p.m. Leah presses upload. The four of you are on a video call. Nobody speaks for three seconds. Then Leah screams. Not because anything happened. Just because it's real. It's online. Anyone can see it. By Monday morning, the video has 47 views. Forty-seven. Leah screenshots the number and sends it to the group chat with twelve exclamation marks. \"That's like a whole classroom!\" Ben writes. \"Almost two classrooms!\" he adds. You do the maths. He's wrong. It doesn't matter.", inlineImage:"campaign/template-youtube-upload.jpg"}
     ],
 
     completion: [
@@ -12307,7 +12744,8 @@ var campaignLevels = [
     episodeTitle: "Episode 2: Coincidences",
     unitNumber: 2,
     grammar: "Past continuous",
-    subscribers: "3,200",
+    subsAtEnd: 47,
+    subscribers: "47",
     sceneImages:{storyA:'campaign/ch02-storyA.jpg',storyB:'campaign/ch02-storyB.jpg',completion:'campaign/ch02-completion.jpg'},
     socialImages:{comments:'campaign/ch02-social-comments.jpg'},
 
@@ -12319,7 +12757,7 @@ var campaignLevels = [
 
     storyB: [
       {speaker:"narrator", text:"The video goes up on Sunday at 8 p.m. You check the count before bed. 89 views. Not bad. You fall asleep. In the morning, you pick up your phone. You blink. You check again. 3,200 views. Three thousand two hundred. Leah has sent forty-seven messages to the group chat. Forty-seven. \"WHAT IS HAPPENING,\" she writes. Then a row of numbers. Then \"I'M NOT OKAY.\" Leo sends a single emoji. A small flame. For Leo, this is a standing ovation."},
-      {speaker:"narrator", text:"The comments. There are comments now. Real people writing real words. \"Love this channel!\" \"The Titanic story is wild.\" \"More please!\" But some comments are different. \"The blond guy is hilarious \uD83D\uDE02.\" \"Is he doing the mistakes on purpose? Comedy gold.\" \"Ben is the best part lol.\" You read them twice. Your stomach does something small and strange. They're nice comments. But they're not laughing with Ben. You're not sure Ben sees the difference."},
+      {speaker:"narrator", text:"The comments. There are comments now. Real people writing real words. \"Love this channel!\" \"The Titanic story is wild.\" \"More please!\" But some comments are different. \"The blond guy is hilarious \uD83D\uDE02.\" \"Is he doing the mistakes on purpose? Comedy gold.\" \"Ben is the best part lol.\" You read them twice. Your stomach does something small and strange. They're nice comments. But they're not laughing with Ben. You're not sure Ben sees the difference.", inlineImage:"campaign/template-youtube-comments.jpg"},
       {speaker:"leah", text:"Okay. I checked every number. I checked watch time, I checked drop-off points, I checked replay rates. Ben's segment has the highest engagement. By far. People rewatch his part. They comment on his part. The algorithm pushes his part. This is \u2014 this is huge. Ben is our secret weapon."},
       {speaker:"narrator", text:"You're walking home. Your headphones are in but no music is playing. You think about the comments. You think about Leah's analytics screen, the graph spiking exactly where Ben says \"Lincoln and Kennedy was both shot on a Friday.\" Was instead of were. The spike is sharp and clear. People rewatched that moment. You want to feel happy. The channel is growing. But something sits in your chest. Small. Quiet. Like a stone you accidentally swallowed. You tell yourself it's nothing."}
     ],
@@ -12424,17 +12862,20 @@ var campaignLevels = [
     episodeTitle: "Episode 3: Adventure",
     unitNumber: 3,
     grammar: "Time connectors: while, during, before, after, until, by the time",
-    subscribers: "11,000",
+    subsAtEnd: 180,
+    subscribers: "180",
     sceneImages:{storyA:'campaign/ch03-storyA.jpg',storyB:'campaign/ch03-storyB.jpg',completion:'campaign/ch03-completion.jpg'},
 
     storyA: [
-      {speaker:"narrator", text:"Episode three. Adventure and travel. Leah has a list of explorers. Mary Kingsley \u2014 a Victorian woman who travelled alone through West Africa. James Holman \u2014 a blind man who walked around the entire world in the 1800s. The stories are amazing. You get excited despite the stone in your chest. This could be the best episode yet. Leo is already planning camera angles. He wants to use maps as backgrounds. \"Cinematic,\" he says. High praise from Leo."},
-      {speaker:"narrator", text:"Ben's segment is about James Holman. His script is ready. Leah wrote it. You notice something. The sentences are longer than before. More complex. \"While Holman was travelling through Siberia, the Russian government arrested him.\" \"During his journey across Africa, he documented species that European scientists had never seen before.\" While. During. Time connectors that trip up even good English speakers. You look at Leah. She's watching her spreadsheet. Her face shows nothing."},
-      {speaker:"narrator", text:"Filming day. Ben reads through his script once, moving his lips. Then he puts it down. \"Ready!\" He smiles that gap-toothed smile. Leo points the camera. Leah watches from behind her phone. Ben starts. \"While Holman was travel \u2014 travelling through Siberia...\" He stumbles. Starts again. Gets further. \"During his journey across Africa, he documented species that scientists have never \u2014 had never saw before.\" Have instead of had. Saw instead of seen. While and during tangle in his mouth. He keeps going. He always keeps going. That's the thing about Ben. He never stops."}
+      {speaker:"narrator", text:"Episode three. Leah has a new idea and she is vibrating with it. \"No more bedrooms. No more ring lights. We go OUT. Into the countryside. Bikes. Real air. Real adventure.\" Leo raises an eyebrow \u2014 his hair falls over one eye. \"Cinematic,\" he says approvingly. Ben is already bouncing on his heels, orange vest unzipped over a bright blue t-shirt. \"I love bikes! I have a bike!\" You check the weather app. Saturday: 80% chance of rain. Leah shrugs without looking up. \"Rain is content too.\""},
+      {speaker:"narrator", text:"Saturday morning, 9 a.m. The four of you meet at the edge of the 14th district. Leo has a waterproof bag for his camera. Leah has a printed schedule. Ben has a bright yellow rain jacket over his orange vest \u2014 the clash of colours is so loud you can almost hear it. You have the script, printed on water-resistant paper, folded into your pocket. You cycle out of Vienna. Empty country roads. Green fields. A cow stares at you. Ben sings a made-up song about bikes. Every line mixes up while and during beautifully: \"While I was ride my bike, during we going fast...\" Leo films from behind. It is somehow perfect."},
+      {speaker:"narrator", text:"Forty minutes in, the sky turns grey. Then black. Then it opens. Rain like someone poured a bucket. Cold, loud, soaking. You pedal faster, looking for shelter. Leah is shouting directions. Leo is shielding the camera under his jacket. Ben is LAUGHING \u2014 actually laughing \u2014 water streaming down his freckled face, hair plastered to his forehead. \"This is GREAT content!\" he yells over the storm. A small stone bridge appears ahead, arching over the road. You all skid underneath, bikes clattering on wet gravel. You are soaked through."}
     ],
 
     storyB: [
-      {speaker:"narrator", text:"Tuesday evening. Leo opens his laptop in the library. You sit next to him. He pulls up the analytics dashboard. He doesn't say anything at first. He just turns the screen toward you. There are two lines on the graph. One is average engagement for all segments. It's steady, normal. The other line is Ben's segments. It spikes to five times higher. Five times. Leo taps the screen with one finger. \"This is not an accident anymore,\" he says."},
+      {speaker:"narrator", text:"Under the bridge. The rain drums on the stone above you. Your clothes cling to your skin. Ben's sandy hair is flat against his forehead, freckles bright in the grey light, gap-toothed grin wider than ever. Leo unpacks the camera. It still works. Leah checks her notes. \"Ben. You're up. Time connectors segment. While. During. Before. After. Until. By the time.\" Ben nods. His teeth chatter slightly. He takes his script from his jacket. The paper is damp but readable. He grins straight into the camera."},
+      {speaker:"narrator", text:"\"While we were cycling, the rain starting... started... While the rain was start \u2014 started falling, we find... found... a bridge. Before we were being... were... completely wet, we hide... hid... under it. During the storm, we filming... filmed... this segment. Until the rain stop... stops... we stay here.\" Ben gets through the whole thing. Almost every time connector is tangled. Almost every tense is wrong. But he finishes. Leo keeps filming long after the script ends \u2014 Ben laughing, Leah pulling out sandwiches, you wringing out your socks. Real moments. The bridge echoes with the sound of rain."},
+      {speaker:"narrator", text:"Back home, warm clothes, hot chocolate. Leo opens his laptop and cuts the footage together: the cycling, the rain, Ben's soggy grin, Ben's tangled grammar. He adds soft piano music under the mistakes. The result is beautiful. And funny. And a little bit sad, somehow. Leah watches it three times. \"This is our best episode yet.\" You should feel proud. You made something good. So why does your chest feel heavy? You look at Ben's face on the screen. Rain in his eyelashes. Smiling. Not knowing that in the editing room, Leo has already zoomed in on his mistakes. Already lingered on them. Already saved them for the Grammar Fix segment.", inlineImage:"campaign/template-youtube-analytics.jpg"},
       {speaker:"leah", text:"Listen. I have an idea. What if \u2014 and hear me out \u2014 what if we give Ben the hardest parts? The most complex grammar, the longest sentences. Not to be mean. Because it works. The audience loves it. He loves being on camera. Everyone wins. We just... lean into what's already happening. That's all."},
       {speaker:"narrator", text:"The four of you \u2014 minus Ben \u2014 sit in the \"Strategy\" chat. Leah's message glows on your screen. Leo replies first. \"The footage is better when he struggles. That's just true.\" You type something. Delete it. Type again. \"But he doesn't know. He thinks he's good at this.\" Send. Three dots appear. Leah is typing. \"He IS good at this. He's the most watchable person on the channel. We're not hurting him. We're featuring him.\" You stare at the screen. You want to say no. Instead you type: \"Okay. But we should be careful.\" It's not a no. You know it's not a no."},
       {speaker:"narrator", text:"The decision is made. Not with a vote. Not with a dramatic moment. It happens the way bad decisions always happen \u2014 quietly, with everyone looking at their shoes. Leah adds a note to her spreadsheet: \"Ben = complex scripts.\" Leo saves a new editing template: longer cuts on Ben's mistakes, subtle zoom on his face when he stumbles. You close the chat. You put your phone face-down on your desk. The stone in your chest is heavier now. It has a name, but you're not ready to say it."}
@@ -12556,7 +12997,8 @@ var campaignLevels = [
     episodeTitle: "Episode 4: Dangerous Animals",
     unitNumber: 4,
     grammar: "Comparative intensifiers: much, a lot, a bit, nearly as...as, not nearly as...as",
-    subscribers: "28,000",
+    subsAtEnd: 850,
+    subscribers: "850",
     sceneImages:{storyA:'campaign/ch04-storyA.jpg',storyB:'campaign/ch04-storyB.jpg',completion:'campaign/ch04-completion.jpg'},
     socialImages:{saraLike:'campaign/ch04-social-sara-like.jpg'},
 
@@ -12568,7 +13010,7 @@ var campaignLevels = [
 ],
 
     storyB: [
-  {speaker:'narrator', text:'Thursday morning. Leo opens the app before first period. His eyes go wide. He turns the phone around so fast he nearly drops it. 28,000 views. Twenty-eight thousand. But that is not the thing that makes his hand shake. Sara — THE Sara, Sara with the silver streak in her hair, Sara with 190,000 followers — has liked the video. Liked it. Her profile picture is right there, a tiny circle with a blue tick beside it. Leah grabs the phone. Her glasses slide down her nose. She stares at the screen for three full seconds without breathing. "This changes everything," she whispers.'},
+  {speaker:'narrator', text:'Thursday morning. Leo opens the app before first period. His eyes go wide. He turns the phone around so fast he nearly drops it. 28,000 views. Twenty-eight thousand. But that is not the thing that makes his hand shake. Sara — THE Sara, Sara with the silver streak in her hair, Sara with 190,000 followers — has liked the video. Liked it. Her profile picture is right there, a tiny circle with a blue tick beside it. Leah grabs the phone. Her glasses slide down her nose. She stares at the screen for three full seconds without breathing. "This changes everything," she whispers.', inlineImage:"campaign/template-instagram-post.jpg"},
   {speaker:'narrator', text:'Break time. The group sits in the courtyard. Leah types on her phone under the table. She is writing a DM to Sara. You watch her draft it three times. Delete. Delete. Send. It says something about being young creators who admire her work. It says nothing about Ben. Leo refreshes the analytics page every forty seconds. 28,400. 28,500. Each number is a small electric shock. Ben walks over with a sandwich. "Hey, what\'s everyone looking at?" Leah locks her phone. "Nothing. Just checking views." Ben sits down. "Cool. How many?" "Twenty-eight thousand." Ben whistles. "Not bad for a kid in an orange vest." Everyone laughs. But the laugh has a different sound now. A hollow sound.'},
   {speaker:'narrator', text:'Ben takes a bite of his sandwich. Mustard on his chin. "Hey, can I ask something?" The group goes quiet. "Why do I always get the hardest lines? Like, Leo reads the easy stuff. I get all the tongue-twisters." Leah doesn\'t even blink. "Because you\'re the funniest, Ben. People love watching you. The camera loves your face." She says it so smoothly. Like she practised. Ben grins. The mustard is still on his chin. "Okay, cool. I just wondered." He takes another bite. You feel something cold move through your chest. Leah picks up her phone. Sara still hasn\'t replied to the DM. But 28,000 people watched Ben fail, and one of them is famous.'}
 ],
@@ -12688,7 +13130,8 @@ var campaignLevels = [
     episodeTitle: "Episode 5: Superstitions",
     unitNumber: 5,
     grammar: "First conditional with if/unless; no will in the if-clause",
-    subscribers: "45,000",
+    subsAtEnd: 2400,
+    subscribers: "2,400",
     sceneImages:{storyA:'campaign/ch05-storyA.jpg',storyB:'campaign/ch05-storyB.jpg',completion:'campaign/ch05-completion.jpg'},
 
     storyA: [
@@ -12820,21 +13263,22 @@ var campaignLevels = [
     episodeTitle: "Episode 6: London",
     unitNumber: 6,
     grammar: "Relative clauses: who, which, that, whose; German L1 interference (was/what, who/which)",
-    subscribers: "55,000",
+    subsAtEnd: 6500,
+    subscribers: "6,500",
     sceneImages:{storyA:'campaign/ch06-storyA.jpg',completion:'campaign/ch06-completion.jpg'},
 
     storyA: [
   {speaker:'narrator', text:'School trip to London. Five days. You can feel the excitement on the bus like electricity. Everyone is talking. Ben sits in the back row, orange vest bright against the grey seats, pointing at everything through the window. "Look! That\'s the motorway what goes to London!" Leah hears it. She turns around so fast her glasses nearly fly off. She looks at Leo. Leo looks at you. "Relative clauses," Leah mouths. She already has her phone out. She\'s already filming. Ben doesn\'t notice. He\'s too busy pressing his face against the glass like a kid at an aquarium. The bus crosses into England. The camera is already rolling.'},
   {speaker:'narrator', text:'Day two. Big Ben. The real one. The group stands at the base, necks bent back, looking up at the clock tower. Ben steps in front of the camera. His orange vest glows against the grey stone. He spreads his arms wide. "This is Big Ben, what is the famous clock in London." Cut. Leah steps in. "Big Ben, WHICH is the famous clock..." The jingle plays from Leo\'s phone. Three notes bouncing off the old stone walls. Take two. Tower Bridge. Ben: "The bridge who opens for big ships..." Grammar Fix. Take three. The British Museum. "The museum what has the Egyptian things..." Grammar Fix again. By the fifth landmark, you have the formula memorized. Ben speaks. Ben fails. Leah fixes. The jingle plays. London is beautiful. And you are turning it into a machine.'},
   {speaker:'narrator', text:'Evening. The hotel lobby. Leo edits on his laptop, headphones on, hair falling into his eyes. The London footage looks incredible. Golden light on old buildings. Ben\'s orange vest against red buses and grey stone. Leah sits across from him, reviewing the Grammar Fix segments. "This is our best episode," she says. She takes off her glasses and presses her fingers against her eyes. Even she looks tired. You sit in the lobby chair and watch them work. Through the window, London glitters. Somewhere out there, eight million people are living their lives. And in this hotel lobby, three people are editing one person\'s mistakes into entertainment.'},
-  {speaker:'narrator', text:'Day three. Camden Market. You find twenty minutes alone while the others shop. You sit on a bench near the canal and take out your phone. You open the FOURTEEN channel. 55,000 subscribers now. The London teaser Leah posted already has 8,000 views. You scroll through comments. They are hungry for more Grammar Fix. More Ben. More mistakes. Your thumb hovers over the screen. You think about closing the app. Instead, you open a new note and write: "London is the city which changed everything." Correct grammar. Nobody will ever film you saying it wrong.'}
+  {speaker:'narrator', text:'Day three. Camden Market. You find twenty minutes alone while the others shop. You sit on a bench near the canal and take out your phone. You open the FOURTEEN channel. 6,500 subscribers now. The London teaser Leah posted already has 8,000 views. You scroll through comments. They are hungry for more Grammar Fix. More Ben. More mistakes. Your thumb hovers over the screen. You think about closing the app. Instead, you open a new note and write: "London is the city which changed everything." Correct grammar. Nobody will ever film you saying it wrong.'}
 ],
 
     storyB: [
-  {speaker:'narrator', text:'Day four. Your phone buzzes during breakfast. A DM. You almost choke on your toast. It is from Sara. THE Sara. Silver-streak Sara. 190,000 followers. She has messaged YOU. Not Leah. Not the channel. You. Your hands shake as you open it. The message is short. "Your channel is clever. I\'ve been watching. But the kid who makes the mistakes — does he know that\'s the point?" You read it three times. Your toast goes cold. Across the table, Ben is laughing with Leo about something. His orange vest has a ketchup stain on the pocket. He looks happy. Sara\'s message blinks on your screen like a warning light.'},
+  {speaker:'narrator', text:'Day four. Your phone buzzes during breakfast. A DM. You almost choke on your toast. It is from Sara. THE Sara. Silver-streak Sara. 190,000 followers. She has messaged YOU. Not Leah. Not the channel. You. Your hands shake as you open it. The message is short. "Your channel is clever. I\'ve been watching. But the kid who makes the mistakes — does he know that\'s the point?" You read it three times. Your toast goes cold. Across the table, Ben is laughing with Leo about something. His orange vest has a ketchup stain on the pocket. He looks happy. Sara\'s message blinks on your screen like a warning light.', inlineImage:"campaign/template-instagram-dm.jpg"},
   {speaker:'narrator', text:'You walk to the British Museum alone after breakfast. Your phone is heavy in your pocket. Sara has sent a second message. You stop in front of the Rosetta Stone — the rock that helped people translate languages they didn\'t understand — and read it. "I\'m not judging. I did similar things when I started. But fame from someone else\'s embarrassment is built on sand. It looks solid until the tide comes in." You stare at the message. Then you stare at the stone. Ancient writing that nobody could read for a thousand years. You think: Ben can\'t read the situation either. And we made sure of that.'},
   {speaker:'narrator', text:'You don\'t tell the group. Not Leah. Not Leo. Not Ben. You put your phone in your jacket pocket and zip it shut. At dinner, everyone is excited about the footage. Leah shows clips on her phone. Ben watches himself on the small screen and laughs. "I really said \'what\' instead of \'which\' every single time?" He shakes his head. "I\'m terrible." Everyone laughs. You laugh too. But your jacket pocket feels heavy. Sara\'s words sit inside it like a stone. Built on sand. The tide. You eat your chips and smile and say nothing. The London lights shine through the restaurant window. Everything looks golden. Everything looks like it could wash away.'},
-  {speaker:'narrator', text:'Last night in London. You can\'t sleep. The hotel room is dark. Leo breathes slowly in the other bed. You take out your phone under the covers. Sara\'s profile picture glows — silver streak, dark eyes, a face that has seen what fame does to people. You want to reply. You type: "He doesn\'t know." You stare at it. Three words. The truth in three words. Then you delete them. You type: "Thank you for watching." Safe. Empty. You send it. The blue tick appears. Sara is typing. Then she stops. No reply comes. You put the phone under your pillow. London hums outside. Fifty-five thousand subscribers. And one message you cannot forget.'}
+  {speaker:'narrator', text:'Last night in London. You can\'t sleep. The hotel room is dark. Leo breathes slowly in the other bed. You take out your phone under the covers. Sara\'s profile picture glows — silver streak, dark eyes, a face that has seen what fame does to people. You want to reply. You type: "He doesn\'t know." You stare at it. Three words. The truth in three words. Then you delete them. You type: "Thank you for watching." Safe. Empty. You send it. The blue tick appears. Sara is typing. Then she stops. No reply comes. You put the phone under your pillow. London hums outside. Six thousand five hundred subscribers. And one message you cannot forget.'}
 ],
 
     completion: [
@@ -12952,7 +13396,8 @@ var campaignLevels = [
     episodeTitle: "Episode 7: Friendship",
     unitNumber: 7,
     grammar: "Present perfect with for/since (German L1: seit = both)",
-    subscribers: "60,000",
+    subsAtEnd: 12000,
+    subscribers: "12,000",
     sceneImages:{storyA:'campaign/ch07-storyA.jpg',storyB:'campaign/ch07-storyB.jpg',completion:'campaign/ch07-completion.jpg'},
 
     storyA: [
@@ -12964,7 +13409,7 @@ var campaignLevels = [
 
     storyB: [
   {speaker:'narrator', text:'The episode drops on Friday. 60,000 views by Sunday. The comments are the usual: laughing emojis, heart emojis, Grammar Fix jingle stuck in my head. But something is different this time. You notice it at midnight, scrolling in bed. People are quoting Ben\'s real words — the ones Leo recorded without him knowing. "These guys are my real friends." The comment section turns them into memes. Someone auto-tuned it into a song. 400 likes. Ben\'s most honest moment, turned into content. You close the app. Open it again. Close it. The screen blinks on and off like a heartbeat.'},
-  {speaker:'narrator', text:'Monday morning. Lockers. You find Leo first. His hair is in his eyes. He looks tired. You say it before you can stop yourself: "Should we tell Ben?" Leo leans against the cold metal. "Tell him what?" "That we write the mistakes into his script. That Grammar Fix is built on him failing." Leo doesn\'t speak for a long time. Then: "We\'ve come too far. 60,000 subscribers, sponsorship talks, Sara following us. You want to throw that away?" His voice isn\'t angry. It\'s afraid. You open your mouth. Close it. The hallway fills with students. The moment passes. Like a door closing softly.'},
+  {speaker:'narrator', text:'Monday morning. Lockers. You find Leo first. His hair is in his eyes. He looks tired. You say it before you can stop yourself: "Should we tell Ben?" Leo leans against the cold metal. "Tell him what?" "That we write the mistakes into his script. That Grammar Fix is built on him failing." Leo doesn\'t speak for a long time. Then: "We\'ve come too far. 12,000 subscribers, sponsorship talks, Sara following us. You want to throw that away?" His voice isn\'t angry. It\'s afraid. You open your mouth. Close it. The hallway fills with students. The moment passes. Like a door closing softly.'},
   {speaker:'narrator', text:'Leah finds you at lunch. She sits down without asking. Her glasses are on top of her head. Her eyes are sharp, focused, like lenses themselves. "Leo told me what you said. About telling Ben." She keeps her voice low. "We\'ve worked on this since September. Seven episodes. Do you know how rare 60,000 is for a school project? We\'re not hurting him. He\'s having fun." She picks up a chip and eats it. "Right?" The question hangs in the air. You nod. Because nodding is easier than the truth. Leah puts her glasses back on. "Good. Episode Eight next week. Inventions. I\'ve already written the script." She walks away. You write in your journal that night: "I\'ve felt wrong since the beginning."'},
   {speaker:'narrator', text:'Ten p.m. Your phone lights up. A message from Ben. Three lines and a smiley: "Best episode yet!! I really need to practise for and since haha. But honestly I think the channel is helping my English 😊 Thanks guys. Love this team." You stare at the message. The group chat is silent. Nobody replies. One minute. Five minutes. Eight minutes. Twelve minutes. Then Leah sends a thumbs up. Then Leo. Then you. Three tiny thumbs, twelve minutes late. Twelve minutes of four people staring at a kind message from someone they don\'t deserve. You put the phone down. The screen goes dark. The smiley face stays, burned into the black.'}
 ],
@@ -12983,7 +13428,7 @@ var campaignLevels = [
         xpEach: 10,
         items: [
           {pairs:[
-            {left:"\uD83D\uDC94 break up with", right:"end a relationship"},
+            {left:"\uD83D\uDC94 break up with", right:"end a relationship", inlineImage:"campaign/template-strategy-chat.jpg"},
             {left:"\uD83D\uDE24 fall out with", right:"have an argument with a friend"},
             {left:"\uD83E\uDD1D make up with", right:"become friends again after an argument"},
             {left:"\uD83D\uDE0A get on well with", right:"have a good relationship with"},
@@ -13054,7 +13499,7 @@ var campaignLevels = [
 
     reading: {
       title: "Journal Entry",
-      passage: "<p>Dear Journal,</p><p>I\u2019ve felt wrong about this since the beginning. We\u2019ve had the channel for two months now. 60,000 subscribers. Everyone says it\u2019s amazing.</p><p>But I\u2019ve been lying to Ben for weeks. We write his scripts on purpose. We make them too hard. We know he\u2019ll make mistakes. And then we film it.</p><p>He thinks the channel is helping his English. He\u2019s been so happy since we started. He messages us every day. He says we\u2019re his best friends.</p><p>Leah says we\u2019ve come too far to stop. Leo says Ben is happy. But I\u2019ve known since Sara\u2019s message that this is wrong. I just can\u2019t say it out loud.</p>",
+      passage: "<p>Dear Journal,</p><p>I\u2019ve felt wrong about this since the beginning. We\u2019ve had the channel for two months now. 12,000 subscribers. Everyone says it\u2019s amazing.</p><p>But I\u2019ve been lying to Ben for weeks. We write his scripts on purpose. We make them too hard. We know he\u2019ll make mistakes. And then we film it.</p><p>He thinks the channel is helping his English. He\u2019s been so happy since we started. He messages us every day. He says we\u2019re his best friends.</p><p>Leah says we\u2019ve come too far to stop. Leo says Ben is happy. But I\u2019ve known since Sara\u2019s message that this is wrong. I just can\u2019t say it out loud.</p>",
       questions: [
         {question:"How long has the protagonist felt wrong?", type:"mc", answer:"Since the beginning", options:["Since the beginning","For one week","Since Sara\u2019s message"]},
         {question:"What has the protagonist been doing for weeks?", type:"mc", answer:"Lying to Ben", options:["Lying to Ben","Avoiding Leah","Studying grammar"]},
@@ -13067,7 +13512,7 @@ var campaignLevels = [
     comic: [
       "Panel 1: The group filming. Topic on the whiteboard: FRIENDSHIP. The irony is visible on the protagonist\u2019s face.",
       "Panel 2: Ben on camera, smiling. Speech bubble: \u201CI have known my friends since three years!\u201D The group laughs.",
-      "Panel 3: Late at night. The protagonist sits alone, writing in a journal. The phone shows 60,000 subscribers.",
+      "Panel 3: Late at night. The protagonist sits alone, writing in a journal. The phone shows 12,000 subscribers.",
       "Panel 4: A phone screen showing Ben\u2019s message: \u201CBest episode yet!! I think the channel is helping my English.\u201D Three heart reactions. The protagonist\u2019s thumb hovers."
     ],
 
@@ -13084,7 +13529,9 @@ var campaignLevels = [
     episodeTitle: "Episode 8: Inventions",
     unitNumber: 8,
     grammar: "Past simple vs present perfect",
-    subscribers: "80,000",
+    subsAtEnd: 22000,
+    imageBeat:{storyA:1},
+    subscribers: "22,000",
     sceneImages:{storyA:'campaign/ch08-storyA.jpg',completion:'campaign/ch08-completion.jpg'},
     socialImages:{comment:'campaign/ch08-social-comments.jpg'},
 
@@ -13092,7 +13539,7 @@ var campaignLevels = [
   {speaker:'narrator', text:'Episode Eight. Inventions that changed the world. Tesla. The printing press. Penicillin. Leah\'s script is twelve pages long. Ben\'s sections are marked in red. Leo designed the new Grammar Fix opening — animated logo, custom jingle remix, three-second intro with a sound effect that goes DING like a bell at a boxing match. The Grammar Fix segment is now three minutes long. Longer than Ben\'s actual presentation. Ben gets two minutes to talk about Tesla. Grammar Fix gets three minutes to explain why he talked about Tesla wrong. You hold the printed script in your hands. The paper feels heavy. Like it\'s made of something thicker than wood.'},
   {speaker:'narrator', text:'Filming. Science lab. Periodic table on the wall behind Ben. His orange vest is freshly washed — you can tell because it\'s brighter than usual, almost glowing under the ring light. He reads his line: "Nikola Tesla has invented the alternating current motor in 1888." Cut. Leah steps in. Green card. Glasses on. "Tesla INVENTED it — past simple, because 1888 is a FINISHED time." DING. Take two. "People used the internet since 1990." Cut. "People HAVE USED the internet since 1990 — present perfect, because we still use it." DING. The corrections are polished. Professional. Ruthless. Each one lands like a small, clean punch. Ben takes it. He always takes it. He stands there in his bright vest, smiling, taking it.'},
   {speaker:'narrator', text:'The edit takes three days. Leo works late every night. When he shows the finished episode, even Leah goes quiet. It looks like a real YouTube channel. Not a school project. Not a joke. The Grammar Fix segment has split screens, slow-motion replays, side-by-side comparisons of wrong and right. It\'s beautiful. And in every frame, Ben is the one who\'s wrong. You watch the full twenty minutes in Leo\'s room. The energy drink cans are multiplying. Leo\'s hair is greasy. He hasn\'t slept enough. "80,000," he says, staring at the screen. "We\'re going to hit 80,000." His voice sounds hollow. Like a bell with no clapper.'},
-  {speaker:'narrator', text:'The episode drops. 80,000 subscribers within a week. The number appears on Leo\'s analytics dashboard like a digital sunrise. Leah posts it in the group chat with five fire emojis. Ben replies: "EIGHTY THOUSAND!! We did it!!" He doesn\'t say "you." He says "we." Because that\'s who Ben is. Three letters. W-E. We. You sit in your room and look at the number. Eighty thousand people who know Ben\'s face. Eighty thousand people who laugh when he gets it wrong. Eighty thousand people who have never heard him get it right. The number is huge. But it feels small. Smaller than one person in an orange vest who still says "we."'}
+  {speaker:'narrator', text:'The episode drops. 22,000 subscribers within a week. The number appears on Leo\'s analytics dashboard like a digital sunrise. Leah posts it in the group chat with five fire emojis. Ben replies: "TWENTY-TWO THOUSAND!! We did it!!" He doesn\'t say "you." He says "we." Because that\'s who Ben is. Three letters. W-E. We. You sit in your room and look at the number. Twenty-two thousand people who know Ben\'s face. Twenty-two thousand people who laugh when he gets it wrong. Twenty-two thousand people who have never heard him get it right. The number is huge. But it feels small. Smaller than one person in an orange vest who still says "we."'}
 ],
 
     storyB: [
@@ -13103,7 +13550,7 @@ var campaignLevels = [
 ],
 
     completion: [
-  {speaker:'narrator', text:'Weekend. You sit at your desk. Your journal is open. You write two columns. LEFT column: 80,000 subscribers. Sponsorship deal. Sara following. Grammar Fix is the brand. RIGHT column: scripted errors. Deleted comments. A friend who doesn\'t know. A screenshot of the truth. You stare at the two columns. They look like the two lines on Leo\'s analytics graph — one going up, one going somewhere else entirely. You close the journal. The left column is what everyone sees. The right column is what you carry. Both are getting heavier.'},
+  {speaker:'narrator', text:'Weekend. You sit at your desk. Your journal is open. You write two columns. LEFT column: 22,000 subscribers. Sponsorship deal. Sara following. Grammar Fix is the brand. RIGHT column: scripted errors. Deleted comments. A friend who doesn\'t know. A screenshot of the truth. You stare at the two columns. They look like the two lines on Leo\'s analytics graph — one going up, one going somewhere else entirely. You close the journal. The left column is what everyone sees. The right column is what you carry. Both are getting heavier.'},
   {speaker:'narrator', text:'Sunday night. Sara replies. Two words and a question mark. "You were right? About what?" You stare at the message for a long time. Then you type: "About everything. About the sand." Send. The blue ticks appear. Sara is typing. Three dots bouncing. Then her reply: "Sand washes away, but people remember how they felt. Remember that." You read it twice. You put the phone down. Monday is tomorrow. The sponsorship meeting is at lunch. Ben will wear his orange vest and smile and say "we." And you will sit there with a screenshot in your pocket and sand under your feet. But for now — for this one Sunday night — someone out there knows the truth. And that is almost enough.'}
 ],
 
@@ -13206,7 +13653,8 @@ var campaignLevels = [
     episodeTitle: "Episode 9: Rules",
     unitNumber: 9,
     grammar: "be allowed to / let",
-    subscribers: "65,000",
+    subsAtEnd: 31000,
+    subscribers: "31,000",
     sceneImages:{storyA:'campaign/ch09-storyA.jpg',storyB:'campaign/ch09-storyB.jpg',completion:'campaign/ch09-completion.jpg'},
 
     storyA: [
@@ -13257,7 +13705,7 @@ var campaignLevels = [
         xpEach: 10,
         items: [
           {sentence:"In Austria, students ___ to use phones in class.", answer:"aren't allowed", options:["aren't allowed","don't allow","isn't allowed"],
-           hint:"Students = plural. Not permitted = aren't allowed.", hintDe:"Students = Mehrzahl. 'Aren't allowed to' = nicht erlaubt."},
+           hint:"Students = plural. Not permitted = aren't allowed.", hintDe:"Students = Mehrzahl. 'Aren't allowed to' = nicht erlaubt.", inlineImage:"campaign/template-whatsapp.jpg"},
           {sentence:"My parents don't ___ me stay out late.", answer:"let", options:["let","allowed","lets"],
            hint:"'Don't let me' + infinitive without 'to'.", hintDe:"'Don't let' + Infinitiv OHNE 'to'."},
           {sentence:"The school ___ let students ___ jeans.", answer:"doesn't...wear", options:["doesn't...wear","don't...to wear","doesn't...to wear"],
@@ -13326,7 +13774,8 @@ var campaignLevels = [
     episodeTitle: "Episode 10: Rights",
     unitNumber: 10,
     grammar: "could / was able to / was allowed to",
-    subscribers: "70,000",
+    subsAtEnd: 42000,
+    subscribers: "42,000",
     sceneImages:{storyA:'campaign/ch10-storyA.jpg',storyB:'campaign/ch10-storyB.jpg',completion:'campaign/ch10-completion.jpg'},
 
     storyA: [
@@ -13430,7 +13879,7 @@ var campaignLevels = [
       "Panel 1: Ben on camera: 'Rosa Parks COULDN'T SAT at the front.' The Grammar Fix timer starts immediately.",
       "Panel 2: Sara and the protagonist sitting on a park bench. Sara's face is serious. Autumn leaves around them.",
       "Panel 3: Close-up of Sara's eyes. Speech bubble: 'I wasn't able to stop them until I left.'",
-      "Panel 4: The protagonist walking home alone. Long shadow on the pavement. Phone shows: 70,000 subscribers."
+      "Panel 4: The protagonist walking home alone. Long shadow on the pavement. Phone shows: 42,000 subscribers."
     ],
 
     maxXP: 210,
@@ -13446,7 +13895,9 @@ var campaignLevels = [
     episodeTitle: "Episode 11: California",
     unitNumber: 11,
     grammar: "Present perfect continuous",
-    subscribers: "75,000",
+    subsAtEnd: 58000,
+    imageBeat:{storyA:1},
+    subscribers: "58,000",
     sceneImages:{storyA:'campaign/ch11-storyA.jpg',completion:'campaign/ch11-completion.jpg'},
     socialImages:{tiktok:'campaign/ch11-social-tiktok.jpg'},
 
@@ -13454,7 +13905,7 @@ var campaignLevels = [
   {speaker:'narrator', text:'Episode Eleven. California, tech culture, algorithms. How videos go viral. What makes the internet choose you. Leah\'s research includes an article she found online: "How Algorithms Reward Cruelty — Why Your Meanest Content Performs Best." She sends the link to the group chat. Nobody mentions it. Nobody says: this is about us. You read it at midnight, under the covers, phone brightness at the lowest setting. The article says embarrassment is the most shareable emotion. More than joy. More than surprise. Embarrassment. You close the article. You open it again. You read one line five times: "The algorithm does not know the difference between laughing with someone and laughing at them. But the person does."'},
   {speaker:'narrator', text:'Filming. Computer room. Maps of Silicon Valley on the screen behind Ben. His orange vest looks almost Californian in the warm light — like a construction worker on a sunny highway. He reads: "Tech companies have been collect our data for years." Cut. "Have been COLLECTING. Present perfect continuous." DING. Take two. "People have been using social media since it has been invented." Cut. "Since it WAS invented." DING. But you can\'t focus. Every time the jingle plays, you hear the article in your head. Algorithms reward cruelty. You hold the microphone above Ben\'s head and your arms feel heavy. Like the weight of what you know is pulling you down through the floor.'},
   {speaker:'narrator', text:'That afternoon. Free period. You sit in the library alone. Your laptop is open. The algorithm article is on the screen. You scroll to the bottom. The last paragraph says: "If your content depends on someone losing, the algorithm will keep feeding it. But the person you\'re feeding to the algorithm is real. Their embarrassment is real. And one day, they will see what you saw — that they were the product, not the creator." You close the laptop slowly. The library is silent. Shelves of books. Other people\'s stories. Other people\'s mistakes, printed on paper, safe in covers. Ben\'s mistakes are not safe. Ben\'s mistakes are live. Watched. Shared. Counted. You pick up your bag and leave the library. The doors close behind you. Softly, like a sentence ending.'},
-  {speaker:'narrator', text:'Evening. Leah sends the analytics report. 75,000 subscribers. The growth curve is a steep, clean line pointing up and to the right. Below it, she\'s added a note: "Grammar Fix engagement is 4x higher than any other segment. It\'s carrying the channel." You look at the graph. The line is beautiful. Clean. Ruthless. Like the edge of something sharp. You think: that line is drawn in Ben\'s mistakes. Every point on it is a moment he got something wrong. Every click is someone watching him fail. 75,000 people. And the line keeps climbing. You turn off your phone. The graph disappears. But you can still see it. Burned into the dark. Going up. Always up.'}
+  {speaker:'narrator', text:'Evening. Leah sends the analytics report. 58,000 subscribers. The growth curve is a steep, clean line pointing up and to the right. Below it, she\'s added a note: "Grammar Fix engagement is 4x higher than any other segment. It\'s carrying the channel." You look at the graph. The line is beautiful. Clean. Ruthless. Like the edge of something sharp. You think: that line is drawn in Ben\'s mistakes. Every point on it is a moment he got something wrong. Every click is someone watching him fail. 58,000 people. And the line keeps climbing. You turn off your phone. The graph disappears. But you can still see it. Burned into the dark. Going up. Always up.'}
 ],
 
     storyB: [
@@ -13527,7 +13978,7 @@ var campaignLevels = [
            answer:"has been checking",
            options:["has been checking","has checked"],
            hint:"An ongoing activity = present perfect continuous.", hintDe:"Eine andauernde Tätigkeit = Present Perfect Continuous."},
-          {prompt:"We ___ 75,000 subscribers. (a milestone reached)",
+          {prompt:"We ___ 58,000 subscribers. (a milestone reached)",
            answer:"have reached",
            options:["have reached","have been reaching"],
            hint:"A completed milestone = present perfect simple.", hintDe:"Ein erreichtes Ziel = Present Perfect Simple."},
@@ -13551,7 +14002,7 @@ var campaignLevels = [
       title: "Comments Under the Compilation",
       passage: "<p>The video is called 'Ben's BEST Grammar Fails — FOURTEEN Compilation.' It has 200,000 views.</p><p>Top comments:<br>@laughking: 'This kid is SO dumb 😂😂😂 I can't stop watching'<br>@grammarnerd: 'He has been making the SAME mistakes for months. How??'<br>@sadviewer: 'This feels mean. Does he know people are laughing at him?'<br>@viralclips: 'More please!! He's been trending all week!'<br>@schoolfriend22: 'Wait I think I know this kid...'</p><p>The compilation has more views than any FOURTEEN episode. The comments are 80% cruel, 15% neutral, and 5% worried. Ben hasn't seen it yet. The protagonist stares at the screen for a long time.</p>",
       questions: [
-        {question:"Most comments under the compilation are supportive.", type:"tf", answer:"False"},
+        {question:"Most comments under the compilation are supportive.", type:"tf", answer:"False", inlineImage:"campaign/template-tiktok.jpg"},
         {question:"Some people think the video is bullying.", type:"tf", answer:"True"},
         {question:"Ben has seen the compilation.", type:"tf", answer:"False"},
         {question:"The protagonist is upset about the video.", type:"tf", answer:"True"},
@@ -13563,7 +14014,7 @@ var campaignLevels = [
       "Panel 1: The protagonist staring at a laptop. On screen: an article titled 'How Algorithms Reward Cruelty.'",
       "Panel 2: A phone screen showing the compilation video: 'Ben's BEST Grammar Fails' — 200,000 views. The protagonist's reflection is visible in the screen.",
       "Panel 3: Comments scrolling past. Laughing emojis. 'This kid is SO dumb.' One small comment: 'Does he know?'",
-      "Panel 4: The protagonist in bed, phone face-down on the pillow. Eyes wide open. 75,000 subscribers means nothing now."
+      "Panel 4: The protagonist in bed, phone face-down on the pillow. Eyes wide open. 58,000 subscribers means nothing now."
     ],
 
     maxXP: 210,
@@ -13579,7 +14030,9 @@ var campaignLevels = [
     episodeTitle: "Episode 12: Natural Disasters",
     unitNumber: 12,
     grammar: "Passive voice",
-    subscribers: "80,000",
+    subsAtEnd: 71000,
+    imageBeat:{storyB:1},
+    subscribers: "71,000",
     sceneImages:{storyA:'campaign/ch12-storyA.jpg',storyB:'campaign/ch12-storyB.jpg',completion:'campaign/ch12-completion.jpg'},
     socialImages:{benPhone:'campaign/ch12-social-ben-phone.jpg'},
 
@@ -13594,12 +14047,12 @@ var campaignLevels = [
   {speaker:'narrator', text:'Ben speaks. His voice is low and steady. Like he practised this. Like, for once, he got to prepare his lines. "I was used," he says. He looks at Leah. "My mistakes were written into the script." He looks at Leo. "They were filmed on purpose." He looks at you. "I was laughed at by thousands of people. And I was the last one to know." Each sentence is a passive voice. Was used. Were written. Were filmed. Was laughed at. He is describing what was done to him. Not what he did. Because he didn\'t do anything. He just stood there in his orange vest and trusted you.'},
   {speaker:'narrator', text:'Leah opens her mouth. "Ben, we —" "Don\'t." One word. Ben holds up his hand. His fingers are shaking. But his voice is not. "I was treated like content. Not like a friend. I was turned into a segment. Grammar Fix." He says the name like it\'s something rotten. "I was corrected and corrected and corrected. And I was never told it was the plan." He pauses. Breathes. "Did you ever think about what it feels like? To watch yourself fail 200,000 times? To read comments from strangers who think you\'re stupid? To find out that the people you trusted built a career on your mistakes?" Nobody answers. Because there is no answer. There is only the truth, standing in an unzipped orange vest, shaking and still.'},
   {speaker:'narrator', text:'Ben looks at each of you one more time. His eyes stop on you the longest. One second. Two. Three. In those three seconds, you see everything — the kid who bought London keychains for everyone, the kid who said "we" instead of "you," the kid who asked "they do like me too, right?" and believed your lie. Then he turns around. He walks to the door. His hand is on the handle when he says the last thing: "I thought the channel was about all of us. I thought we were a team. But I was just the joke. And nobody told me." The door opens. The door closes. The sound is very quiet. Like the click of a lock.'},
-  {speaker:'narrator', text:'The room is empty now. Just three people and a folded green screen and a ring light that is off. Nobody speaks. The silence has a texture — thick, grey, like wet concrete hardening. Finally, Leo breaks it. His voice is raw. "He\'s right." Two words. He runs his hand through his hair and leaves it there, gripping. "He\'s right about all of it." Leah puts her phone down on the table. Screen-down. Like she can\'t look at it anymore. Like the numbers on it have turned into something she doesn\'t recognize. 80,000 subscribers. Zero friends left. You sit in the plastic chair and feel the room shrink around you. The fairy lights are off. The camera is packed away. And there is no take two.'}
+  {speaker:'narrator', text:'The room is empty now. Just three people and a folded green screen and a ring light that is off. Nobody speaks. The silence has a texture — thick, grey, like wet concrete hardening. Finally, Leo breaks it. His voice is raw. "He\'s right." Two words. He runs his hand through his hair and leaves it there, gripping. "He\'s right about all of it." Leah puts her phone down on the table. Screen-down. Like she can\'t look at it anymore. Like the numbers on it have turned into something she doesn\'t recognize. 22,000 subscribers. Zero friends left. You sit in the plastic chair and feel the room shrink around you. The fairy lights are off. The camera is packed away. And there is no take two.'}
 ],
 
     completion: [
-  {speaker:'narrator', text:'That evening. You sit at your desk. Your journal is open to a blank page. You pick up the pen. You write: "Ben was right." Then you stop. Because what else is there to say? 80,000 subscribers means nothing when one person walks out of a room and doesn\'t look back. You think about his unzipped vest. The way it hung open, like a wound. You think about his hand shaking. His voice not shaking. How he was braver in that room than any of you have been in nine episodes. You close the journal. The pen rolls off the desk and hits the floor. You leave it there.'},
-  {speaker:'narrator', text:'Leah texts at midnight: "Channel is paused." That\'s all. No emoji. No plan. No analytics. Just two words and a full stop. Leo reads the message and doesn\'t reply. You read it and feel something break open in your chest — not sharp, not sudden, but slow. Like ice melting. Like something that was frozen for months finally starting to move. 80,000 subscribers. It took nine episodes to build. It took twelve minutes of compilation to crack. And it took one person in an orange vest to bring it down. Not with anger. Not with shouting. Just with the truth. Plain, clear, passive voice: "I was used." And he was. And you helped. And now the screen is dark.'}
+  {speaker:'narrator', text:'That evening. You sit at your desk. Your journal is open to a blank page. You pick up the pen. You write: "Ben was right." Then you stop. Because what else is there to say? 71,000 subscribers means nothing when one person walks out of a room and doesn\'t look back. You think about his unzipped vest. The way it hung open, like a wound. You think about his hand shaking. His voice not shaking. How he was braver in that room than any of you have been in nine episodes. You close the journal. The pen rolls off the desk and hits the floor. You leave it there.'},
+  {speaker:'narrator', text:'Leah texts at midnight: "Channel is paused." That\'s all. No emoji. No plan. No analytics. Just two words and a full stop. Leo reads the message and doesn\'t reply. You read it and feel something break open in your chest — not sharp, not sudden, but slow. Like ice melting. Like something that was frozen for months finally starting to move. 22,000 subscribers. It took nine episodes to build. It took twelve minutes of compilation to crack. And it took one person in an orange vest to bring it down. Not with anger. Not with shouting. Just with the truth. Plain, clear, passive voice: "I was used." And he was. And you helped. And now the screen is dark.'}
 ],
 
     tasks: [
@@ -13684,7 +14137,7 @@ var campaignLevels = [
       "Panel 1: Ben staring at his phone. On screen: the compilation video. His face is frozen.",
       "Panel 2: Ben standing in front of the group. Eyes red. Speech bubble: 'I was treated like content. Not like a friend.'",
       "Panel 3: Ben walking out of the room. The door is half-closed. The group sits in silence.",
-      "Panel 4: Leah's phone on the table, face-down. The screen still glows: 80,000 subscribers. Nobody picks it up."
+      "Panel 4: Leah's phone on the table, face-down. The screen still glows: 22,000 subscribers. Nobody picks it up."
     ],
 
     maxXP: 210,
@@ -13700,7 +14153,8 @@ var campaignLevels = [
     episodeTitle: "Episode 13: Decisions",
     unitNumber: 13,
     grammar: "Second conditional",
-    subscribers: "\u2014",
+    subsAtEnd: 63000,
+    subscribers: "63,000",
     sceneImages:{storyA:'campaign/ch13-storyA.jpg',storyB:'campaign/ch13-storyB.jpg',completion:'campaign/ch13-completion.jpg'},
 
     storyA: [
@@ -13831,7 +14285,8 @@ var campaignLevels = [
     episodeTitle: "Episode 14: The Live Show",
     unitNumber: 14,
     grammar: "going to future",
-    subscribers: "LIVE \uD83D\uDD34",
+    subsAtEnd: 89000,
+    subscribers: "89,000",
     sceneImages:{storyA:'campaign/ch14-storyA.jpg',completion:'campaign/ch14-completion.jpg'},
     socialImages:{live:'campaign/ch14-social-live.jpg',about:'campaign/ch14-social-about.jpg'},
 
@@ -13850,7 +14305,7 @@ var campaignLevels = [
 ],
 
     completion: [
-  {speaker:'narrator', text:'Two months later. The channel looks different. New intro — no jingle. New format — shorter videos, all four people on camera, equal time. Fewer views. 40,000 instead of 80,000. The algorithm doesn\'t like honesty as much as it liked humiliation. But the comments are different. Real comments. "This is what a real channel looks like." "Ben\'s grammar corner is my favourite part." "Respect for telling the truth." Ben has his own segment now: "Ben\'s Grammar Corner." He picks the topic. He writes his own lines. He makes mistakes — real ones, not scripted — and corrects himself. No green card. No DING. Just a kid in an orange vest, learning out loud. And sometimes, when he gets it right on the first take, he does a little fist pump. Nobody edits it out.'},
+  {speaker:'narrator', text:'Two months later. The channel looks different. New intro — no jingle. New format — shorter videos, all four people on camera, equal time. Fewer views. 32,000 instead of 71,000. The algorithm doesn\'t like honesty as much as it liked humiliation. But the comments are different. Real comments. "This is what a real channel looks like." "Ben\'s grammar corner is my favourite part." "Respect for telling the truth." Ben has his own segment now: "Ben\'s Grammar Corner." He picks the topic. He writes his own lines. He makes mistakes — real ones, not scripted — and corrects himself. No green card. No DING. Just a kid in an orange vest, learning out loud. And sometimes, when he gets it right on the first take, he does a little fist pump. Nobody edits it out.'},
   {speaker:'narrator', text:'Sara guest-appears in Episode Sixteen. Silver streak, denim jacket, same steady eyes. She talks about online authenticity. About building something real. She tells her story — the cooking channel, the burnt food, the two years of silence. Ben sits next to her and listens. When she finishes, he says: "Thank you for helping my friends find their way back." Sara smiles. It\'s the first time you\'ve seen her smile. It changes her whole face. Like sunlight on the oak tree in the park. The episode gets 35,000 views. Not the biggest number. But every view is earned. Every view is clean.'},
   {speaker:'narrator', text:'The last scene. The common room. No fairy lights this time. Just afternoon light coming through the window. Warm and ordinary. Ben sits on the sofa in his orange vest. Leah is next to him, glasses clean, notebook closed. Leo is behind the camera — but the lens cap is on. He\'s just sitting there. You\'re in the frame too. For the first time. Ben looks into the camera that isn\'t recording and says: "We\'re not going to be perfect. We\'re going to make mistakes. We\'re going to get the grammar wrong and the timing wrong and probably everything wrong. But we\'re going to be honest. And that\'s enough." He looks at you. You look at him. His vest is bright. The room is warm. It\'s enough.'},
   {speaker:'narrator', text:'Final shot. You walk home through the park. Same bench. Same oak tree. The leaves are green now — full, thick, alive. You sit down. Your phone buzzes. A notification from the channel: "New comment on Ben\'s Grammar Corner." You open it. A thirteen-year-old from Munich has written: "I make mistakes in English every day and I was always embarrassed. But Ben showed me that mistakes are just steps. Thank you." You read it twice. Three times. You think about the beginning — Episode One, the art room, the first scripted error. And you think about now — this bench, this tree, this one small comment from someone you\'ll never meet. You close your phone. The park is quiet. The sun is warm. Somewhere, Ben is practising English. Getting it wrong. Getting it right. Getting it wrong again. And that\'s the whole point. Your voice matters — even when it makes mistakes. Especially when it makes mistakes.'}
@@ -13904,7 +14359,7 @@ var campaignLevels = [
         context: "Put the words in the correct order to build sentences about the live show.",
         xpEach: 10,
         items: [
-          {words:["going","to","we're","live","go","tonight"], answer:"We're going to go live tonight."},
+          {words:["going","to","we're","live","go","tonight"], answer:"We're going to go live tonight.", inlineImage:"campaign/template-youtube-live.jpg"},
           {words:["is","going","Ben","to","present","Grammar","Corner","his"], answer:"Ben is going to present his Grammar Corner."},
           {words:["to","honest","going","we're","be"], answer:"We're going to be honest."},
           {words:["going","to","are","real","we","be","from","now","on"], answer:"We are going to be real from now on."},
