@@ -11571,10 +11571,17 @@ function populateEpisodeCard(levelIdx, opts) {
     epTitleEl.textContent = 'EP ' + (levelIdx + 1) + ': ' + (lv.levelName || 'Episode');
   }
 
-  // Stats grid — show cumulative total AND session gain
-  var prevTotals = getCumulativeStats(levelIdx); // everything BEFORE this level
+  // Stats grid — subs use the story-canonical values from lv.subsAtEnd so they match the Channel Total bar.
+  // views/likes/comments stay as session-earned cumulative totals (since they don't have canonical values).
+  var prevTotals = getCumulativeStats(levelIdx); // everything BEFORE this level (views/likes/comments only for that part)
+  var prevCanonicalSubs = (levelIdx > 0 && campaignLevels[levelIdx - 1] && typeof campaignLevels[levelIdx - 1].subsAtEnd === 'number')
+    ? campaignLevels[levelIdx - 1].subsAtEnd
+    : 0;
+  var newCanonicalSubs = (typeof lv.subsAtEnd === 'number') ? lv.subsAtEnd : prevCanonicalSubs;
+  var subsDelta = newCanonicalSubs - prevCanonicalSubs;
+
   var newTotals = {
-    subs: prevTotals.subs + (sessionStats.subs || 0),
+    subs: newCanonicalSubs,
     views: prevTotals.views + (sessionStats.views || 0),
     likes: prevTotals.likes + (sessionStats.likes || 0),
     comments: prevTotals.comments + (sessionStats.comments || 0)
@@ -11589,26 +11596,23 @@ function populateEpisodeCard(levelIdx, opts) {
       '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDCAC</div><span class="yt-stat-value" id="yt-cum-comments">0</span><div class="yt-stat-gain" id="yt-gain-comments">+0</div><div class="yt-stat-label">comments</div></div>';
 
     // Animate cumulative totals from previous → new
-    animateCounter(document.getElementById('yt-cum-subs'),     prevTotals.subs,     newTotals.subs,     900);
-    animateCounter(document.getElementById('yt-cum-views'),    prevTotals.views,    newTotals.views,    900);
-    animateCounter(document.getElementById('yt-cum-likes'),    prevTotals.likes,    newTotals.likes,    900);
-    animateCounter(document.getElementById('yt-cum-comments'), prevTotals.comments, newTotals.comments, 900);
+    animateCounter(document.getElementById('yt-cum-subs'),     prevCanonicalSubs,   newCanonicalSubs,     900);
+    animateCounter(document.getElementById('yt-cum-views'),    prevTotals.views,    newTotals.views,      900);
+    animateCounter(document.getElementById('yt-cum-likes'),    prevTotals.likes,    newTotals.likes,      900);
+    animateCounter(document.getElementById('yt-cum-comments'), prevTotals.comments, newTotals.comments,   900);
 
-    // Show session gain underneath
-    var gainFmt = function(n) { return (n >= 0 ? '+' : '') + n; };
-    document.getElementById('yt-gain-subs').textContent     = gainFmt(sessionStats.subs     || 0);
+    // Show session gain underneath — subs gain is the canonical delta, others are session rewards
+    var gainFmt = function(n) { return (n >= 0 ? '+' : '') + n.toLocaleString(); };
+    document.getElementById('yt-gain-subs').textContent     = gainFmt(subsDelta);
     document.getElementById('yt-gain-views').textContent    = gainFmt(sessionStats.views    || 0);
     document.getElementById('yt-gain-likes').textContent    = gainFmt(sessionStats.likes    || 0);
     document.getElementById('yt-gain-comments').textContent = gainFmt(sessionStats.comments || 0);
   }
 
-  // Total channel subscribers (story-canonical from lv.subsAtEnd)
+  // Total channel subscribers bar — same canonical values as the grid
   var totalEl = document.getElementById('yt-total-subs');
   if (totalEl && typeof lv.subsAtEnd === 'number') {
-    var prevSubs = (levelIdx > 0 && campaignLevels[levelIdx - 1] && typeof campaignLevels[levelIdx - 1].subsAtEnd === 'number')
-      ? campaignLevels[levelIdx - 1].subsAtEnd
-      : 0;
-    animateCounter(totalEl, prevSubs, lv.subsAtEnd, 600, ' subscribers');
+    animateCounter(totalEl, prevCanonicalSubs, newCanonicalSubs, 600, ' subscribers');
   }
 
   // Stars
@@ -12740,11 +12744,11 @@ function showCampaignFeedback(result, correctAnswer, xp) {
   } else if (result.isClose) {
     penalty = generateSocialPenalty();
     applySessionPenalty(penalty);
-    msg = 'Almost! The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' \u2212' + penalty.amount + ' ' + penalty.type + '</span>';
+    msg = 'Almost! The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' ' + penalty.amount + ' ' + penalty.type + '</span>';
   } else {
     penalty = generateSocialPenalty();
     applySessionPenalty(penalty);
-    msg = 'The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' \u2212' + penalty.amount + ' ' + penalty.type + '</span>';
+    msg = 'The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' ' + penalty.amount + ' ' + penalty.type + '</span>';
   }
 
   feedback.innerHTML = '<div class="campaign-feedback ' + cls + '">' + msg + '</div>' +
@@ -12757,17 +12761,20 @@ function showCampaignFeedback(result, correctAnswer, xp) {
     xpEl.textContent = totalEngagement + ' engagement';
   }
 
-  // Fly-up popup (themed)
+  // Fly-up popup (themed) — positioned BELOW the progress bar so it doesn't collide with the engagement counter
   var flyFx = reward || penalty;
   if (flyFx) {
     var flyUp = document.createElement('div');
     flyUp.className = 'campaign-xp-fly';
-    var sign = reward ? '+' : '\u2212';
+    var sign = reward ? '+' : '';
     flyUp.innerHTML = flyFx.icon + ' ' + sign + flyFx.amount + ' ' + flyFx.type;
-    flyUp.style.right = '1rem';
-    flyUp.style.top = '0.5rem';
+    flyUp.style.left = '50%';
+    flyUp.style.top = '100%';
+    flyUp.style.transform = 'translateX(-50%)';
     flyUp.style.color = flyFx.colour;
     flyUp.style.fontWeight = '700';
+    flyUp.style.whiteSpace = 'nowrap';
+    flyUp.style.pointerEvents = 'none';
     var taskProgress = document.getElementById('campaign-task-progress');
     if (taskProgress) {
       taskProgress.style.position = 'relative';
