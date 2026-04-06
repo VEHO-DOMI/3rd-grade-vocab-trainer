@@ -2559,6 +2559,17 @@ body.playing .header-container { display: none; }
 @keyframes statCardIn { 0% { opacity:0; transform:translateY(10px); } 100% { opacity:1; transform:none; } }
 
 .yt-buttons { display:flex; flex-direction:column; gap:0.4rem; margin-top:0.6rem; }
+.yt-threshold-warning {
+  background:linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  border:2px solid #FB8C00; border-radius:10px;
+  padding:0.7rem 0.9rem; margin:0.6rem 0;
+  animation: statCardIn 0.5s ease both;
+}
+.yt-threshold-warning .warn-title { font-weight:800; font-size:0.85rem; color:#E65100; margin-bottom:0.2rem; }
+.yt-threshold-warning .warn-desc { font-size:0.75rem; color:#BF360C; line-height:1.4; }
+[data-theme="dark"] .yt-threshold-warning { background:linear-gradient(135deg, rgba(251,140,0,0.15), rgba(255,152,0,0.1)); border-color:#FB8C00; }
+[data-theme="dark"] .yt-threshold-warning .warn-title { color:#FFB74D; }
+[data-theme="dark"] .yt-threshold-warning .warn-desc { color:#FFCC80; }
 
 /* Vibe: celebration (L01-L11) - default styles above */
 /* Vibe: shock (L12) - channel frozen */
@@ -2599,6 +2610,61 @@ body.playing .header-container { display: none; }
   100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
 }
 
+/* Shock mist — cold grey clouds drifting across */
+.mood-mist {
+  position:absolute;
+  border-radius:50%;
+  background: radial-gradient(ellipse at center, rgba(200,210,220,0.9) 0%, rgba(180,190,200,0.5) 40%, rgba(150,160,170,0) 70%);
+  filter: blur(20px);
+  animation: mistDrift 10s ease-in-out forwards;
+  pointer-events:none;
+}
+@keyframes mistDrift {
+  0%   { transform:translateX(0) translateY(0) scale(1); opacity:0; }
+  15%  { opacity:1; }
+  85%  { opacity:1; }
+  100% { transform:translateX(140vw) translateY(-20px) scale(1.3); opacity:0; }
+}
+
+/* Reflection fog — soft slow warm-grey clouds descending */
+.mood-fog {
+  position:absolute;
+  border-radius:50%;
+  background: radial-gradient(ellipse at center, rgba(200,185,170,0.8) 0%, rgba(180,170,160,0.4) 40%, rgba(140,130,120,0) 70%);
+  filter: blur(25px);
+  animation: fogDescend 12s ease-in-out forwards;
+  pointer-events:none;
+}
+@keyframes fogDescend {
+  0%   { transform:translateY(0) scale(0.9); opacity:0; }
+  20%  { opacity:1; }
+  80%  { opacity:1; }
+  100% { transform:translateY(110vh) scale(1.2); opacity:0; }
+}
+
+/* Card thumbnail dramatic reveal — blur-to-sharp + gentle scale */
+.yt-thumbnail-wrap.reveal-anim { animation: thumbReveal 1.4s cubic-bezier(0.2,0.8,0.3,1) both; }
+@keyframes thumbReveal {
+  0%   { opacity:0; filter:blur(18px); transform:scale(1.06); }
+  40%  { opacity:1; }
+  100% { opacity:1; filter:blur(0); transform:scale(1); }
+}
+.yt-thumbnail-wrap.reveal-anim .yt-thumbnail { animation: thumbShimmer 1.4s ease-out; }
+@keyframes thumbShimmer {
+  0%   { filter: brightness(1.3) saturate(1.2); }
+  60%  { filter: brightness(1.1) saturate(1.1); }
+  100% { filter: brightness(1) saturate(1); }
+}
+
+/* Stat grid cumulative + gain styling */
+.yt-stat { position:relative; }
+.yt-stat-gain {
+  font-size:0.62rem; font-weight:700; color:#4CAF50;
+  margin-top:0.1rem;
+}
+.vibe-shock .yt-stat-gain, .vibe-reflection .yt-stat-gain { color:#E53935; }
+.vibe-redemption .yt-stat-gain { color:#FF6B35; }
+
 /* === Stats Wall === */
 #campaign-stats-wall-screen { padding: 0.8rem 0.6rem; }
 .stats-wall-list { display:flex; flex-direction:column; gap:0.6rem; max-width:500px; margin:0 auto; padding-bottom:2rem; }
@@ -2613,6 +2679,10 @@ body.playing .header-container { display: none; }
 .stats-wall-item.unlocked.dark     { border-color:#757575; background:linear-gradient(135deg, rgba(97,97,97,0.08), var(--card)); }
 .stats-wall-item.unlocked.redemption { border-color:#FF6B35; background:linear-gradient(135deg, rgba(255,107,53,0.12), var(--card)); }
 .stats-wall-item.locked { opacity:0.35; }
+.stats-wall-item.clickable { cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
+.stats-wall-item.clickable:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,0.12); }
+.stats-wall-item.clickable:active { transform:scale(0.98); }
+.stats-wall-hint { font-size:0.65rem; color:var(--accent); margin-top:0.3rem; font-weight:600; opacity:0.8; }
 .stats-wall-img {
   width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;
   background:#f0f0f0;
@@ -2966,7 +3036,7 @@ body.playing .header-container { display: none; }
   <div class="campaign-task-progress" id="campaign-task-progress">
     <span id="campaign-task-label">Task 1/3</span>
     <div class="campaign-task-progress-bar"><div class="campaign-task-progress-fill" id="campaign-task-progress-fill" style="width:0%"></div></div>
-    <span id="campaign-task-xp" style="font-weight:700;color:var(--accent);">0 XP</span>
+    <span id="campaign-task-xp" style="font-weight:700;color:var(--accent);font-size:0.78rem;">0 engagement</span>
   </div>
   <div id="campaign-task-header" style="margin-bottom:0.4rem;"></div>
   <div id="campaign-hint-area" style="margin-bottom:0.4rem;"></div>
@@ -2982,7 +3052,7 @@ body.playing .header-container { display: none; }
   </div>
   <div class="campaign-task-progress">
     <span>Reading</span>
-    <span id="campaign-reading-xp" style="font-weight:700;color:var(--accent);font-size:0.82rem;">0 XP</span>
+    <span id="campaign-reading-xp" style="font-weight:700;color:var(--accent);font-size:0.78rem;">0 engagement</span>
   </div>
   <div class="campaign-reading-card" id="campaign-passage"></div>
   <div id="campaign-question-area" style="margin-top:0.6rem;"></div>
@@ -10986,12 +11056,13 @@ function showYouTubeStatsWall() {
       var imgHtml = item.img
         ? '<img class="stats-wall-img" src="' + item.img + '" alt="" onerror="this.outerHTML=\'<div class=\\\'stats-wall-lock\\\'>\uD83D\uDCCA</div>\';">'
         : '<div class="stats-wall-lock">\uD83D\uDCCA</div>';
-      html += '<div class="stats-wall-item unlocked ' + (item.vibe || 'positive') + '">' +
+      html += '<div class="stats-wall-item unlocked clickable ' + (item.vibe || 'positive') + '" onclick="previewEpisodeComplete(' + (item.level - 1) + ')">' +
         imgHtml +
         '<div class="stats-wall-body">' +
           '<div class="stats-wall-level">EP ' + item.level + '</div>' +
           '<div class="stats-wall-title">' + escapeHtml(item.title) + '</div>' +
           '<div class="stats-wall-desc">' + escapeHtml(item.desc) + '</div>' +
+          '<div class="stats-wall-hint">Tap to replay episode card \u203A</div>' +
         '</div>' +
       '</div>';
     } else {
@@ -11327,30 +11398,120 @@ function pickResultsVibe(levelIdx) {
   return 'celebration';
 }
 
-function renderConfetti(vibe) {
+function renderMoodEffect(vibe) {
   var layer = document.getElementById('yt-confetti-layer');
   if (!layer) return;
   layer.innerHTML = '';
-  if (vibe === 'shock' || vibe === 'reflection') return; // no confetti
-  var colours = (vibe === 'redemption')
-    ? ['#FFD700','#FF6B35','#C9A84C','#FFA726','#E53935']
-    : ['#4CAF50','#2196F3','#F9A825','#E91E63','#9C27B0','#FF9800'];
-  for (var i = 0; i < 40; i++) {
-    var piece = document.createElement('div');
-    piece.className = 'confetti-piece';
-    piece.style.left = (Math.random() * 100) + '%';
-    piece.style.background = colours[i % colours.length];
-    piece.style.animationDelay = (Math.random() * 0.8) + 's';
-    piece.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
-    piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
-    layer.appendChild(piece);
+  layer.className = 'yt-confetti-layer mood-' + vibe;
+
+  if (vibe === 'celebration') {
+    // Bright confetti rain
+    var colours = ['#4CAF50','#2196F3','#F9A825','#E91E63','#9C27B0','#FF9800'];
+    for (var i = 0; i < 40; i++) {
+      var piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = (Math.random() * 100) + '%';
+      piece.style.background = colours[i % colours.length];
+      piece.style.animationDelay = (Math.random() * 0.8) + 's';
+      piece.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+      piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+      layer.appendChild(piece);
+    }
+  } else if (vibe === 'redemption') {
+    // Warm red/gold confetti
+    var warmColours = ['#FFD700','#FF6B35','#C9A84C','#FFA726','#E53935'];
+    for (var j = 0; j < 40; j++) {
+      var wpiece = document.createElement('div');
+      wpiece.className = 'confetti-piece';
+      wpiece.style.left = (Math.random() * 100) + '%';
+      wpiece.style.background = warmColours[j % warmColours.length];
+      wpiece.style.animationDelay = (Math.random() * 0.8) + 's';
+      wpiece.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
+      wpiece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+      layer.appendChild(wpiece);
+    }
+  } else if (vibe === 'shock') {
+    // Cold grey mist/cloud drift — 12 soft blobs rolling across from different angles
+    for (var m = 0; m < 12; m++) {
+      var mist = document.createElement('div');
+      mist.className = 'mood-mist';
+      mist.style.top = (Math.random() * 100) + '%';
+      mist.style.left = (-30 + Math.random() * 20) + '%';
+      mist.style.width = (120 + Math.random() * 80) + 'px';
+      mist.style.height = (60 + Math.random() * 40) + 'px';
+      mist.style.animationDelay = (Math.random() * 2) + 's';
+      mist.style.animationDuration = (8 + Math.random() * 4) + 's';
+      mist.style.opacity = (0.15 + Math.random() * 0.2).toFixed(2);
+      layer.appendChild(mist);
+    }
+  } else if (vibe === 'reflection') {
+    // Soft descending fog — slower, warmer-grey, more contemplative
+    for (var f = 0; f < 10; f++) {
+      var fog = document.createElement('div');
+      fog.className = 'mood-fog';
+      fog.style.left = (Math.random() * 100) + '%';
+      fog.style.top = (-20 + Math.random() * 20) + '%';
+      fog.style.width = (100 + Math.random() * 100) + 'px';
+      fog.style.height = (50 + Math.random() * 30) + 'px';
+      fog.style.animationDelay = (Math.random() * 3) + 's';
+      fog.style.animationDuration = (10 + Math.random() * 5) + 's';
+      fog.style.opacity = (0.1 + Math.random() * 0.15).toFixed(2);
+      layer.appendChild(fog);
+    }
   }
 }
 
-function showCampaignResults() {
-  var lv = campaignLevels[campaignState.currentLevel];
-  var stars = campaignState.earnedStars || 0;
-  var levelIdx = campaignState.currentLevel;
+// Cumulative stats across all completed levels (excluding the given level)
+function getCumulativeStats(upToLevelIdxExclusive) {
+  var cp = getCampaignProgress();
+  var totals = {subs:0, views:0, likes:0, comments:0};
+  if (!cp || !cp.levels) return totals;
+  for (var i = 0; i < upToLevelIdxExclusive; i++) {
+    var lid = 'L' + String(i + 1).padStart(2, '0');
+    var ld = cp.levels[lid];
+    if (ld && ld.sessionStats) {
+      totals.subs     += ld.sessionStats.subs     || 0;
+      totals.views    += ld.sessionStats.views    || 0;
+      totals.likes    += ld.sessionStats.likes    || 0;
+      totals.comments += ld.sessionStats.comments || 0;
+    }
+  }
+  return totals;
+}
+
+// Animate a number element from `from` → `to` over ~1.2s
+function animateCounter(el, from, to, delay, suffix, formatFn) {
+  if (!el) return;
+  delay = delay || 0;
+  var fmt = formatFn || function(n) { return n.toLocaleString(); };
+  el.textContent = fmt(from) + (suffix || '');
+  if (from === to) return;
+  setTimeout(function() {
+    var current = from;
+    var diff = to - from;
+    var steps = 40;
+    var step = Math.max(1, Math.ceil(Math.abs(diff) / steps));
+    if (diff < 0) step = -step;
+    var interval = setInterval(function() {
+      current += step;
+      if ((diff > 0 && current >= to) || (diff < 0 && current <= to)) {
+        current = to;
+        clearInterval(interval);
+      }
+      el.textContent = fmt(current) + (suffix || '');
+    }, 30);
+  }, delay);
+}
+
+// Populates the Episode Complete card DOM with the given data.
+// This is the single source of truth used by BOTH live completion AND Stats Wall review.
+function populateEpisodeCard(levelIdx, opts) {
+  opts = opts || {};
+  var lv = campaignLevels[levelIdx];
+  if (!lv) return;
+  var stars = opts.stars || 0;
+  var sessionStats = opts.sessionStats || {subs:0, views:0, likes:0, comments:0};
+  var reviewMode = !!opts.reviewMode;
   var vibe = pickResultsVibe(levelIdx);
 
   // Apply vibe class to card
@@ -11366,10 +11527,11 @@ function showCampaignResults() {
     if (vibe === 'shock') statusText = 'The channel is paused...';
     else if (vibe === 'reflection') statusText = 'Reflecting\u2026';
     else if (vibe === 'redemption') statusText = 'We went LIVE. For real.';
+    if (reviewMode) statusText = 'Episode ' + (levelIdx + 1) + ' \u2014 replay';
     statusEl.textContent = statusText;
   }
 
-  // Look up the Stats Wall card for this level — used for both the thumbnail image AND the caption
+  // Look up the Stats Wall card for this level
   var earnedStat = null;
   if (typeof campaignYouTubeStats !== 'undefined') {
     for (var ec = 0; ec < campaignYouTubeStats.length; ec++) {
@@ -11380,8 +11542,7 @@ function showCampaignResults() {
     }
   }
 
-  // Thumbnail: use the Stats Wall image at its natural aspect ratio (no crop).
-  // Fallback chain: stat wall image → completion scene → storyA scene.
+  // Thumbnail with blur-to-sharp reveal
   var thumb = document.getElementById('yt-thumbnail');
   var thumbWrap = document.getElementById('yt-thumbnail-wrap');
   if (thumb) {
@@ -11392,7 +11553,13 @@ function showCampaignResults() {
     if (thumbSrc) {
       thumb.style.display = 'block';
       thumb.src = thumbSrc;
-      if (thumbWrap) thumbWrap.style.display = '';
+      if (thumbWrap) {
+        thumbWrap.style.display = '';
+        thumbWrap.classList.remove('reveal-anim');
+        // Force reflow then re-add the class to restart the animation
+        void thumbWrap.offsetWidth;
+        thumbWrap.classList.add('reveal-anim');
+      }
     } else {
       if (thumbWrap) thumbWrap.style.display = 'none';
     }
@@ -11404,30 +11571,44 @@ function showCampaignResults() {
     epTitleEl.textContent = 'EP ' + (levelIdx + 1) + ': ' + (lv.levelName || 'Episode');
   }
 
-  // Stats grid — session engagement
+  // Stats grid — show cumulative total AND session gain
+  var prevTotals = getCumulativeStats(levelIdx); // everything BEFORE this level
+  var newTotals = {
+    subs: prevTotals.subs + (sessionStats.subs || 0),
+    views: prevTotals.views + (sessionStats.views || 0),
+    likes: prevTotals.likes + (sessionStats.likes || 0),
+    comments: prevTotals.comments + (sessionStats.comments || 0)
+  };
+
   var statsGrid = document.getElementById('yt-stats-grid');
   if (statsGrid) {
     statsGrid.innerHTML =
-      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDC64</div><span class="yt-stat-value">+' + (campaignState.sessionSubs || 0) + '</span><div class="yt-stat-label">subs</div></div>' +
-      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDC41\uFE0F</div><span class="yt-stat-value">+' + (campaignState.sessionViews || 0) + '</span><div class="yt-stat-label">views</div></div>' +
-      '<div class="yt-stat"><div class="yt-stat-icon">\u2764\uFE0F</div><span class="yt-stat-value">+' + (campaignState.sessionLikes || 0) + '</span><div class="yt-stat-label">likes</div></div>' +
-      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDCAC</div><span class="yt-stat-value">+' + (campaignState.sessionComments || 0) + '</span><div class="yt-stat-label">comments</div></div>';
+      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDC64</div><span class="yt-stat-value" id="yt-cum-subs">0</span><div class="yt-stat-gain" id="yt-gain-subs">+0</div><div class="yt-stat-label">subs</div></div>' +
+      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDC41\uFE0F</div><span class="yt-stat-value" id="yt-cum-views">0</span><div class="yt-stat-gain" id="yt-gain-views">+0</div><div class="yt-stat-label">views</div></div>' +
+      '<div class="yt-stat"><div class="yt-stat-icon">\u2764\uFE0F</div><span class="yt-stat-value" id="yt-cum-likes">0</span><div class="yt-stat-gain" id="yt-gain-likes">+0</div><div class="yt-stat-label">likes</div></div>' +
+      '<div class="yt-stat"><div class="yt-stat-icon">\uD83D\uDCAC</div><span class="yt-stat-value" id="yt-cum-comments">0</span><div class="yt-stat-gain" id="yt-gain-comments">+0</div><div class="yt-stat-label">comments</div></div>';
+
+    // Animate cumulative totals from previous → new
+    animateCounter(document.getElementById('yt-cum-subs'),     prevTotals.subs,     newTotals.subs,     900);
+    animateCounter(document.getElementById('yt-cum-views'),    prevTotals.views,    newTotals.views,    900);
+    animateCounter(document.getElementById('yt-cum-likes'),    prevTotals.likes,    newTotals.likes,    900);
+    animateCounter(document.getElementById('yt-cum-comments'), prevTotals.comments, newTotals.comments, 900);
+
+    // Show session gain underneath
+    var gainFmt = function(n) { return (n >= 0 ? '+' : '') + n; };
+    document.getElementById('yt-gain-subs').textContent     = gainFmt(sessionStats.subs     || 0);
+    document.getElementById('yt-gain-views').textContent    = gainFmt(sessionStats.views    || 0);
+    document.getElementById('yt-gain-likes').textContent    = gainFmt(sessionStats.likes    || 0);
+    document.getElementById('yt-gain-comments').textContent = gainFmt(sessionStats.comments || 0);
   }
 
-  // Total channel subscribers (from this level's subsAtEnd)
+  // Total channel subscribers (story-canonical from lv.subsAtEnd)
   var totalEl = document.getElementById('yt-total-subs');
   if (totalEl && typeof lv.subsAtEnd === 'number') {
-    var target = lv.subsAtEnd;
-    var current = 0;
-    totalEl.textContent = '0 subscribers';
-    setTimeout(function() {
-      var step = Math.max(1, Math.ceil(target / 40));
-      var interval = setInterval(function() {
-        current += step;
-        if (current >= target) { current = target; clearInterval(interval); }
-        totalEl.textContent = current.toLocaleString() + ' subscribers';
-      }, 30);
-    }, 600);
+    var prevSubs = (levelIdx > 0 && campaignLevels[levelIdx - 1] && typeof campaignLevels[levelIdx - 1].subsAtEnd === 'number')
+      ? campaignLevels[levelIdx - 1].subsAtEnd
+      : 0;
+    animateCounter(totalEl, prevSubs, lv.subsAtEnd, 600, ' subscribers');
   }
 
   // Stars
@@ -11445,7 +11626,7 @@ function showCampaignResults() {
     starsContainer.innerHTML = starsHtml;
   }
 
-  // Stat card caption (title + desc text only — the image is already the thumbnail above)
+  // Stat card caption (title + desc)
   var captionEl = document.getElementById('yt-stat-card-caption');
   if (captionEl) {
     if (earnedStat) {
@@ -11457,19 +11638,94 @@ function showCampaignResults() {
     }
   }
 
-  // Next button
-  var nextBtn = document.getElementById('campaign-next-btn');
-  var nextIdx = levelIdx + 1;
-  if (nextBtn) {
-    nextBtn.style.display = (nextIdx < campaignLevels.length) ? '' : 'none';
+  // Engagement threshold check
+  var cpCheck = getCampaignProgress();
+  var lidCheck = 'L' + String(levelIdx + 1).padStart(2, '0');
+  var alreadyCompleted = !!(cpCheck.levels && cpCheck.levels[lidCheck] && cpCheck.levels[lidCheck].completed);
+  var netEngagement = (sessionStats.subs || 0) + (sessionStats.views || 0) + (sessionStats.likes || 0) + (sessionStats.comments || 0);
+  var threshold = engagementThresholdFor(levelIdx);
+  var thresholdMet = netEngagement >= threshold || alreadyCompleted || reviewMode;
+
+  // Threshold warning banner
+  var buttonsWrap = document.querySelector('#campaign-results-screen .yt-buttons');
+  if (buttonsWrap) {
+    // Remove any old threshold warning
+    var oldWarn = document.getElementById('yt-threshold-warning');
+    if (oldWarn) oldWarn.remove();
+    if (!thresholdMet) {
+      var warnHtml = '<div id="yt-threshold-warning" class="yt-threshold-warning">' +
+        '<div class="warn-title">\u26A0\uFE0F Not enough engagement to publish</div>' +
+        '<div class="warn-desc">You reached <strong>' + netEngagement + '</strong> engagement. Episode ' + (levelIdx + 1) + ' needs at least <strong>' + threshold + '</strong> to go live. Try the episode again and answer more carefully.</div>' +
+        '</div>';
+      buttonsWrap.insertAdjacentHTML('beforebegin', warnHtml);
+    }
   }
 
-  // Confetti
-  renderConfetti(vibe);
+  // Buttons — different in review mode / threshold not met
+  var nextBtn = document.getElementById('campaign-next-btn');
+  if (nextBtn) {
+    if (reviewMode) {
+      nextBtn.style.display = 'none';
+    } else if (!thresholdMet) {
+      // Swap Next → Retry episode
+      nextBtn.textContent = '\u21BA Retry Episode';
+      nextBtn.setAttribute('onclick', 'startCampaignLevel(' + levelIdx + ')');
+      nextBtn.style.display = '';
+    } else {
+      nextBtn.textContent = 'Next Episode \u2192';
+      nextBtn.setAttribute('onclick', 'showNextLevelOrMap()');
+      var nextIdx = levelIdx + 1;
+      nextBtn.style.display = (nextIdx < campaignLevels.length) ? '' : 'none';
+    }
+  }
+  // Swap the secondary button text in review mode
+  var backBtn = document.querySelector('#campaign-results-screen .yt-buttons .btn-secondary');
+  if (backBtn) {
+    if (reviewMode) {
+      backBtn.textContent = '\u2190 Back to Stats Wall';
+      backBtn.setAttribute('onclick', 'showYouTubeStatsWall()');
+    } else {
+      backBtn.textContent = 'Back to Map';
+      backBtn.setAttribute('onclick', 'showCampaignMap()');
+    }
+  }
 
-  // Save progress
-  saveCampaignProgress(stars);
+  // Atmospheric reveal effect
+  renderMoodEffect(vibe);
+
   showScreen('campaign-results-screen');
+}
+
+function showCampaignResults() {
+  var levelIdx = campaignState.currentLevel;
+  var stars = campaignState.earnedStars || 0;
+  var sessionStats = {
+    subs:     campaignState.sessionSubs     || 0,
+    views:    campaignState.sessionViews    || 0,
+    likes:    campaignState.sessionLikes    || 0,
+    comments: campaignState.sessionComments || 0
+  };
+  // Save progress first (writes sessionStats to cp.levels[lid])
+  saveCampaignProgress(stars, sessionStats);
+  // Then populate the card
+  populateEpisodeCard(levelIdx, {
+    stars: stars,
+    sessionStats: sessionStats,
+    reviewMode: false
+  });
+}
+
+// Replay an episode's completion card from the Stats Wall
+function previewEpisodeComplete(levelIdx) {
+  if (typeof levelIdx !== 'number' || !campaignLevels[levelIdx]) return;
+  var cp = getCampaignProgress();
+  var lid = 'L' + String(levelIdx + 1).padStart(2, '0');
+  var ld = (cp && cp.levels && cp.levels[lid]) || {};
+  populateEpisodeCard(levelIdx, {
+    stars: ld.stars || 0,
+    sessionStats: ld.sessionStats || {subs:0, views:0, likes:0, comments:0},
+    reviewMode: true
+  });
 }
 
 function showNextLevelOrMap() {
@@ -11873,11 +12129,11 @@ function selectMatchRight(el) {
     updateComboStreak(true);
 
     var statusEl = document.getElementById('campaign-match-status');
-    if (statusEl) statusEl.textContent = '\u2714 +' + xp + ' XP';
+    if (statusEl) statusEl.textContent = '\u2714 engagement earned';
 
     // Update XP display
     var xpEl = document.getElementById('campaign-task-xp');
-    if (xpEl) xpEl.textContent = campaignState.levelXP + ' XP';
+    if (xpEl) xpEl.textContent = ((campaignState.sessionSubs||0) + (campaignState.sessionViews||0) + (campaignState.sessionLikes||0) + (campaignState.sessionComments||0)) + ' engagement';
 
     // Check if all pairs found
     if (campaignState._matchPairsFound >= campaignState._matchPairsTotal) {
@@ -12149,7 +12405,7 @@ function renderCampaignReading(reading) {
 
   passage.innerHTML = reading.passage || '';
   var xpEl = document.getElementById('campaign-reading-xp');
-  if (xpEl) xpEl.textContent = campaignState.levelXP + ' XP';
+  if (xpEl) xpEl.textContent = ((campaignState.sessionSubs||0) + (campaignState.sessionViews||0) + (campaignState.sessionLikes||0) + (campaignState.sessionComments||0)) + ' engagement';
   if (feedback) feedback.innerHTML = '';
 
   campaignState.readingQuestionIndex = 0;
@@ -12208,6 +12464,28 @@ function submitReadingAnswer(btn, answer) {
   campaignState.readingXP += xp;
   campaignState.levelXP += xp;
 
+  if (result.isCorrect) {
+    updateComboStreak(true);
+  } else {
+    updateComboStreak(false);
+  }
+
+  // Engagement reward OR penalty
+  var reward = null;
+  var penalty = null;
+  if (result.isCorrect) {
+    var comboMult = 1;
+    if (typeof getComboTier === 'function') {
+      var tier = getComboTier(campaignState.comboStreak);
+      comboMult = tier.mult || 1;
+    }
+    reward = generateSocialReward(xp, comboMult);
+    addToSessionSocial(reward);
+  } else {
+    penalty = generateSocialPenalty();
+    applySessionPenalty(penalty);
+  }
+
   var btns = document.querySelectorAll('#campaign-question-area .campaign-mc-btn');
   btns.forEach(function(b) {
     b.disabled = true;
@@ -12217,18 +12495,23 @@ function submitReadingAnswer(btn, answer) {
   if (!result.isCorrect) btn.classList.add('wrong');
 
   var xpEl = document.getElementById('campaign-reading-xp');
-  if (xpEl) xpEl.textContent = campaignState.levelXP + ' XP';
-  showReadingFeedback(result, q.answer, xp);
+  if (xpEl) xpEl.textContent = ((campaignState.sessionSubs||0) + (campaignState.sessionViews||0) + (campaignState.sessionLikes||0) + (campaignState.sessionComments||0)) + ' engagement';
+  showReadingFeedback(result, q.answer, reward, penalty);
   campaignState.taskResults.push({ correct: result.isCorrect, xp: xp });
 }
 
-function showReadingFeedback(result, correctAnswer, xp) {
+function showReadingFeedback(result, correctAnswer, reward, penalty) {
   var feedback = document.getElementById('campaign-reading-feedback');
   if (!feedback) return;
   var cls = result.isCorrect ? 'correct' : (result.isClose ? 'close' : 'wrong');
-  var msg = result.isCorrect
-    ? ('Correct! +' + xp + ' XP')
-    : (result.isClose ? ('Close! The answer is: ' + escapeHtml(correctAnswer)) : ('The answer is: ' + escapeHtml(correctAnswer)));
+  var msg;
+  if (result.isCorrect && reward) {
+    msg = 'Nice! ' + reward.icon + ' <strong style="color:' + reward.colour + ';">+' + reward.amount + ' ' + reward.type + '</strong>';
+  } else if (penalty) {
+    msg = 'The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' ' + penalty.amount + ' ' + penalty.type + '</span>';
+  } else {
+    msg = result.isClose ? ('Close! The answer is: ' + escapeHtml(correctAnswer)) : ('The answer is: ' + escapeHtml(correctAnswer));
+  }
   feedback.innerHTML = '<div class="campaign-feedback ' + cls + '">' + msg + '</div>' +
     '<button class="btn" onclick="nextReadingQuestion()" style="margin-top:0.5rem;width:100%;">Next</button>';
 }
@@ -12390,6 +12673,36 @@ function addToSessionSocial(reward) {
   campaignState.sessionComments = (campaignState.sessionComments || 0) + (reward.type==='comments'    ? reward.amount : 0);
 }
 
+// Wrong-answer penalty — negative engagement (unsubs, dislikes, hate comments, hidden views)
+function generateSocialPenalty() {
+  var types = [
+    {type:'unsubscribes', statKey:'subs',     icon:'\uD83D\uDC64\u2796', weight:1, range:[1, 3], colour:'#E53935'},
+    {type:'hidden views', statKey:'views',    icon:'\uD83D\uDE48',       weight:4, range:[3, 15], colour:'#546E7A'},
+    {type:'dislikes',     statKey:'likes',    icon:'\uD83D\uDC4E',       weight:3, range:[1, 6],  colour:'#455A64'},
+    {type:'hate comments',statKey:'comments', icon:'\uD83D\uDCA2',       weight:2, range:[1, 3],  colour:'#8E24AA'}
+  ];
+  var totalWeight = 0;
+  for (var i = 0; i < types.length; i++) totalWeight += types[i].weight;
+  var r = Math.random() * totalWeight;
+  var pick = types[0];
+  var acc = 0;
+  for (var j = 0; j < types.length; j++) {
+    acc += types[j].weight;
+    if (r <= acc) { pick = types[j]; break; }
+  }
+  var min = pick.range[0], max = pick.range[1];
+  var amount = Math.floor(Math.random() * (max - min + 1)) + min;
+  return {type:pick.type, statKey:pick.statKey, icon:pick.icon, amount:amount, colour:pick.colour};
+}
+
+function applySessionPenalty(penalty) {
+  // Subtract from the matching session stat — can go negative
+  if (penalty.statKey === 'subs')     campaignState.sessionSubs     = (campaignState.sessionSubs     || 0) - penalty.amount;
+  if (penalty.statKey === 'views')    campaignState.sessionViews    = (campaignState.sessionViews    || 0) - penalty.amount;
+  if (penalty.statKey === 'likes')    campaignState.sessionLikes    = (campaignState.sessionLikes    || 0) - penalty.amount;
+  if (penalty.statKey === 'comments') campaignState.sessionComments = (campaignState.sessionComments || 0) - penalty.amount;
+}
+
 // ── Feedback & Continue ────────────────────────────────────────────────────
 
 function showCampaignFeedback(result, correctAnswer, xp) {
@@ -12414,6 +12727,7 @@ function showCampaignFeedback(result, correctAnswer, xp) {
   }
 
   var reward = null;
+  var penalty = null;
   var msg = '';
   if (result.isCorrect) {
     reward = generateSocialReward(xp, comboMult);
@@ -12424,9 +12738,13 @@ function showCampaignFeedback(result, correctAnswer, xp) {
     }
     msg = 'Nice! ' + reward.icon + ' <strong style="color:' + reward.colour + ';">+' + reward.amount + ' ' + reward.type + '</strong>' + comboHtml;
   } else if (result.isClose) {
-    msg = 'Almost! The answer is: ' + escapeHtml(correctAnswer);
+    penalty = generateSocialPenalty();
+    applySessionPenalty(penalty);
+    msg = 'Almost! The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' \u2212' + penalty.amount + ' ' + penalty.type + '</span>';
   } else {
-    msg = 'The answer is: ' + escapeHtml(correctAnswer);
+    penalty = generateSocialPenalty();
+    applySessionPenalty(penalty);
+    msg = 'The answer is: ' + escapeHtml(correctAnswer) + '<br><span style="color:' + penalty.colour + ';font-weight:700;">' + penalty.icon + ' \u2212' + penalty.amount + ' ' + penalty.type + '</span>';
   }
 
   feedback.innerHTML = '<div class="campaign-feedback ' + cls + '">' + msg + '</div>' +
@@ -12440,13 +12758,15 @@ function showCampaignFeedback(result, correctAnswer, xp) {
   }
 
   // Fly-up popup (themed)
-  if (reward) {
+  var flyFx = reward || penalty;
+  if (flyFx) {
     var flyUp = document.createElement('div');
     flyUp.className = 'campaign-xp-fly';
-    flyUp.innerHTML = reward.icon + ' +' + reward.amount + ' ' + reward.type;
+    var sign = reward ? '+' : '\u2212';
+    flyUp.innerHTML = flyFx.icon + ' ' + sign + flyFx.amount + ' ' + flyFx.type;
     flyUp.style.right = '1rem';
     flyUp.style.top = '0.5rem';
-    flyUp.style.color = reward.colour;
+    flyUp.style.color = flyFx.colour;
     flyUp.style.fontWeight = '700';
     var taskProgress = document.getElementById('campaign-task-progress');
     if (taskProgress) {
@@ -12494,7 +12814,7 @@ function updateCampaignTaskProgress() {
   var fill = document.getElementById('campaign-task-progress-fill');
   if (fill) fill.style.width = pct + '%';
   var xpEl = document.getElementById('campaign-task-xp');
-  if (xpEl) xpEl.textContent = campaignState.levelXP + ' XP';
+  if (xpEl) xpEl.textContent = ((campaignState.sessionSubs||0) + (campaignState.sessionViews||0) + (campaignState.sessionLikes||0) + (campaignState.sessionComments||0)) + ' engagement';
 }
 
 // ── 11. Progress Persistence ───────────────────────────────────────────────
@@ -12511,17 +12831,65 @@ function getCampaignProgress() {
   return { levels: {} };
 }
 
-function saveCampaignProgress(stars) {
+// Minimum net engagement (subs + views + likes + comments) required to mark a level as completed
+// and unlock the next episode. Tuned so a casual correct-heavy run clears it easily, but
+// just clicking through randomly does not.
+function engagementThresholdFor(levelIdx) {
+  // Sum of all items in the level (across vocab/grammar/reading/etc) × average reward ~2
+  var lv = campaignLevels[levelIdx];
+  if (!lv || !lv.tasks) return 30;
+  var items = 0;
+  for (var i = 0; i < lv.tasks.length; i++) {
+    var t = lv.tasks[i];
+    items += (t.items && t.items.length) ? t.items.length : 0;
+  }
+  if (lv.reading && lv.reading.questions) items += lv.reading.questions.length;
+  // Require about 40% of the maximum possible positive engagement (rough estimate: items × 3)
+  return Math.max(20, Math.round(items * 1.2));
+}
+
+function getNetSessionEngagement(stats) {
+  stats = stats || {
+    subs:     campaignState.sessionSubs     || 0,
+    views:    campaignState.sessionViews    || 0,
+    likes:    campaignState.sessionLikes    || 0,
+    comments: campaignState.sessionComments || 0
+  };
+  return (stats.subs || 0) + (stats.views || 0) + (stats.likes || 0) + (stats.comments || 0);
+}
+
+function saveCampaignProgress(stars, sessionStats) {
   var lid = 'L' + String(campaignState.currentLevel + 1).padStart(2, '0');
   var cp = getCampaignProgress();
   var prevBest = (cp.levels && cp.levels[lid]) ? (cp.levels[lid].bestXP || 0) : 0;
   var prevStars = (cp.levels && cp.levels[lid]) ? (cp.levels[lid].stars || 0) : 0;
+  var prevCompleted = (cp.levels && cp.levels[lid]) ? !!cp.levels[lid].completed : false;
+  var prevStats = (cp.levels && cp.levels[lid] && cp.levels[lid].sessionStats) ? cp.levels[lid].sessionStats : null;
   var isNewBest = campaignState.levelXP > prevBest;
 
+  // Pick the stronger sessionStats (new vs previous) so replays don't downgrade a better run
+  var newStats = sessionStats || {
+    subs:     campaignState.sessionSubs     || 0,
+    views:    campaignState.sessionViews    || 0,
+    likes:    campaignState.sessionLikes    || 0,
+    comments: campaignState.sessionComments || 0
+  };
+  var prevSum = prevStats ? (prevStats.subs + prevStats.views + prevStats.likes + prevStats.comments) : 0;
+  var newSum  = newStats.subs + newStats.views + newStats.likes + newStats.comments;
+  var bestStats = (newSum >= prevSum || !prevStats) ? newStats : prevStats;
+
+  // Engagement threshold gate: only mark completed if this run OR a previous run cleared the bar
+  var threshold = engagementThresholdFor(campaignState.currentLevel);
+  var thisRunCleared = newSum >= threshold;
+  var levelIsCompleted = prevCompleted || thisRunCleared;
+  campaignState._thresholdCleared = thisRunCleared;
+  campaignState._thresholdValue = threshold;
+
   var levelData = {
-    completed: true,
+    completed: levelIsCompleted,
     stars: Math.max(stars, prevStars),
-    bestXP: isNewBest ? campaignState.levelXP : prevBest
+    bestXP: isNewBest ? campaignState.levelXP : prevBest,
+    sessionStats: bestStats
   };
 
   // Save to localStorage always
