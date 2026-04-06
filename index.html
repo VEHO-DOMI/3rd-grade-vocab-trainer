@@ -5297,6 +5297,10 @@ function logout() {
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(LS_KEY + '-section');
   localStorage.removeItem(LS_KEY + '-mode');
+  // Wipe in-memory campaign progress so the next student doesn't inherit
+  // the previous student's XP, combo streak, or prologue-watched flag.
+  // Scoped localStorage is read on the next showCampaignMap() call.
+  if (typeof resetCampaignState === 'function') resetCampaignState();
   state.mode = 'vocab';
   state.studentId = null;
   state.studentName = null;
@@ -10864,6 +10868,50 @@ goHome = function() {
 // === FOURTEEN CAMPAIGN ENGINE ===
 // === FOURTEEN CAMPAIGN ENGINE ===
 
+// ── 0. Student-scoped localStorage key helper ─────────────────────────────
+// Campaign progress (stars, completion, session stats) and the prologue-seen
+// flag must NOT leak across accounts on the same device. Firebase is the
+// authoritative per-student store, but localStorage is used as a fallback
+// for offline / unauthenticated play. Scope every campaign localStorage key
+// to the current class and student so each account gets its own slot.
+function campaignLsKey(suffix) {
+  var cls = (typeof CLASS_ID !== 'undefined' && CLASS_ID) ? CLASS_ID : 'nocls';
+  var sid = (typeof state !== 'undefined' && state && state.studentId) ? state.studentId : 'nostudent';
+  return 'm3-campaign-' + suffix + '::' + cls + '::' + sid;
+}
+
+// Reset in-memory campaign session state. Called on logout so that switching
+// accounts without a page refresh doesn't carry over the previous student's
+// XP, combo streak, or level progress.
+function resetCampaignState() {
+  if (typeof campaignState === 'undefined') return;
+  campaignState.currentLevel = null;
+  campaignState.currentTaskIndex = 0;
+  campaignState.currentItemIndex = 0;
+  campaignState.levelXP = 0;
+  campaignState.taskResults = [];
+  campaignState.readingQuestionIndex = 0;
+  campaignState.storyBeatIndex = 0;
+  campaignState.storyCallback = null;
+  campaignState.vocabXP = 0;
+  campaignState.grammarXP = 0;
+  campaignState.readingXP = 0;
+  campaignState.comboStreak = 0;
+  campaignState.hintUsed = false;
+  campaignState.hintTaps = {};
+  campaignState.prologueWatched = false;
+  campaignState.prologueScene = 0;
+  campaignState._storyBShown = false;
+  campaignState._taskBriefingShown = false;
+  campaignState._matchSelected = null;
+  campaignState._matchPairsFound = 0;
+  campaignState._orderPlaced = [];
+  campaignState.sessionSubs = 0;
+  campaignState.sessionViews = 0;
+  campaignState.sessionLikes = 0;
+  campaignState.sessionComments = 0;
+}
+
 // ── 1. Campaign State ──────────────────────────────────────────────────────
 var campaignState = {
   currentLevel: null,
@@ -11038,7 +11086,7 @@ function prevPrologueScene() {
 
 function finishPrologue() {
   campaignState.prologueWatched = true;
-  localStorage.setItem('m3-campaign-prologue-watched', 'true');
+  try { localStorage.setItem(campaignLsKey('prologue-watched'), 'true'); } catch (e) { /* ignore */ }
   showCampaignMap();
 }
 
@@ -11116,10 +11164,16 @@ function confirmQuitLevel() {
 // ── 4. Campaign Map ────────────────────────────────────────────────────────
 
 function showCampaignMap() {
-  // Check if prologue was watched
-  if (localStorage.getItem('m3-campaign-prologue-watched') === 'true') {
-    campaignState.prologueWatched = true;
-  }
+  // Check if prologue was watched (per-student scoped key, see campaignLsKey)
+  try {
+    if (localStorage.getItem(campaignLsKey('prologue-watched')) === 'true') {
+      campaignState.prologueWatched = true;
+    } else {
+      // New student on this device should NOT inherit a previous student's
+      // "prologue watched" flag \u2014 explicitly reset the in-memory flag.
+      campaignState.prologueWatched = false;
+    }
+  } catch (e) { /* ignore */ }
   if (!campaignState.prologueWatched && prologueScenes.length > 0) {
     showPrologue();
     return;
@@ -13254,12 +13308,15 @@ function updateCampaignTaskProgress() {
 // ── 11. Progress Persistence ───────────────────────────────────────────────
 
 function getCampaignProgress() {
-  // Try Firebase first
+  // Firebase is authoritative per-student.
   var d = state.studentData || {};
   if (d.campaignProgress) return d.campaignProgress;
-  // Fallback to localStorage
+  // Fallback to localStorage, but scoped to (class, student) so progress
+  // does NOT leak across accounts on a shared device. A brand-new student
+  // whose Firebase doc has no campaignProgress will get an empty slate
+  // because their scoped localStorage key has never been written.
   try {
-    var stored = localStorage.getItem('m3-campaign-progress');
+    var stored = localStorage.getItem(campaignLsKey('progress'));
     if (stored) return JSON.parse(stored);
   } catch (e) { /* ignore */ }
   return { levels: {} };
@@ -13326,11 +13383,12 @@ function saveCampaignProgress(stars, sessionStats) {
     sessionStats: bestStats
   };
 
-  // Save to localStorage always
+  // Save to localStorage always, scoped to (class, student) so that saving
+  // for Student A on a shared device can never be read by Student B.
   if (!cp.levels) cp.levels = {};
   cp.levels[lid] = levelData;
   try {
-    localStorage.setItem('m3-campaign-progress', JSON.stringify(cp));
+    localStorage.setItem(campaignLsKey('progress'), JSON.stringify(cp));
   } catch (e) { /* ignore */ }
 
   // Save to Firebase if connected
