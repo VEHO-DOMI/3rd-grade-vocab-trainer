@@ -10162,7 +10162,8 @@ function launchTaskPractice(type, structureIds) {
   let items = grammarItems.filter(i => i.t === type);
   if (structureIds) items = items.filter(i => structureIds.includes(i.sid));
   if (items.length === 0) { alert('No exercises available.'); return; }
-  const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 10);
+  const maxItems = structureIds ? 25 : 10;
+  const shuffled = items.sort(() => Math.random() - 0.5).slice(0, maxItems);
   grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_type_' + type, practiceType: type };
   document.body.classList.add('playing');
   renderGrammarItem();
@@ -10264,7 +10265,7 @@ function startGrammarExercise(structureId, filterTypes) {
     items = items.filter(i => filterTypes.includes(i.t));
   }
   if (items.length === 0) { alert('No exercises available for this topic yet.'); return; }
-  const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 10);
+  const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 25);
   grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: structureId };
   document.body.classList.add('playing');
   renderGrammarItem();
