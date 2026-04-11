@@ -10261,23 +10261,7 @@ async function loadClassLevelRoadmap() {
   } catch(e) { container.innerHTML = '<p style="color:var(--muted);">Error loading class data</p>'; }
 }
 
-function addModeSwitchPill() {
-  let pill = document.getElementById('mode-switch-pill');
-  if (!pill) {
-    pill = document.createElement('div');
-    pill.id = 'mode-switch-pill';
-    const profileCard = document.getElementById('profile-card');
-    if (profileCard) {
-      const logoutRow = profileCard.querySelector('.profile-logout-row');
-      if (logoutRow) logoutRow.insertAdjacentElement('afterbegin', pill);
-    }
-  }
-  const isGrammar = state.mode === 'grammar';
-  pill.className = 'mode-pill';
-  pill.innerHTML = isGrammar ? '<span>Current: \uD83E\uDDE0 Grammar</span> <span style="margin-left:8px;padding:2px 10px;background:var(--accent-glow);border:1px solid var(--accent);border-radius:8px;font-size:0.7rem;cursor:pointer;">Switch Mode</span>' : '<span>Current: \uD83D\uDCDA Vocab</span> <span style="margin-left:8px;padding:2px 10px;background:var(--accent-glow);border:1px solid var(--accent);border-radius:8px;font-size:0.7rem;cursor:pointer;">Switch Mode</span>';
-  pill.style.cssText = '';
-  pill.onclick = function() { showModeSelectScreen(); };
-}
+function addModeSwitchPill() { /* legacy — removed, mode switch handled by home-mode-switch button */ }
 
 // --- Grammar Practice Flow ---
 let grammarPracticeTab = 'topics'; // 'topics' or 'tasks'
