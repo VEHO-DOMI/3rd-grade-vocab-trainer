@@ -962,6 +962,10 @@ body.playing .header-container { display: none; }
   padding: 1rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.5px;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 /* Practice Setup Overlay */
@@ -3178,7 +3182,7 @@ body.playing .header-container { display: none; }
       <div class="profile-xp-labels"><span id="rank-current-label"></span><span id="rank-xp-to-next"></span><span id="rank-next-label"></span></div>
     </div>
     <!-- Overall English level bar -->
-    <div class="profile-overall-bar" id="overall-level-display" style="cursor:pointer;margin-top:6px;">
+    <div class="profile-overall-bar" id="overall-level-display" onclick="showOverallLevelProgression()" style="cursor:pointer;margin-top:6px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
         <span style="font-size:0.7rem;font-weight:700;color:var(--trans-color);" id="overall-badge">🌍 Lv 1 · First Steps</span>
         <span style="font-size:0.6rem;color:var(--muted);font-weight:600;" id="overall-label">0 XP</span>
@@ -3278,7 +3282,7 @@ body.playing .header-container { display: none; }
   </div>
 
   <!-- Class Level Card -->
-  <div id="class-level-card" class="home-class-level-card" style="display:none;">
+  <div id="class-level-card" class="home-class-level-card" style="display:none;cursor:pointer;" onclick="showClassLevelProgression()">
     <div class="class-level-header">
       <span class="class-level-title" id="class-level-title">🏫 Class 3A</span>
       <span class="class-level-name" id="class-level-name">Study Group</span>
@@ -9851,14 +9855,14 @@ async function loadModeSelectLeaderboards() {
     const students = [];
     snap.forEach(doc => {
       const d = doc.data();
-      students.push({ id: doc.id, name: d.name, vxp: d.xp || 0, gxp: d.grammarXp || 0, avatarId: d.avatarId || 1 });
+      students.push({ id: doc.id, name: d.name, vxp: d.xp || 0, gxp: d.grammarXp || 0, totalXp: (d.xp || 0) + (d.grammarXp || 0), avatarId: d.avatarId || 1 });
     });
     const medals = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49'];
-    const renderTop3 = (list, mode) => {
+    const renderTop3 = (list, key) => {
       if (list.length === 0) return '<div style="color:var(--muted);font-size:0.72rem;text-align:center;">No students yet</div>';
       return list.slice(0, 3).map((s, i) => {
         const isMe = s.id === state.studentId;
-        const xp = mode === 'vocab' ? s.vxp : s.gxp;
+        const xp = s[key] || 0;
         return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:0.78rem;' + (isMe ? 'font-weight:700;color:var(--accent);' : '') + '">' +
           '<span style="width:22px;text-align:center;">' + medals[i] + '</span>' +
           '<img src="avatars/avatar (' + s.avatarId + ').png" style="width:20px;height:20px;border-radius:50%;" onerror="this.style.display=\'none\'">' +
@@ -9869,16 +9873,21 @@ async function loadModeSelectLeaderboards() {
     };
     const vocabSorted = [...students].sort((a, b) => b.vxp - a.vxp);
     const grammarSorted = [...students].sort((a, b) => b.gxp - a.gxp);
+    const overallSorted = [...students].sort((a, b) => b.totalXp - a.totalXp);
     container.innerHTML =
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0;">' +
-        '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius);padding:0.6rem 0.8rem;overflow:hidden;min-width:0;">' +
-          '<div style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;">\uD83D\uDCDA Vocab Top 3</div>' +
-          renderTop3(vocabSorted, 'vocab') +
+        '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius);padding:0.6rem 0.8rem;overflow:hidden;min-width:0;cursor:pointer;" onclick="showLeaderboard()">' +
+          '<div style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;">\uD83D\uDCDA VOCAB TOP 3 \u2192</div>' +
+          renderTop3(vocabSorted, 'vxp') +
         '</div>' +
-        '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius);padding:0.6rem 0.8rem;overflow:hidden;min-width:0;">' +
-          '<div style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;">\uD83E\uDDE0 Grammar Top 3</div>' +
-          renderTop3(grammarSorted, 'grammar') +
+        '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius);padding:0.6rem 0.8rem;overflow:hidden;min-width:0;cursor:pointer;" onclick="showLeaderboard()">' +
+          '<div style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;">\uD83E\uDDE0 GRAMMAR TOP 3 \u2192</div>' +
+          renderTop3(grammarSorted, 'gxp') +
         '</div>' +
+      '</div>' +
+      '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius);padding:0.6rem 0.8rem;margin-top:8px;cursor:pointer;" onclick="showLeaderboard()">' +
+        '<div style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;">\uD83C\uDF0D OVERALL TOP 3 \u2192</div>' +
+        renderTop3(overallSorted, 'totalXp') +
       '</div>';
   } catch (e) {
     container.innerHTML = '';
@@ -10165,6 +10174,91 @@ async function loadClassLevel() {
     document.getElementById('class-level-fill').style.width = Math.round(cl.progress * 100) + '%';
     card.style.display = '';
   } catch(e) { card.style.display = 'none'; }
+}
+
+function showOverallLevelProgression() {
+  var d = state.studentData || {};
+  var totalXp = (d.xp || 0) + (d.grammarXp || 0);
+  var ol = getOverallLevel(totalXp);
+  var html = '<div class="progress-nav"><button class="btn btn-secondary" onclick="showHomeScreen()">\u2190 Back</button><span class="nav-title">\uD83C\uDF0D English Level</span><span style="width:60px;"></span></div>';
+  html += '<div style="background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:var(--radius-lg);padding:1.2rem;margin-bottom:1rem;color:#fff;text-align:center;">';
+  html += '<div style="font-size:2.5rem;font-weight:900;font-family:Fredoka,sans-serif;">Lv ' + ol.level + '</div>';
+  html += '<div style="font-size:1.1rem;font-weight:700;margin-top:4px;">' + ol.name + '</div>';
+  if (ol.vibe) html += '<div style="font-size:0.78rem;opacity:0.8;font-style:italic;margin-top:2px;">' + ol.vibe + '</div>';
+  html += '<div style="margin-top:10px;font-size:0.82rem;opacity:0.9;">' + totalXp.toLocaleString() + ' XP (Vocab + Grammar)</div>';
+  if (ol.next) {
+    var pct = Math.round(ol.progress * 100);
+    html += '<div style="height:8px;background:rgba(255,255,255,0.2);border-radius:4px;overflow:hidden;margin-top:8px;"><div style="width:' + pct + '%;height:100%;background:#fff;border-radius:4px;"></div></div>';
+    html += '<div style="font-size:0.7rem;opacity:0.7;margin-top:4px;">' + (ol.next.xp - totalXp).toLocaleString() + ' XP to ' + ol.next.name + '</div>';
+  }
+  html += '</div>';
+  html += '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius-lg);padding:0.8rem;">';
+  OVERALL_LEVELS.forEach(function(lv) {
+    var done = totalXp >= lv.xp && lv.level < ol.level;
+    var isCurrent = lv.level === ol.level;
+    var locked = lv.level > ol.level;
+    var bg = isCurrent ? 'background:rgba(13,148,136,0.1);border-radius:10px;padding:10px 8px;margin:2px -8px;' : '';
+    html += '<div class="roadmap-item" style="' + (locked?'opacity:0.4;':'') + bg + '">';
+    html += '<div class="roadmap-lvl" style="color:#0d9488;">' + lv.level + '</div>';
+    html += '<div class="roadmap-icon" style="background:rgba(13,148,136,0.1);">' + (done ? '<span class="roadmap-check">\u2713</span>' : '\uD83C\uDF0D') + '</div>';
+    html += '<div class="roadmap-info"><div class="roadmap-name"' + (isCurrent?' style="color:#0d9488;font-weight:800;"':'') + '>' + (locked ? '?? ??' : lv.name) + '</div>';
+    if (!locked && lv.vibe) html += '<div class="roadmap-vibe">' + lv.vibe + '</div>';
+    html += '</div>';
+    html += '<div class="roadmap-xp">' + (isCurrent ? '<strong style="color:#0d9488;">YOU</strong>' : (lv.xp === 0 ? 'Start' : lv.xp.toLocaleString() + ' XP')) + '</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('practice-screen').innerHTML = html;
+  showScreen('practice-screen');
+}
+
+function showClassLevelProgression() {
+  var html = '<div class="progress-nav"><button class="btn btn-secondary" onclick="showHomeScreen()">\u2190 Back</button><span class="nav-title">\uD83C\uDFEB Class Level</span><span style="width:60px;"></span></div>';
+  html += '<div id="class-level-roadmap-content" style="text-align:center;color:var(--muted);padding:2rem;">Loading...</div>';
+  document.getElementById('practice-screen').innerHTML = html;
+  showScreen('practice-screen');
+  loadClassLevelRoadmap();
+}
+
+async function loadClassLevelRoadmap() {
+  var container = document.getElementById('class-level-roadmap-content');
+  if (!container || !db || !CLASS_ID) return;
+  try {
+    var snap = await db.collection('classes').doc(CLASS_ID).collection('students').get();
+    var totalXp = 0, count = 0;
+    snap.forEach(function(doc) { var d = doc.data(); totalXp += (d.xp || 0) + (d.grammarXp || 0); count++; });
+    var cl = getClassLevel(totalXp);
+    var sectionLabel = SECTIONS.find(function(s) { return s.id === CLASS_ID; });
+    var label = sectionLabel ? sectionLabel.label : CLASS_ID;
+    var html = '';
+    html += '<div style="background:linear-gradient(135deg,var(--accent-deep),var(--accent));border-radius:var(--radius-lg);padding:1.2rem;margin-bottom:1rem;color:#fff;text-align:center;">';
+    html += '<div style="font-size:1rem;opacity:0.8;margin-bottom:4px;">Class ' + label + ' \u00B7 ' + count + ' students</div>';
+    html += '<div style="font-size:2.2rem;font-weight:900;font-family:Fredoka,sans-serif;">Lv ' + cl.level + '</div>';
+    html += '<div style="font-size:1rem;font-weight:700;margin-top:4px;">' + cl.name + '</div>';
+    if (cl.vibe) html += '<div style="font-size:0.78rem;opacity:0.8;font-style:italic;margin-top:2px;">' + cl.vibe + '</div>';
+    html += '<div style="margin-top:8px;font-size:0.82rem;opacity:0.9;">' + totalXp.toLocaleString() + ' XP total</div>';
+    if (cl.next) {
+      var pct = Math.round(cl.progress * 100);
+      html += '<div style="height:8px;background:rgba(255,255,255,0.2);border-radius:4px;overflow:hidden;margin-top:8px;"><div style="width:' + pct + '%;height:100%;background:#fff;border-radius:4px;"></div></div>';
+      html += '<div style="font-size:0.7rem;opacity:0.7;margin-top:4px;">' + (cl.next.xp - totalXp).toLocaleString() + ' XP to ' + cl.next.name + '</div>';
+    }
+    html += '</div>';
+    html += '<div style="background:var(--card);border:1.5px solid var(--card-border);border-radius:var(--radius-lg);padding:0.8rem;">';
+    CLASS_LEVELS.forEach(function(lv) {
+      var done = totalXp >= lv.xp && lv.level < cl.level;
+      var isCurrent = lv.level === cl.level;
+      var locked = lv.level > cl.level;
+      var bg = isCurrent ? 'background:var(--accent-glow);border-radius:10px;padding:10px 8px;margin:2px -8px;' : '';
+      html += '<div class="roadmap-item" style="' + (locked?'opacity:0.4;':'') + bg + '">';
+      html += '<div class="roadmap-lvl" style="color:var(--accent);">' + lv.level + '</div>';
+      html += '<div class="roadmap-icon" style="background:var(--accent-glow);">' + (done ? '<span class="roadmap-check">\u2713</span>' : '\uD83C\uDFEB') + '</div>';
+      html += '<div class="roadmap-info"><div class="roadmap-name"' + (isCurrent?' style="color:var(--accent);font-weight:800;"':'') + '>' + (locked ? '?? ??' : lv.name) + '</div>';
+      if (!locked && lv.vibe) html += '<div class="roadmap-vibe">' + lv.vibe + '</div>';
+      html += '</div>';
+      html += '<div class="roadmap-xp">' + (isCurrent ? '<strong style="color:var(--accent);">YOU</strong>' : (lv.xp === 0 ? 'Start' : lv.xp.toLocaleString() + ' XP')) + '</div></div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } catch(e) { container.innerHTML = '<p style="color:var(--muted);">Error loading class data</p>'; }
 }
 
 function addModeSwitchPill() {
