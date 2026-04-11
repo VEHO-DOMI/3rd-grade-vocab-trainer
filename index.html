@@ -652,16 +652,38 @@ body.playing .header-container { display: none; }
 
 /* Bottom action area */
 .home-actions { width: 100%; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.2rem; }
-.home-actions-row { display: flex; gap: 0.5rem; }
-.home-actions-row .btn { flex: 1; }
-.home-actions-area { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 0.6rem; }
-.home-actions-area .btn-start-practice { width: 100%; }
-.home-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.home-actions-row .btn, .home-actions-row .btn-battle, .home-actions-row .btn-review { width: 100%; font-size: 0.85rem; padding: 0.8rem 0.6rem; font-family: 'Fredoka', sans-serif; border-radius: var(--radius); }
-.home-nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-top: 0.5rem; margin-bottom: 0.8rem; }
-.home-nav-grid .btn { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.7rem; padding: 0.6rem 0.3rem; font-family: 'Fredoka', sans-serif; border-radius: var(--radius); background: var(--card); border: 1.5px solid var(--card-border); box-shadow: var(--shadow-card); color: var(--text); font-weight: 600; }
-.home-nav-grid .btn:hover { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
-.home-nav-grid .btn span { font-size: 0.68rem; font-family: 'Inter', sans-serif; font-weight: 600; opacity: 0.7; }
+.home-section { width: 100%; margin-bottom: 0.6rem; }
+.home-section .btn-start-practice { width: 100%; }
+.home-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+.home-action-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 0.9rem 0.5rem; border-radius: var(--radius); border: 1.5px solid var(--card-border); background: var(--card); cursor: pointer; transition: all 0.15s; min-height: 68px; width: 100%; box-sizing: border-box; box-shadow: var(--shadow-card); }
+.home-action-card:hover { border-color: var(--accent); background: var(--card-hover); transform: translateY(-1px); }
+.home-action-card:active { transform: scale(0.97); }
+.home-action-icon { font-size: 1.4rem; line-height: 1; }
+.home-action-label { font-size: 0.75rem; font-weight: 700; color: var(--text); font-family: 'Fredoka', sans-serif; text-align: center; line-height: 1.2; }
+[data-theme="light"] .home-action-card { background: #fff; }
+.home-smart-review-hint { display: flex; align-items: center; gap: 8px; width: 100%; padding: 0.6rem 1rem; margin-top: 6px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(37,99,235,0.15); transition: all 0.15s; box-sizing: border-box; }
+.home-smart-review-hint:hover { border-color: var(--accent); }
+.home-smart-review-hint:active { transform: scale(0.98); }
+.home-mode-switch-btn { display: block; width: 100%; text-align: center; margin-top: 8px; padding: 0.6rem 1rem; background: var(--card); border: 1.5px dashed var(--card-border); border-radius: var(--radius); cursor: pointer; font-size: 0.78rem; font-weight: 600; color: var(--accent); font-family: inherit; transition: all 0.15s; box-sizing: border-box; }
+.home-mode-switch-btn:hover { border-color: var(--accent); background: var(--accent-glow); }
+.home-mode-switch-btn:active { transform: scale(0.98); }
+.home-fullwidth-card { display: flex; align-items: center; gap: 12px; width: 100%; padding: 0.9rem 1rem; border-radius: var(--radius); border: 1.5px solid var(--card-border); background: var(--card); cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-card); text-align: left; box-sizing: border-box; }
+.home-fullwidth-card:hover { border-color: var(--accent); background: var(--card-hover); transform: translateY(-1px); }
+.home-fullwidth-card:active { transform: scale(0.98); }
+.home-fullwidth-icon { font-size: 1.5rem; flex-shrink: 0; width: 36px; text-align: center; }
+.home-fullwidth-info { flex: 1; min-width: 0; }
+.home-fullwidth-title { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.92rem; color: var(--text); display: block; }
+.home-fullwidth-subtitle { font-size: 0.72rem; color: var(--muted); display: block; margin-top: 1px; }
+.home-fullwidth-arrow { color: var(--muted); font-size: 0.9rem; flex-shrink: 0; }
+[data-theme="light"] .home-fullwidth-card { background: #fff; }
+.practice-btn-sub { display: block; font-size: 0.68rem; color: rgba(255,255,255,0.7); margin-top: 2px; font-weight: 400; }
+.home-class-level-card { background: var(--card); border: 1.5px solid var(--card-border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 0.6rem; box-shadow: var(--shadow-card); width: 100%; }
+.class-level-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.class-level-title { font-weight: 800; font-size: 0.82rem; color: var(--accent); }
+.class-level-name { font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); }
+.class-level-bar { height: 8px; background: var(--card-border); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+.class-level-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 4px; transition: width 0.6s ease; }
+.class-level-text { font-size: 0.68rem; color: var(--muted); text-align: center; }
 .home-nav-footer { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.8rem; margin-bottom: 1.5rem; }
 .home-nav-footer .btn { font-size: 0.72rem; padding: 0.5rem 1.2rem; }
 .mode-row { display: flex; gap: 0.5rem; }
@@ -3135,51 +3157,103 @@ body.playing .header-container { display: none; }
 </div>
 
 <div id="home-screen" class="screen">
+  <!-- Player Card -->
   <div class="profile-card" id="profile-card">
     <div class="profile-top">
       <img id="home-avatar" class="avatar avatar-lg" src="" alt="" style="display:none;cursor:pointer;" onclick="openAvatarPicker()">
-      <div class="profile-info">
+      <div class="profile-info" onclick="showProgressScreen()" style="cursor:pointer;">
         <div class="profile-name">
           <span id="welcome-name">Welcome</span>
           <span class="class-tag" id="profile-class-tag">3A</span>
+          <span class="profile-rank-pill" id="rank-badge" style="font-size:0.58rem;padding:2px 8px;margin-left:4px;"></span>
         </div>
         <div class="profile-xp-row">
           <span class="profile-xp" id="welcome-xp">0 XP</span>
         </div>
-        <div class="profile-rank-row">
-          <span class="profile-rank-pill" id="rank-badge"></span>
-        </div>
+        <div id="welcome-vibe" style="font-size:0.72rem;color:var(--muted);font-style:italic;margin-top:1px;"></div>
       </div>
     </div>
     <div class="profile-xp-bar" id="rank-display" style="display:none;">
       <div class="profile-xp-track"><div class="profile-xp-fill" id="rank-progress-fill"></div></div>
       <div class="profile-xp-labels"><span id="rank-current-label"></span><span id="rank-xp-to-next"></span><span id="rank-next-label"></span></div>
     </div>
-    <div class="profile-badges-row" id="badge-row"></div>
+    <!-- Overall English level bar -->
+    <div class="profile-overall-bar" id="overall-level-display" style="cursor:pointer;margin-top:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <span style="font-size:0.7rem;font-weight:700;color:var(--trans-color);" id="overall-badge">🌍 Lv 1 · First Steps</span>
+        <span style="font-size:0.6rem;color:var(--muted);font-weight:600;" id="overall-label">0 XP</span>
+      </div>
+      <div class="profile-xp-track" style="height:6px;"><div class="profile-xp-fill" id="overall-progress-fill" style="width:0%;background:linear-gradient(90deg,#0d9488,#14b8a6);"></div></div>
+    </div>
     <div class="profile-logout-row">
       <button class="logout-btn" onclick="logout()">Log Out</button>
     </div>
   </div>
+  <span id="rank-mode-label" style="display:none;"></span>
 
-  <div class="stats-bar">
+  <!-- Hidden: stats + badges kept for JS -->
+  <div id="badge-row" style="display:none;"></div>
+  <div class="stats-bar" style="display:none;">
     <div class="stat-card"><div class="stat-value" id="stat-sessions">0</div><div class="stat-label">Sessions</div></div>
     <div class="stat-card"><div class="stat-value" id="stat-accuracy">–</div><div class="stat-label">Accuracy</div></div>
     <div class="stat-card"><div class="stat-value" id="stat-mastered">0</div><div class="stat-label">Mastered</div></div>
-    <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak 🔥</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+  </div>
+  <div id="review-btn" style="display:none;"></div>
+
+  <!-- Start Practice + Smart Review hint + Mode Switch -->
+  <div class="home-section">
+    <button class="btn btn-primary btn-start-practice" onclick="openPracticeSetup()">
+      <span id="practice-btn-label">🎯 Start Practice</span>
+      <span class="practice-btn-sub" id="practice-subtitle">Choose units and exercise types</span>
+    </button>
+    <div id="smart-review-hint" class="home-smart-review-hint" style="display:none;" onclick="startSmartReview()">
+      <span>📝</span>
+      <span id="smart-review-hint-text">Words to review</span>
+      <span style="font-size:0.65rem;color:var(--muted);margin-left:auto;">Start →</span>
+    </div>
+    <button class="home-mode-switch-btn" id="home-mode-switch" onclick="showModeSelectScreen()">↩️ Switch to Grammar or Story Mode</button>
   </div>
 
-  <div class="home-actions-area">
-    <button class="btn btn-primary btn-start-practice" onclick="openPracticeSetup()">🎯 Start Practice</button>
-    <div class="home-actions-row">
-      <button class="btn btn-review" id="review-btn" style="display:none;" onclick="startSmartReview()">🔄 Smart Review</button>
-      <button class="btn btn-secondary" id="home-words-btn" onclick="showWordReference()">📖 Words</button>
-    </div>
-    <div class="home-actions-row">
-      <button class="btn-battle" onclick="openClassQuizJoin()" style="background:linear-gradient(135deg,var(--accent-light),var(--accent));">🎓 Class Quiz</button>
-      <button id="btn-battle" class="btn-battle" onclick="openBattleLobby()" style="display:none;">⚔️ Battle Arena</button>
+  <!-- Words — full width card -->
+  <div class="home-section">
+    <button class="home-fullwidth-card" id="home-words-btn" onclick="showWordReference()">
+      <span class="home-fullwidth-icon">📖</span>
+      <div class="home-fullwidth-info">
+        <span class="home-fullwidth-title" id="home-words-title">Dictionary</span>
+        <span class="home-fullwidth-subtitle" id="home-words-subtitle">Browse your full vocabulary library</span>
+      </div>
+      <span class="home-fullwidth-arrow">→</span>
+    </button>
+  </div>
+
+  <!-- Battle Arena — full width card -->
+  <div class="home-section">
+    <button class="home-fullwidth-card" id="btn-battle" onclick="openBattleLobby()" style="display:none;">
+      <span class="home-fullwidth-icon">⚔️</span>
+      <div class="home-fullwidth-info">
+        <span class="home-fullwidth-title">Battle Arena</span>
+        <span class="home-fullwidth-subtitle" id="battle-arena-subtitle">Duels, Class Quiz & battle history</span>
+      </div>
+      <span class="home-fullwidth-arrow">→</span>
+    </button>
+  </div>
+
+  <!-- Nav Row: Progress + Leaderboard (2-col) -->
+  <div class="home-section">
+    <div class="home-action-grid">
+      <button class="home-action-card" onclick="showProgressScreen()">
+        <span class="home-action-icon">📊</span>
+        <span class="home-action-label">Progress</span>
+      </button>
+      <button class="home-action-card" onclick="showLeaderboard()">
+        <span class="home-action-icon">🏆</span>
+        <span class="home-action-label">Leaderboard</span>
+      </button>
     </div>
   </div>
 
+  <!-- Daily Content Card -->
   <div class="today-card" id="today-card" style="display:none;">
     <div class="today-section">
       <div class="today-header">
@@ -3203,22 +3277,17 @@ body.playing .header-container { display: none; }
     </div>
   </div>
 
-  <div id="weekly-goal-card" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:12px;">
-      <span style="font-weight:800;font-size:0.85rem;color:var(--accent);white-space:nowrap;">🎯 Weekly Class Goal</span>
-      <span id="weekly-goal-label" style="font-size:0.68rem;color:var(--muted);white-space:nowrap;"></span>
+  <!-- Class Level Card -->
+  <div id="class-level-card" class="home-class-level-card" style="display:none;">
+    <div class="class-level-header">
+      <span class="class-level-title" id="class-level-title">🏫 Class 3A</span>
+      <span class="class-level-name" id="class-level-name">Study Group</span>
     </div>
-    <div style="height:10px;background:var(--card-border);border-radius:5px;overflow:hidden;margin-bottom:4px;">
-      <div id="weekly-goal-fill" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:5px;transition:width 0.6s ease;width:0%;"></div>
-    </div>
-    <div id="weekly-goal-text" style="font-size:0.75rem;color:var(--text-secondary);text-align:center;"></div>
+    <div class="class-level-bar"><div class="class-level-fill" id="class-level-fill" style="width:0%"></div></div>
+    <div class="class-level-text" id="class-level-text">0 XP · Level 1</div>
   </div>
+  <div id="weekly-goal-card" style="display:none;"></div>
 
-  <div class="home-nav-grid">
-    <button class="btn btn-secondary btn-small" onclick="showProgressMap()">🗺️<span>Map</span></button>
-    <button class="btn btn-secondary btn-small" onclick="showProgressScreen()">📊<span>Progress</span></button>
-    <button class="btn btn-secondary btn-small" onclick="showLeaderboard()">🏆<span>Leaderboard</span></button>
-  </div>
   <div class="home-nav-footer">
     <button id="theme-toggle-btn" onclick="toggleTheme()" class="btn btn-secondary btn-small">☀️ Light</button>
     <button id="sfx-toggle-btn" onclick="toggleSfx()" class="btn btn-secondary btn-small">🔊 Sound: ON</button>
@@ -4340,6 +4409,44 @@ function getLevel(xp, mode) {
   const next = levels[lvl.level] || null;
   const progress = next ? (xp - lvl.xp) / (next.xp - lvl.xp) : 1;
   return { ...lvl, next, progress, currentXp: xp, prestige: lvl.prestige || 0 };
+}
+const OVERALL_LEVELS = [
+  {level:1,xp:0,name:'First Steps',zone:'bronze',vibe:'every journey starts here'},
+  {level:2,xp:300,name:'Listener',zone:'bronze',vibe:'tuning in to English'},
+  {level:3,xp:1000,name:'Communicator',zone:'silver',vibe:'starting to get your point across'},
+  {level:4,xp:3000,name:'Storyteller',zone:'silver',vibe:'finding your voice in English'},
+  {level:5,xp:6000,name:'Translator',zone:'gold',vibe:'bridging two languages'},
+  {level:6,xp:12000,name:'Globetrotter',zone:'gold',vibe:'English takes you places'},
+  {level:7,xp:20000,name:'Polyglot',zone:'gold',vibe:'fluency is within reach'},
+  {level:8,xp:35000,name:'Native Speaker',zone:'diamond',vibe:'sounds like you grew up with it'},
+  {level:9,xp:55000,name:'Language Architect',zone:'diamond',vibe:'building English like a pro'},
+  {level:10,xp:80000,name:'English GOAT',zone:'diamond',vibe:'greatest English learner of all time'},
+];
+const CLASS_LEVELS = [
+  {level:1,xp:0,name:'Study Group',vibe:'just getting started together'},
+  {level:2,xp:2000,name:'Book Club',vibe:'reading the same page'},
+  {level:3,xp:8000,name:'Think Tank',vibe:'brains working together'},
+  {level:4,xp:20000,name:'Dream Team',vibe:'unstoppable together'},
+  {level:5,xp:40000,name:'Brain Squad',vibe:'collective genius'},
+  {level:6,xp:70000,name:'Power Crew',vibe:'no challenge too big'},
+  {level:7,xp:110000,name:'Super Class',vibe:'above and beyond'},
+  {level:8,xp:160000,name:'Legend League',vibe:'the stuff of legends'},
+  {level:9,xp:220000,name:'Hall of Famers',vibe:'every name remembered'},
+  {level:10,xp:300000,name:'World Class',vibe:'the best class on the planet'},
+];
+function getOverallLevel(totalXp) {
+  let lvl = OVERALL_LEVELS[0];
+  for (let i = OVERALL_LEVELS.length - 1; i >= 0; i--) { if (totalXp >= OVERALL_LEVELS[i].xp) { lvl = OVERALL_LEVELS[i]; break; } }
+  const next = OVERALL_LEVELS[lvl.level] || null;
+  const progress = next ? (totalXp - lvl.xp) / (next.xp - lvl.xp) : 1;
+  return { ...lvl, next, progress, currentXp: totalXp };
+}
+function getClassLevel(classXp) {
+  let lvl = CLASS_LEVELS[0];
+  for (let i = CLASS_LEVELS.length - 1; i >= 0; i--) { if (classXp >= CLASS_LEVELS[i].xp) { lvl = CLASS_LEVELS[i]; break; } }
+  const next = CLASS_LEVELS[lvl.level] || null;
+  const progress = next ? (classXp - lvl.xp) / (next.xp - lvl.xp) : 1;
+  return { ...lvl, next, progress, currentXp: classXp };
 }
 const ZONE_COLORS = {
   bronze:{bg:'#92572a',light:'#f5c4a1',text:'#4a1b0c',accent:'#d4874a'},
@@ -5901,34 +6008,69 @@ function showHomeScreen() {
   document.getElementById('welcome-name').textContent = state.studentName;
   const classTag = document.getElementById('profile-class-tag');
   if (classTag) classTag.textContent = sectionLabel;
-  const homeLv = getLevel(state.studentData?.xp || 0);
-  document.getElementById('welcome-xp').innerHTML = `⭐ ${(state.studentData?.xp || 0).toLocaleString()} XP · <span style="opacity:0.7;">${homeLv.name}</span>${homeLv.vibe ? '<br><span style="opacity:0.5;font-style:italic;font-size:0.75rem;">' + homeLv.vibe + '</span>' : ''}`;
+  const d = state.studentData || {};
+  const homeLv = getLevel(d.xp || 0);
+  document.getElementById('welcome-xp').innerHTML = '⭐ ' + (d.xp || 0).toLocaleString() + ' XP · ' + homeLv.name;
+  var vibeEl = document.getElementById('welcome-vibe');
+  if (vibeEl) vibeEl.textContent = homeLv.vibe || '';
   updateAllAvatars();
 
-  // Stats
-  const d = state.studentData || {};
+  // Overall English Level bar
+  var totalXp = (d.xp || 0) + (d.grammarXp || 0);
+  var overall = getOverallLevel(totalXp);
+  var overallBadge = document.getElementById('overall-badge');
+  if (overallBadge) overallBadge.textContent = '🌍 Lv ' + overall.level + ' · ' + overall.name;
+  var overallLabel = document.getElementById('overall-label');
+  if (overallLabel) overallLabel.textContent = totalXp.toLocaleString() + ' XP';
+  var overallFill = document.getElementById('overall-progress-fill');
+  if (overallFill) overallFill.style.width = Math.round(overall.progress * 100) + '%';
+
+  // Stats (hidden on home but needed for JS)
   document.getElementById('stat-sessions').textContent = d.totalSessions || 0;
   const acc = d.totalAnswered > 0 ? Math.round((d.totalCorrect / d.totalAnswered) * 100) + '%' : '–';
   document.getElementById('stat-accuracy').textContent = acc;
-  const mastered = getTotalMastered();
-  document.getElementById('stat-mastered').textContent = mastered;
-  document.getElementById('stat-streak').textContent = state.studentData?.streak || 0;
+  document.getElementById('stat-mastered').textContent = getTotalMastered();
+  document.getElementById('stat-streak').textContent = d.streak || 0;
   updateRankDisplay();
-  renderBadgeRow();
   renderWordOfTheDay();
-  renderWeeklyGoal();
   renderDailyCard();
 
-  // Smart review button (replaces old weak words)
-  const reviewWords2 = getSmartReviewWords();
-  const reviewBtn2 = document.getElementById('review-btn');
-  if (reviewBtn2) {
-    if (reviewWords2.length > 0) {
-      reviewBtn2.style.display = '';
-      reviewBtn2.textContent = `🔄 Smart Review (${reviewWords2.length} words)`;
+  // Smart review hint bar
+  var reviewWords = getSmartReviewWords();
+  var reviewHint = document.getElementById('smart-review-hint');
+  if (reviewHint) {
+    if (reviewWords.length > 0) {
+      reviewHint.style.display = '';
+      var hintText = document.getElementById('smart-review-hint-text');
+      if (hintText) hintText.textContent = reviewWords.length + ' words to review';
     } else {
-      reviewBtn2.style.display = 'none';
+      reviewHint.style.display = 'none';
     }
+  }
+
+  // Class Level card
+  var classLevelCard = document.getElementById('class-level-card');
+  if (classLevelCard && classRef) {
+    classLevelCard.style.display = '';
+    var classTitle = document.getElementById('class-level-title');
+    if (classTitle) classTitle.textContent = '🏫 Class ' + sectionLabel;
+    // Load class XP
+    classRef.get().then(function(snap) {
+      if (!snap.exists) return;
+      var classData = snap.data();
+      var classXp = 0;
+      // Sum all students' XP
+      classRef.collection('entries').get().then(function(qs) {
+        qs.forEach(function(doc) { classXp += (doc.data().xp || 0) + (doc.data().grammarXp || 0); });
+        var clv = getClassLevel(classXp);
+        var clName = document.getElementById('class-level-name');
+        if (clName) clName.textContent = clv.name;
+        var clFill = document.getElementById('class-level-fill');
+        if (clFill) clFill.style.width = Math.round(clv.progress * 100) + '%';
+        var clText = document.getElementById('class-level-text');
+        if (clText) clText.textContent = classXp.toLocaleString() + ' XP · Level ' + clv.level;
+      }).catch(function() {});
+    }).catch(function() {});
   }
 
   showScreen('home-screen');
