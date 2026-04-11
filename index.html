@@ -6048,31 +6048,6 @@ function showHomeScreen() {
     }
   }
 
-  // Class Level card
-  var classLevelCard = document.getElementById('class-level-card');
-  if (classLevelCard && classRef) {
-    classLevelCard.style.display = '';
-    var classTitle = document.getElementById('class-level-title');
-    if (classTitle) classTitle.textContent = '🏫 Class ' + sectionLabel;
-    // Load class XP
-    classRef.get().then(function(snap) {
-      if (!snap.exists) return;
-      var classData = snap.data();
-      var classXp = 0;
-      // Sum all students' XP
-      classRef.collection('entries').get().then(function(qs) {
-        qs.forEach(function(doc) { classXp += (doc.data().xp || 0) + (doc.data().grammarXp || 0); });
-        var clv = getClassLevel(classXp);
-        var clName = document.getElementById('class-level-name');
-        if (clName) clName.textContent = clv.name;
-        var clFill = document.getElementById('class-level-fill');
-        if (clFill) clFill.style.width = Math.round(clv.progress * 100) + '%';
-        var clText = document.getElementById('class-level-text');
-        if (clText) clText.textContent = classXp.toLocaleString() + ' XP · Level ' + clv.level;
-      }).catch(function() {});
-    }).catch(function() {});
-  }
-
   showScreen('home-screen');
   setupPresence();
   const battleBtn = document.getElementById('btn-battle');
@@ -9978,6 +9953,9 @@ showHomeScreen = function() {
     if (olLabel) olLabel.textContent = totalXp.toLocaleString() + ' XP';
     var olFill = document.getElementById('overall-progress-fill');
     if (olFill) olFill.style.width = Math.round(ol.progress * 100) + '%';
+    loadClassLevel();
+    var wgc = document.getElementById('weekly-goal-card');
+    if (wgc) wgc.style.display = 'none';
     _origShowHomeScreen();
     addModeSwitchPill();
   }
@@ -10163,12 +10141,30 @@ function showGrammarHomeScreen() {
   if (olLabel) olLabel.textContent = totalXp.toLocaleString() + ' XP';
   var olFill = document.getElementById('overall-progress-fill');
   if (olFill) olFill.style.width = Math.round(ol.progress * 100) + '%';
-  // Mode pill
+  loadClassLevel();
   addModeSwitchPill();
   showScreen('home-screen');
   setupPresence();
   var battleBtn = document.getElementById('btn-battle');
   if (battleBtn) battleBtn.style.display = '';
+}
+
+async function loadClassLevel() {
+  var card = document.getElementById('class-level-card');
+  if (!card || !db || !CLASS_ID) return;
+  try {
+    var snap = await db.collection('classes').doc(CLASS_ID).collection('students').get();
+    var totalXp = 0;
+    snap.forEach(function(doc) { var d = doc.data(); totalXp += (d.xp || 0) + (d.grammarXp || 0); });
+    var cl = getClassLevel(totalXp);
+    var sectionLabel = SECTIONS.find(function(s) { return s.id === CLASS_ID; });
+    var label = sectionLabel ? sectionLabel.label : CLASS_ID;
+    document.getElementById('class-level-title').textContent = '🏫 Class ' + label;
+    document.getElementById('class-level-name').textContent = cl.name;
+    document.getElementById('class-level-text').textContent = totalXp.toLocaleString() + ' XP · Level ' + cl.level + (cl.next ? ' → ' + cl.next.name : '');
+    document.getElementById('class-level-fill').style.width = Math.round(cl.progress * 100) + '%';
+    card.style.display = '';
+  } catch(e) { card.style.display = 'none'; }
 }
 
 function addModeSwitchPill() {
