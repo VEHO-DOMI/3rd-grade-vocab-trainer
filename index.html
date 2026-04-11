@@ -907,6 +907,8 @@ body.playing .header-container { display: none; }
   padding: 0;
   margin-bottom: 0.8rem;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 .today-section {
   padding: 1rem 1.2rem;
@@ -3301,9 +3303,10 @@ body.playing .header-container { display: none; }
 <!-- LEADERBOARD SCREEN -->
 <div id="leaderboard-screen" class="screen">
   <div class="progress-nav">
-    <button class="btn btn-secondary" onclick="goHome()">← Back</button>
+    <button class="btn btn-secondary" onclick="showHomeScreen()">← Back</button>
+    <span class="nav-title">🏆 Leaderboard</span>
+    <span style="width:60px;"></span>
   </div>
-  <h2 style="margin-bottom:0.5rem;">🏆 Class Leaderboard</h2>
   <div id="lb-main"></div>
   <hr class="lb-divider">
   <div class="lb-section-title">⚡ Today's Challenge</div>
@@ -3316,7 +3319,7 @@ body.playing .header-container { display: none; }
 <!-- PROGRESS SCREEN -->
 <div id="progress-screen" class="screen">
   <div class="progress-nav">
-    <button class="btn btn-secondary" onclick="goHome()">← Back</button>
+    <button class="btn btn-secondary" onclick="showHomeScreen()">← Back</button>
   </div>
 
   <!-- Overall ring + stats -->
@@ -10447,13 +10450,27 @@ function renderGrammarUnits() {
   html += renderGrammarPracticeTabs('topics');
   html += renderGrammarLevelSelector();
   html += '<div style="display:flex;flex-direction:column;gap:8px;padding:0.3rem 0;">';
-  const unitNames = {
+  const m1UnitNames = {
+    1:'Time for School', 2:'At the Zoo', 3:'My Family', 4:'After School',
+    5:'Favourite Things', 6:'Daily Life', 7:'Food & Drink', 8:'Asking Questions',
+    9:'Around Town', 10:'In a Shop', 11:"What's the Time?", 12:'The Birthday Cake',
+    13:'Help!', 14:"It's My Favourite", 15:'Holiday Plans'
+  };
+  const m2UnitNames = {
+    1:'First Day Back at School', 2:'How Embarrassing!', 3:'Halloween',
+    4:'What an Animal!', 5:"Where's the Supermarket?", 6:'Time for Adventure',
+    7:'Plans for the Weekend', 8:'Out of This World', 9:'Eating Out',
+    10:"Who's in Your Family?", 11:'Homes', 12:'Feeling Bad and Feeling Better',
+    13:'Rain and Sun', 14:'Move and Keep Fit!', 15:'Caring for Animals'
+  };
+  const m3UnitNames = {
     1:'Music Makes the World Go Round', 2:'Would You Believe It?',
     3:'What an Adventure!', 4:'Wild and Dangerous?', 5:'Superstitions',
     6:'We Love London', 7:'Friends Forever', 8:'Inventors and Inventions',
     9:'My World', 10:'Know Your Rights!', 11:'The Golden State',
     12:'Natural Disasters', 13:'Difficult Decisions', 14:'Into the Wild'
   };
+  const unitNames = grammarLevelFilter === 'm1' ? m1UnitNames : grammarLevelFilter === 'm2' ? m2UnitNames : m3UnitNames;
   Object.keys(unitMap).sort((a,b) => a - b).forEach(u => {
     const structs = unitMap[u];
     const masteredCount = structs.filter(s => {
