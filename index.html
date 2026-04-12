@@ -1147,7 +1147,7 @@ body.playing .header-container { display: none; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
+  padding: 0.5rem 1rem 0.2rem;
   flex-shrink: 0;
 }
 .flashcard-counter {
@@ -1161,7 +1161,7 @@ body.playing .header-container { display: none; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 1rem;
+  padding: 0 0.5rem;
   position: relative;
   overflow: hidden;
   touch-action: pan-y;
@@ -1169,13 +1169,13 @@ body.playing .header-container { display: none; }
 .flashcard-container {
   perspective: 1200px;
   width: 100%;
-  max-width: 400px;
+  max-width: 92%; width: 100%;
   cursor: pointer;
 }
 .flashcard {
   position: relative;
   width: 100%;
-  min-height: 320px;
+  min-height: 200px;
   transition: transform 0.5s ease;
   transform-style: preserve-3d;
 }
@@ -1188,11 +1188,11 @@ body.playing .header-container { display: none; }
 .flashcard-front, .flashcard-back {
   position: absolute;
   top: 0; left: 0; right: 0;
-  min-height: 320px;
+  min-height: 200px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--radius-lg);
-  padding: 2rem 1.5rem;
+  padding: 1.2rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1211,7 +1211,7 @@ body.playing .header-container { display: none; }
   transform: rotateY(180deg);
 }
 .flashcard-word {
-  font-size: 1.6rem;
+  font-size: 1.3rem; word-break: break-word; overflow-wrap: break-word;
   font-weight: 800;
   margin-bottom: 1rem;
   color: var(--text);
@@ -1222,13 +1222,13 @@ body.playing .header-container { display: none; }
   line-height: 1.6;
 }
 .flashcard-tap-hint {
-  margin-top: 1.5rem;
+  margin-top: 0.6rem;
   font-size: 0.8rem;
   color: var(--muted);
   opacity: 0.6;
 }
 .flashcard-swipe-hint {
-  margin-top: 1rem;
+  margin-top: 0.3rem;
   font-size: 0.72rem;
   color: var(--muted);
   opacity: 0.4;
@@ -1253,7 +1253,7 @@ body.playing .header-container { display: none; }
   padding: 1rem;
   flex-shrink: 0;
   width: 100%;
-  max-width: 400px;
+  max-width: 92%;
   margin: 0 auto;
 }
 .flashcard-btn-again {
@@ -1282,18 +1282,7 @@ body.playing .header-container { display: none; }
   transition: transform 0.1s;
 }
 .flashcard-btn-got-it:active { transform: scale(0.97); }
-/* Optimized flashcard layout */
-.flashcard-container { max-width: 90%; width: 100%; }
-.flashcard { min-height: 220px; }
-.flashcard-front, .flashcard-back { min-height: 220px; padding: 1.5rem 1.5rem; }
-.flashcard-word { font-size: 1.35rem; margin-bottom: 0.6rem; word-break: break-word; overflow-wrap: break-word; }
-.flashcard-sentence { font-size: 0.88rem; line-height: 1.5; }
-.flashcard-tap-hint { margin-top: 0.6rem; font-size: 0.75rem; }
-.flashcard-stage { padding: 0 0.5rem; justify-content: center; gap: 0; }
-.flashcard-swipe-hint { margin-top: 0.4rem; margin-bottom: 0; }
-.flashcard-header { padding: 0.6rem 1rem 0.3rem; }
-.flashcard-counter { font-size: 0.82rem; }
-.flashcard-actions { padding: 0.6rem 1rem 0.8rem; }
+
 
 
 /* Swipe overlay indicators */
