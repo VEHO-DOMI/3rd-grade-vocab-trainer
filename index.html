@@ -1282,14 +1282,19 @@ body.playing .header-container { display: none; }
   transition: transform 0.1s;
 }
 .flashcard-btn-got-it:active { transform: scale(0.97); }
-/* Compact flashcard layout */
-.flashcard { min-height: 250px; }
-.flashcard-front, .flashcard-back { min-height: 250px; padding: 1.5rem 1.2rem; }
-.flashcard-word { font-size: 1.4rem; word-break: break-word; overflow-wrap: break-word; }
-.flashcard-sentence { font-size: 0.9rem; }
-.flashcard-stage { padding: 0 0.8rem; }
-.flashcard-swipe-hint { margin-top: 0.5rem; }
-.flashcard-tap-hint { margin-top: 0.8rem; }
+/* Optimized flashcard layout */
+.flashcard-container { max-width: 90%; width: 100%; }
+.flashcard { min-height: 220px; }
+.flashcard-front, .flashcard-back { min-height: 220px; padding: 1.5rem 1.5rem; }
+.flashcard-word { font-size: 1.35rem; margin-bottom: 0.6rem; word-break: break-word; overflow-wrap: break-word; }
+.flashcard-sentence { font-size: 0.88rem; line-height: 1.5; }
+.flashcard-tap-hint { margin-top: 0.6rem; font-size: 0.75rem; }
+.flashcard-stage { padding: 0 0.5rem; justify-content: center; gap: 0; }
+.flashcard-swipe-hint { margin-top: 0.4rem; margin-bottom: 0; }
+.flashcard-header { padding: 0.6rem 1rem 0.3rem; }
+.flashcard-counter { font-size: 0.82rem; }
+.flashcard-actions { padding: 0.6rem 1rem 0.8rem; }
+
 
 /* Swipe overlay indicators */
 .flashcard-swipe-indicator {
