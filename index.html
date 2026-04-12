@@ -11429,8 +11429,9 @@ function renderGrammarDailyCard() {
 
 // --- Grammar Reference ---
 function showGrammarReference() {
+  initGrammarLevelFilter();
   const showDe = typeof SHOW_DE_FEEDBACK !== 'undefined' ? SHOW_DE_FEEDBACK : true;
-  let html = '';
+  let html = renderGrammarLevelSelector();
   grammarStructures.forEach(s => {
     const practiceBtn = '<button class="grammar-practice-full-btn" onclick="showGrammarFormatSelection(\'' + s.id + '\', \'reference\')">\u25B6 Practice this</button>';
     html += '<div class="grammar-ref-card">';
