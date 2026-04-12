@@ -1160,7 +1160,7 @@ body.playing .header-container { display: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; padding-top: 1rem;
   padding: 0 0.5rem;
   position: relative;
   overflow: hidden;
@@ -1175,7 +1175,7 @@ body.playing .header-container { display: none; }
 .flashcard {
   position: relative;
   width: 100%;
-  min-height: 200px;
+  min-height: 40vh;
   transition: transform 0.5s ease;
   transform-style: preserve-3d;
 }
@@ -1188,7 +1188,7 @@ body.playing .header-container { display: none; }
 .flashcard-front, .flashcard-back {
   position: absolute;
   top: 0; left: 0; right: 0;
-  min-height: 200px;
+  min-height: 40vh;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--radius-lg);
