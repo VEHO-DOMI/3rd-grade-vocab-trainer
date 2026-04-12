@@ -3199,7 +3199,7 @@ body.playing .header-container { display: none; }
     </div>
     <div class="profile-logout-row">
       <button class="logout-btn" onclick="logout()">Log Out</button>
-      <button class="logout-btn" id="profile-mode-switch" onclick="showModeSelectScreen()" style="margin-left:auto;">🔄 Mode</button>
+      <button id="profile-mode-switch" onclick="showModeSelectScreen()" style="margin-left:auto;padding:6px 16px;border-radius:var(--radius);font-size:0.82rem;font-weight:700;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent-glow);color:var(--accent);font-family:inherit;transition:all 0.15s;">🔄 Switch Mode</button>
     </div>
   </div>
   <span id="rank-mode-label" style="display:none;"></span>
@@ -10084,7 +10084,7 @@ showHomeScreen = function() {
     }
     // Mode switch
     var modeLink = document.getElementById('profile-mode-switch');
-    if (modeLink) modeLink.textContent = '🔄 Mode';
+    if (modeLink) modeLink.textContent = '🔄 Switch Mode';
     // Restore today-card
     var todayCard = document.getElementById('today-card');
     if (todayCard) {
@@ -10279,7 +10279,7 @@ function showGrammarHomeScreen() {
   if (wordsBtn) wordsBtn.onclick = function() { showGrammarReference(); };
   // Mode switch
   var modeLink = document.getElementById('profile-mode-switch');
-  if (modeLink) modeLink.textContent = '🔄 Mode';
+  if (modeLink) modeLink.textContent = '🔄 Switch Mode';
   // Battle arena subtitle
   var bSub = document.getElementById('battle-arena-subtitle');
   if (bSub) bSub.textContent = 'Duels, Class Quiz & battle history';
