@@ -195,7 +195,7 @@ h1 { display: none; }
 .profile-xp-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
 .profile-xp { font-size: 0.92rem; color: var(--accent); font-weight: 700; }
 .profile-rank-row { margin-top: 4px; }
-.profile-rank-pill { font-size: 0.72rem; padding: 4px 12px; border-radius: 8px; font-weight: 700; white-space: nowrap; }
+.profile-rank-pill { font-size: 0.78rem; padding: 5px 14px; border-radius: 10px; font-weight: 700; white-space: nowrap; }
 .profile-badges-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
 .profile-badges-row .badge-icon { width: 30px; height: 30px; font-size: 17px; border-radius: 10px; transition: transform 0.15s, box-shadow 0.15s; }
 .profile-badges-row .badge-icon:hover { transform: scale(1.2); box-shadow: 0 0 12px var(--accent-glow); }
@@ -613,7 +613,7 @@ h1 { display: none; }
   .profile-top { gap: 8px; }
   .profile-name { font-size: 0.95rem; }
   .profile-xp { font-size: 0.7rem; }
-  .profile-rank-pill { font-size: 0.58rem; padding: 1px 6px; }
+  
   .profile-badges .badge-icon { width: 20px; height: 20px; font-size: 12px; }
   .profile-xp-bar { margin-top: 0.5rem; }
   .profile-xp-labels { font-size: 0.55rem; }
@@ -3177,7 +3177,7 @@ body.playing .header-container { display: none; }
         <div class="profile-name">
           <span id="welcome-name">Welcome</span>
           <span class="class-tag" id="profile-class-tag">3A</span>
-          <span class="profile-rank-pill" id="rank-badge" style="font-size:0.58rem;padding:2px 8px;margin-left:4px;"></span>
+          <span class="profile-rank-pill" id="rank-badge" style="margin-left:4px;"></span>
         </div>
         <div class="profile-xp-row">
           <span class="profile-xp" id="welcome-xp">0 XP</span>
@@ -6057,7 +6057,7 @@ function showHomeScreen() {
   if (classTag) classTag.textContent = sectionLabel;
   const d = state.studentData || {};
   const homeLv = getLevel(d.xp || 0);
-  document.getElementById('welcome-xp').innerHTML = '⭐ ' + (d.xp || 0).toLocaleString() + ' XP · ' + homeLv.name;
+  document.getElementById('welcome-xp').innerHTML = '⭐ ' + (d.xp || 0).toLocaleString() + ' XP';
   var vibeEl = document.getElementById('welcome-vibe');
   if (vibeEl) vibeEl.textContent = homeLv.vibe || '';
   updateAllAvatars();
@@ -10220,7 +10220,7 @@ function showGrammarHomeScreen() {
   var d = state.studentData || {};
   var gxp = d.grammarXp || 0;
   var glv = getLevel(gxp, 'grammar');
-  document.getElementById('welcome-xp').innerHTML = '⭐ ' + gxp.toLocaleString() + ' XP · ' + glv.name;
+  document.getElementById('welcome-xp').innerHTML = '⭐ ' + gxp.toLocaleString() + ' XP';
   var vibeEl = document.getElementById('welcome-vibe');
   if (vibeEl) vibeEl.textContent = glv.vibe || '';
   updateAllAvatars();
