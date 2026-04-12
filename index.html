@@ -1282,6 +1282,14 @@ body.playing .header-container { display: none; }
   transition: transform 0.1s;
 }
 .flashcard-btn-got-it:active { transform: scale(0.97); }
+/* Compact flashcard layout */
+.flashcard { min-height: 250px; }
+.flashcard-front, .flashcard-back { min-height: 250px; padding: 1.5rem 1.2rem; }
+.flashcard-word { font-size: 1.4rem; word-break: break-word; overflow-wrap: break-word; }
+.flashcard-sentence { font-size: 0.9rem; }
+.flashcard-stage { padding: 0 0.8rem; }
+.flashcard-swipe-hint { margin-top: 0.5rem; }
+.flashcard-tap-hint { margin-top: 0.8rem; }
 
 /* Swipe overlay indicators */
 .flashcard-swipe-indicator {
@@ -3229,8 +3237,8 @@ body.playing .header-container { display: none; }
     <button class="home-fullwidth-card" id="home-words-btn" onclick="showWordReference()">
       <span class="home-fullwidth-icon">📖</span>
       <div class="home-fullwidth-info">
-        <span class="home-fullwidth-title" id="home-words-title">Dictionary</span>
-        <span class="home-fullwidth-subtitle" id="home-words-subtitle">Browse your full vocabulary library</span>
+        <span class="home-fullwidth-title" id="home-words-title">Dictionary & Flashcards</span>
+        <span class="home-fullwidth-subtitle" id="home-words-subtitle">Look up words and study with flashcards</span>
       </div>
       <span class="home-fullwidth-arrow">→</span>
     </button>
@@ -3592,7 +3600,7 @@ body.playing .header-container { display: none; }
       </button>
     </div>
     <button class="btn btn-sprint sprint-again" id="sprint-again-btn" style="display:none;" onclick="startSprint()">🏃 Another Sprint</button>
-    <button class="btn btn-secondary" onclick="goHome()">New Practice</button>
+    <button class="btn btn-secondary" id="results-home-btn" onclick="goHome()">New Practice</button>
   </div>
 </div>
 
@@ -6799,7 +6807,11 @@ async function saveFlashcardProgress(word, status) {
   } catch(e) { console.error('Flashcard progress save error:', e); }
 }
 
+var _fcReturnToDict = false;
 async function endFlashcards() {
+  _fcReturnToDict = true;
+  var homeBtn = document.getElementById('results-home-btn');
+  if (homeBtn) { homeBtn.textContent = '📖 Back to Dictionary'; homeBtn.onclick = function() { showWordReference(); }; }
   showScreen('results-screen');
   const total = flashcardGotWords.size;
   const remaining = flashcardDeck.length;
@@ -10007,9 +10019,9 @@ showHomeScreen = function() {
     if (practiceSub) practiceSub.textContent = 'Choose units and exercise type';
     // Restore Words card
     var wTitle = document.getElementById('home-words-title');
-    if (wTitle) wTitle.textContent = 'Dictionary';
+    if (wTitle) wTitle.textContent = 'Dictionary & Flashcards';
     var wSub = document.getElementById('home-words-subtitle');
-    if (wSub) wSub.textContent = 'Browse your full vocabulary library';
+    if (wSub) wSub.textContent = 'Look up words and study with flashcards';
     var wIcon = document.querySelector('#home-words-btn .home-fullwidth-icon');
     if (wIcon) wIcon.textContent = '📖';
     var wordsBtn = document.getElementById('home-words-btn');
