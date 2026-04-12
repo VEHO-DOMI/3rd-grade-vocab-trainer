@@ -3199,6 +3199,7 @@ body.playing .header-container { display: none; }
     </div>
     <div class="profile-logout-row">
       <button class="logout-btn" onclick="logout()">Log Out</button>
+      <button id="profile-mode-switch" onclick="showModeSelectScreen()" style="margin-left:auto;padding:6px 14px;border-radius:var(--radius);font-size:0.72rem;font-weight:700;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent-glow);color:var(--accent);font-family:inherit;white-space:nowrap;">↩️ Switch to Grammar or Story Mode</button>
     </div>
   </div>
   <span id="rank-mode-label" style="display:none;"></span>
@@ -3224,7 +3225,7 @@ body.playing .header-container { display: none; }
       <span id="smart-review-hint-text">Words to review</span>
       <span style="font-size:0.65rem;color:var(--muted);margin-left:auto;">Start →</span>
     </div>
-    <button class="home-mode-switch-btn" id="home-mode-switch" onclick="showModeSelectScreen()">↩️ Switch to Grammar or Story Mode</button>
+    <button class="home-mode-switch-btn" id="home-mode-switch" onclick="showModeSelectScreen()" style="display:none;">↩️ Switch to Grammar or Story Mode</button>
   </div>
 
   <!-- Words — full width card -->
@@ -10082,7 +10083,7 @@ showHomeScreen = function() {
       } else { srHint.style.display = 'none'; }
     }
     // Mode switch
-    var modeLink = document.getElementById('home-mode-switch');
+    var modeLink = document.getElementById('profile-mode-switch');
     if (modeLink) modeLink.textContent = '↩️ Switch to Grammar or Story Mode';
     // Restore today-card
     var todayCard = document.getElementById('today-card');
@@ -10277,7 +10278,7 @@ function showGrammarHomeScreen() {
   var wordsBtn = document.getElementById('home-words-btn');
   if (wordsBtn) wordsBtn.onclick = function() { showGrammarReference(); };
   // Mode switch
-  var modeLink = document.getElementById('home-mode-switch');
+  var modeLink = document.getElementById('profile-mode-switch');
   if (modeLink) modeLink.textContent = '↩️ Switch to Grammar or Story Mode';
   // Battle arena subtitle
   var bSub = document.getElementById('battle-arena-subtitle');
