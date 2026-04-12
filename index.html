@@ -1134,8 +1134,7 @@ body.playing .header-container { display: none; }
 }
 
 /* Flashcard screen */
-#flashcard-screen.active {
-  padding: 0 !important;
+#flashcard-screen.active { padding: 0 0.6rem !important;
   max-width: 100% !important;
   display: flex !important;
   flex-direction: column;
@@ -1147,7 +1146,7 @@ body.playing .header-container { display: none; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem 0.5rem;
+  padding: 0.6rem 0.4rem 0.4rem;
   flex-shrink: 0;
 }
 .flashcard-counter {
@@ -1160,14 +1159,14 @@ body.playing .header-container { display: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: stretch;
-  padding: 0.8rem 0.5rem 0;
+  justify-content: flex-start;
+  padding: 0.5rem 0 0;
   position: relative;
   overflow: hidden;
   touch-action: pan-y;
 }
-.flashcard-container { perspective: 1200px; width: 100%; max-width: 100%; cursor: pointer; flex: 1; display: flex; }
-.flashcard { position: relative; width: 100%; flex: 1; transition: transform 0.5s ease; transform-style: preserve-3d; }
+.flashcard-container { perspective: 1200px; width: 100%; cursor: pointer; }
+.flashcard { position: relative; width: 100%; min-height: 55vh; transition: transform 0.5s ease; transform-style: preserve-3d; }
 .flashcard.flipped {
   transform: rotateY(180deg);
 }
@@ -1200,7 +1199,7 @@ body.playing .header-container { display: none; }
   transform: rotateY(180deg);
 }
 .flashcard-word {
-  font-size: 1.4rem; word-break: break-word; overflow-wrap: break-word;
+  font-size: 1.5rem; word-break: break-word; overflow-wrap: break-word;
   font-weight: 800;
   margin-bottom: 1rem;
   color: var(--text);
@@ -1217,7 +1216,7 @@ body.playing .header-container { display: none; }
   opacity: 0.6;
 }
 .flashcard-swipe-hint {
-  margin-top: 0.2rem;
+  margin-top: 0.4rem;
   font-size: 0.72rem;
   color: var(--muted);
   opacity: 0.4;
@@ -1239,7 +1238,7 @@ body.playing .header-container { display: none; }
 .flashcard-actions {
   display: flex;
   gap: 0.8rem;
-  padding: 0.5rem 1rem 0.8rem;
+  padding: 0.4rem 0 0.6rem;
   flex-shrink: 0;
   width: 100%;
   max-width: 100%;
@@ -1289,13 +1288,13 @@ body.playing .header-container { display: none; }
   border-radius: 12px;
 }
 .flashcard-swipe-indicator.left {
-  left: 1rem;
+  left: 0.5rem;
   color: var(--wrong);
   border: 3px solid var(--wrong);
   background: rgba(220,38,38,0.1);
 }
 .flashcard-swipe-indicator.right {
-  right: 1rem;
+  right: 0.5rem;
   color: var(--correct);
   border: 3px solid var(--correct);
   background: rgba(22,163,74,0.1);
