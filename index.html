@@ -637,7 +637,7 @@ h1 { display: none; }
   .profile-badges .badge-icon { width: 18px; height: 18px; font-size: 11px; }
   .type-grid { flex-direction: column; }
   .type-btn { min-width: unset; }
-  .screen { padding: 0 0.8rem; }
+  .screen { padding: 0 0.6rem; }
 }
 
 /* Responsive — Desktop */
@@ -1137,7 +1137,7 @@ body.playing .header-container { display: none; }
 #flashcard-screen.active {
   padding: 0 !important;
   max-width: 100% !important;
-  display: flex !important;
+  display: flex !important; align-items: stretch !important;
   flex-direction: column;
   height: 100vh;
   height: 100dvh;
@@ -1159,9 +1159,9 @@ body.playing .header-container { display: none; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  padding: 0 1rem;
+  padding: 0 0.6rem;
   position: relative;
   overflow: hidden;
   touch-action: pan-y;
@@ -1250,7 +1250,7 @@ body.playing .header-container { display: none; }
 .flashcard-actions {
   display: flex;
   gap: 0.8rem;
-  padding: 1rem;
+  padding: 0.5rem 0.6rem 0.8rem;
   flex-shrink: 0;
   width: 100%;
   max-width: 100%;
