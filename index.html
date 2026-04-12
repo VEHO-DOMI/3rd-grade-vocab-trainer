@@ -10471,6 +10471,20 @@ function renderGrammarUnits() {
     12:'Natural Disasters', 13:'Difficult Decisions', 14:'Into the Wild'
   };
   const unitNames = grammarLevelFilter === 'm1' ? m1UnitNames : grammarLevelFilter === 'm2' ? m2UnitNames : m3UnitNames;
+  // Add Unit 1 review card if current grade has no Unit 1 structures
+  if (!unitMap[1] && grammarLevelFilter && grammarLevelFilter !== 'm1' && unitNames[1]) {
+    var reviewPrefix = grammarLevelFilter === 'm3' ? 'm2' : 'm1';
+    var reviewItems = (_grammarItemsAll || []).filter(function(it) { return it.id.indexOf(reviewPrefix + '-') === 0 || it.id.indexOf('m1-') === 0; });
+    var reviewCount = reviewItems.length;
+    html += '<button class="grammar-topic-card" onclick="startUnit1Review()" style="width:100%;opacity:0.85;">' +
+      '<div style="min-width:36px;text-align:center;"><span style="font-size:1.2rem;font-weight:800;color:var(--accent);">1</span></div>' +
+      '<div class="grammar-topic-info">' +
+        '<div class="grammar-topic-name">Unit 1: ' + (unitNames[1] || 'Review') + '</div>' +
+        '<div class="grammar-topic-desc">Review · mixed grammar from previous grades</div>' +
+      '</div>' +
+      '<div style="color:var(--text-secondary);font-size:0.8rem;">→</div>' +
+    '</button>';
+  }
   Object.keys(unitMap).sort((a,b) => a - b).forEach(u => {
     const structs = unitMap[u];
     const masteredCount = structs.filter(s => {
@@ -10493,6 +10507,20 @@ function renderGrammarUnits() {
   const ps = document.getElementById('practice-screen');
   ps.innerHTML = html;
   showScreen('practice-screen');
+}
+
+function startUnit1Review() {
+  // Unit 1 is a review chapter — pull items from all previous grades
+  if (!_grammarItemsAll) { initGrammarLevelFilter(); }
+  var currentPrefix = grammarLevelFilter || 'm3';
+  var reviewItems = (_grammarItemsAll || []).filter(function(it) {
+    return it.id.indexOf(currentPrefix + '-') !== 0; // everything except current grade
+  });
+  if (reviewItems.length === 0) { alert('No review items available.'); return; }
+  var shuffled = reviewItems.sort(function() { return Math.random() - 0.5; }).slice(0, 15);
+  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_unit1_review' };
+  document.body.classList.add('playing');
+  renderGrammarItem();
 }
 
 function showGrammarTopics(unit) {
