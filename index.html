@@ -11004,48 +11004,48 @@ function renderContextPicker(item) {
 }
 
 function renderMatching(item) {
-  // Parse left items from prompt, right items from distractors array
-  // Prompt format: "Match ... 1: text, 2: text, 3: text 4: text"
-  // Distractors: ["a: text.", "b: text.", "c: text.", "d: text."]
-  // Correct answer: JSON like {"1":"c","2":"a","3":"d","4":"b"}
-  let leftItems = [], rightItems = [];
-  const prompt = item.p || '';
-
-  // Right items: from distractors array (each element is "a: text")
-  if (item.ds && item.ds.length > 0) {
-    rightItems = item.ds.map(s => {
-      const m = s.match(/^([a-z])[\s:.)]+\s*(.+)/i);
-      return m ? {id: m[1].toLowerCase(), text: m[2].trim().replace(/[.]$/, '')} : {id: '?', text: s.trim().replace(/[.]$/, '')};
-    });
+  var leftItems = [], rightItems = [];
+  var prompt = item.p || '';
+  var parts = prompt.split(/\s*[—–]\s*/);
+  var leftPart = parts[0] || '';
+  var rightPart = parts[1] || '';
+  if (!rightPart) {
+    var letterStart = leftPart.search(/\s[a-d]\)\s/);
+    if (letterStart > 0) {
+      rightPart = leftPart.substring(letterStart).trim();
+      leftPart = leftPart.substring(0, letterStart).trim();
+    }
   }
-
-  // Left items: from prompt text (numbered with "1:", "2:", etc.)
-  // First extract the instruction (text before the numbered items)
-  const instructionMatch = prompt.match(/^(.*?)(?=\s*1\s*[:.)]\s*)/s);
-  const instruction = instructionMatch ? instructionMatch[1].trim().replace(/[.]$/, '') : prompt.split(/\d+\s*[:.)]/)[0].trim();
-
-  // Parse numbered items from prompt: "1: text, 2: text" or "1. text 2. text"
-  const leftMatches = prompt.match(/(\d+)\s*[:.)]\s*([^0-9]+?)(?=\s*\d+\s*[:.)]|$)/g);
+  if (!rightPart && item.ds && item.ds.length > 0) {
+    rightPart = item.ds.join(' ');
+  }
+  var instructionMatch = leftPart.match(/^(.*?)(?=\s*1\s*[:.)])/s);
+  var instruction = instructionMatch ? instructionMatch[1].trim().replace(/[:]$/, '') : '';
+  var leftMatches = leftPart.match(/(\d+)\s*[:.)]?\s*([^0-9]+?)(?=\s*\d+\s*[:.)]|$)/g);
   if (leftMatches) {
-    leftItems = leftMatches.map(s => {
-      const m = s.match(/(\d+)\s*[:.)]\s*(.+)/);
+    leftItems = leftMatches.map(function(s) {
+      var m = s.match(/(\d+)\s*[:.)]?\s*(.+)/);
       return m ? {id: m[1], text: m[2].trim().replace(/[,.]$/, '')} : {id: '?', text: s.trim()};
     });
   }
-
-  // Shuffle right column
-  rightItems = rightItems.sort(() => Math.random() - 0.5);
-
-  let html = '<div class="grammar-instruction">Match the items:</div>';
+  var rightMatches = rightPart.match(/([a-d])\s*[:.)]?\s*([^a-d]+?)(?=\s*[a-d]\s*[:.)]|$)/gi);
+  if (rightMatches) {
+    rightItems = rightMatches.map(function(s) {
+      var m = s.match(/([a-d])\s*[:.)]?\s*(.+)/i);
+      return m ? {id: m[1].toLowerCase(), text: m[2].trim().replace(/[,.]$/, '')} : {id: '?', text: s.trim()};
+    });
+  }
+  rightItems = rightItems.sort(function() { return Math.random() - 0.5; });
+  var html = '<div class="grammar-instruction">Match the items:</div>';
   html += '<div class="grammar-prompt" style="font-size:0.85rem;">' + instruction + '</div>';
   html += '<div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;">Tap one item on the left, then tap its match on the right.</div>';
   html += '<div class="match-columns" id="match-area">';
   html += '<div class="match-col" id="match-left">';
-  leftItems.forEach(l => {
+  leftItems.forEach(function(l) {
     html += '<div class="match-item match-left-item" data-id="' + l.id + '" onclick="selectMatchItem(this,\'left\')">' + l.id + '. ' + l.text + '</div>';
   });
   html += '</div><div class="match-col" id="match-right">';
-  rightItems.forEach(r => {
+  rightItems.forEach(function(r) {
     html += '<div class="match-item match-right-item" data-id="' + r.id + '" onclick="selectMatchItem(this,\'right\')">' + r.id + ') ' + r.text + '</div>';
   });
   html += '</div></div>';
@@ -11053,9 +11053,6 @@ function renderMatching(item) {
   html += '<button class="grammar-check-btn" id="match-check-btn" onclick="checkMatchingAnswer()" style="display:none;">Check Answer</button>';
   return html;
 }
-
-let matchState = { selectedLeft: null, selectedRight: null, pairs: {} };
-
 function selectMatchItem(el, side) {
   if (el.classList.contains('matched')) return;
   const col = side === 'left' ? 'match-left-item' : 'match-right-item';
