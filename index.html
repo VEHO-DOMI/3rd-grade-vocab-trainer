@@ -10866,13 +10866,18 @@ function renderGrammarItem() {
 
 // --- Exercise Type Renderers ---
 function renderGapFill(item) {
-  const options = [...(item.ds || []), item.c].sort(() => Math.random() - 0.5);
   let html = '<div class="grammar-prompt">' + item.p.replace(/_{2,}/g, '<span class="blank">______</span>') + '</div>';
-  html += '<div class="grammar-options" id="grammar-options">';
-  options.forEach(opt => {
-    html += '<button class="grammar-option-btn" onclick="selectGrammarOption(this,\'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>';
-  });
-  html += '</div>';
+  if (item.ds && item.ds.length > 0) {
+    const options = [...item.ds, item.c].sort(() => Math.random() - 0.5);
+    html += '<div class="grammar-options" id="grammar-options">';
+    options.forEach(opt => {
+      html += '<button class="grammar-option-btn" onclick="selectGrammarOption(this,\'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div class="grammar-type-area"><input type="text" class="grammar-type-input" id="grammar-answer-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="off">';
+    html += '<button class="grammar-check-btn" onclick="checkGrammarTyped()">Check</button></div>';
+  }
   return html;
 }
 
