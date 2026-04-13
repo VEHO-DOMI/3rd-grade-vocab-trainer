@@ -1611,6 +1611,38 @@ body.playing .header-container { display: none; }
 .match-item:hover { border-color:var(--accent); }
 .match-item.selected { border-color:var(--accent); background:var(--accent-glow); color:var(--accent); }
 .match-item.matched { border-color:var(--correct); background:rgba(34,197,94,0.08); color:var(--correct); opacity:0.7; pointer-events:none; }
+
+/* --- Group Sort --- */
+.gs-groups { display:flex; gap:8px; margin-top:0.8rem; flex-wrap:wrap; }
+.gs-group { flex:1; min-width:120px; background:var(--card); border:2px solid var(--card-border); border-radius:var(--radius); padding:8px; min-height:100px; }
+.gs-group-title { font-size:0.78rem; font-weight:700; color:var(--accent); text-align:center; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--card-border); }
+.gs-group-items { display:flex; flex-direction:column; gap:4px; min-height:40px; }
+.gs-item-placed { padding:6px 10px; background:var(--accent-glow); border:1px solid var(--accent); border-radius:8px; font-size:0.78rem; font-weight:600; color:var(--accent); cursor:pointer; text-align:center; }
+.gs-pool { display:flex; flex-wrap:wrap; gap:6px; margin-top:0.8rem; justify-content:center; }
+.gs-chip { padding:10px 16px; background:var(--card); border:2px solid var(--card-border); border-radius:10px; font-size:0.84rem; font-weight:600; color:var(--text); cursor:pointer; transition:all 0.15s; user-select:none; }
+.gs-chip:hover, .gs-chip:active { border-color:var(--accent); background:var(--card-hover); }
+.gs-chip.gs-selected { border-color:var(--accent); background:var(--accent-glow); color:var(--accent); }
+.gs-chip.placed { opacity:0.25; pointer-events:none; }
+.gs-group.gs-target { border-color:var(--accent); border-style:dashed; }
+.gs-result-correct { border-color:var(--correct) !important; }
+.gs-result-wrong .gs-group-title { color:var(--wrong); }
+
+/* --- Matching Pairs (Memory) --- */
+.mp-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:0.8rem; }
+.mp-card { aspect-ratio:1; display:flex; align-items:center; justify-content:center; background:var(--accent); border:2px solid var(--accent); border-radius:var(--radius); font-size:0.78rem; font-weight:700; color:white; cursor:pointer; transition:all 0.25s; user-select:none; text-align:center; padding:4px; word-break:break-word; }
+.mp-card.flipped { background:var(--card); color:var(--text); border-color:var(--card-border); }
+.mp-card.matched { background:rgba(34,197,94,0.1); border-color:var(--correct); color:var(--correct); pointer-events:none; opacity:0.75; }
+.mp-card.wrong-flash { animation:mpWrongFlash 0.5s; }
+@keyframes mpWrongFlash { 0%,100%{border-color:var(--card-border);} 50%{border-color:var(--wrong);background:rgba(239,68,68,0.1);} }
+
+/* --- Anagram --- */
+.ag-letters { display:flex; flex-wrap:wrap; gap:6px; margin-top:0.8rem; justify-content:center; }
+.ag-letter { width:42px; height:42px; display:flex; align-items:center; justify-content:center; background:var(--card); border:2px solid var(--card-border); border-radius:10px; font-size:1.1rem; font-weight:700; color:var(--text); cursor:pointer; transition:all 0.15s; user-select:none; text-transform:uppercase; }
+.ag-letter:hover, .ag-letter:active { border-color:var(--accent); background:var(--card-hover); }
+.ag-letter.used { opacity:0.25; pointer-events:none; }
+.ag-answer { display:flex; flex-wrap:wrap; gap:4px; margin-top:0.8rem; min-height:46px; padding:8px 12px; background:var(--card); border:2px dashed var(--card-border); border-radius:var(--radius); justify-content:center; align-items:center; }
+.ag-answer-letter { width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:var(--accent-glow); border:1px solid var(--accent); border-radius:8px; font-size:1rem; font-weight:700; color:var(--accent); cursor:pointer; text-transform:uppercase; }
+
 /* Error Correction clickable words */
 .ec-words { display: flex; flex-wrap: wrap; gap: 4px; line-height: 2; }
 .ec-word {
@@ -2469,6 +2501,31 @@ body.playing .header-container { display: none; }
 @keyframes correctPop { 0% { transform:scale(1); } 30% { transform:scale(1.08); } 100% { transform:scale(1); } }
 
 /* Feedback slide in */
+/* --- Chat Simulation --- */
+.chat-sim-container { display:flex; flex-direction:column; gap:6px; max-height:350px; overflow-y:auto; padding:10px; background:var(--bg); border:1px solid var(--card-border); border-radius:14px; margin-bottom:0.7rem; scroll-behavior:smooth; }
+.chat-sim-header { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--card); border:1px solid var(--card-border); border-radius:12px; margin-bottom:0.5rem; }
+.chat-sim-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0; }
+.chat-sim-name { font-weight:700; font-size:0.88rem; color:var(--text); }
+.chat-bubble { max-width:80%; padding:8px 12px; border-radius:14px; font-size:0.85rem; line-height:1.45; animation:chatBubbleIn 0.3s ease; }
+.chat-bubble.received { align-self:flex-start; background:var(--card); border:1px solid var(--card-border); color:var(--text); border-bottom-left-radius:4px; }
+.chat-bubble.sent { align-self:flex-end; background:var(--accent); color:white; border-bottom-right-radius:4px; }
+.chat-bubble.sent.correct-answer { background:var(--correct); }
+.chat-bubble.sent.wrong-answer { background:var(--wrong); }
+.chat-bubble-sender { font-size:0.68rem; color:var(--muted); font-weight:700; margin-bottom:2px; text-transform:uppercase; letter-spacing:0.3px; }
+.chat-sim-options { display:flex; flex-direction:column; gap:6px; margin-top:0.5rem; }
+.chat-sim-option-btn { width:100%; padding:10px 14px; background:var(--card); border:2px solid var(--card-border); border-radius:12px; font-size:0.85rem; font-weight:600; color:var(--text); cursor:pointer; transition:all 0.15s; text-align:left; line-height:1.4; font-family:inherit; }
+.chat-sim-option-btn:hover, .chat-sim-option-btn:active { border-color:var(--accent); background:var(--card-hover); }
+.chat-sim-option-btn:disabled { cursor:default; opacity:0.7; }
+.chat-sim-option-btn.correct { border-color:var(--correct); background:var(--correct-glow); color:var(--correct); font-weight:700; }
+.chat-sim-option-btn.wrong { border-color:var(--wrong); background:var(--wrong-glow); color:var(--wrong); }
+.chat-sim-reply-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:0.5rem; margin-bottom:0.2rem; }
+.chat-sim-typing { align-self:flex-start; padding:10px 16px; background:var(--card); border:1px solid var(--card-border); border-radius:14px; border-bottom-left-radius:4px; }
+.chat-sim-typing span { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--muted); margin:0 1px; animation:typingDot 1.4s infinite; }
+.chat-sim-typing span:nth-child(2) { animation-delay:0.2s; }
+.chat-sim-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingDot { 0%,60%,100%{opacity:0.3;transform:translateY(0);} 30%{opacity:1;transform:translateY(-4px);} }
+@keyframes chatBubbleIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+
 .campaign-feedback { animation: feedbackSlideIn 0.3s ease-out; }
 @keyframes feedbackSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 
@@ -10492,6 +10549,9 @@ function renderGrammarTypeCards() {
     'question-formation': { icon: '❓', name: 'Questions', desc: 'Form questions correctly' },
     'tense-id': { icon: '⏰', name: 'Tense Check', desc: 'Identify the grammar form' },
     'context-picker': { icon: '🎯', name: 'Context Picker', desc: 'Pick the sentence that fits' },
+    'group-sort': { icon: '📦', name: 'Group Sort', desc: 'Sort words into categories' },
+    'matching-pairs': { icon: '🃏', name: 'Memory Match', desc: 'Flip cards and find pairs' },
+    'anagram': { icon: '🔤', name: 'Anagram', desc: 'Unscramble the letters' },
   };
 
   let html = '<div class="progress-nav"><button class="btn btn-secondary" onclick="goHome()">← Back</button><span class="nav-title">Practice Grammar</span></div>';
@@ -10784,7 +10844,10 @@ function showGrammarFormatSelection(structureId, returnTo) {
     'sentence-building': { icon: '\uD83E\uDDE9', name: 'Sentence Builder' },
     'matching': { icon: '\uD83D\uDD17', name: 'Matching' },
     'context-picker': { icon: '\uD83C\uDFAF', name: 'Context Picker' },
-    'question-formation': { icon: '\u2753', name: 'Questions' }
+    'question-formation': { icon: '\u2753', name: 'Questions' },
+    'group-sort': { icon: '\uD83D\uDCE6', name: 'Group Sort' },
+    'matching-pairs': { icon: '\uD83C\uDCCF', name: 'Memory Match' },
+    'anagram': { icon: '\uD83D\uDD24', name: 'Anagram' }
   };
   const typeCounts = {};
   allItems.forEach(i => { typeCounts[i.t] = (typeCounts[i.t] || 0) + 1; });
@@ -10901,6 +10964,9 @@ function renderGrammarItem() {
     case 'tense-id': html += renderTenseId(item); break;
     case 'context-picker': html += renderContextPicker(item); break;
     case 'matching': html += renderMatching(item); break;
+    case 'group-sort': html += renderGroupSort(item); break;
+    case 'matching-pairs': html += renderMatchingPairs(item); break;
+    case 'anagram': html += renderAnagram(item); break;
     default: html += renderTypedAnswer(item, item.t); break;
   }
 
@@ -11153,6 +11219,298 @@ function checkMatchingAnswer() {
   const isCorrect = correct === total;
   matchState = { selectedLeft: null, selectedRight: null, pairs: {} };
   processGrammarAnswer(item, correct + '/' + total + ' correct', isCorrect, false);
+}
+
+// =============================================
+// --- GROUP SORT ---
+// =============================================
+let gsState = { selected: null, placements: {}, displayMap: {}, revealMap: {} };
+
+function gsParseItem(raw) {
+  const idx = raw.indexOf('|');
+  if (idx === -1) return { display: raw, reveal: raw, key: raw };
+  return { display: raw.substring(0, idx), reveal: raw.substring(idx + 1), key: raw };
+}
+
+function renderGroupSort(item) {
+  gsState = { selected: null, placements: {}, displayMap: {}, revealMap: {} };
+  let groups;
+  try { groups = JSON.parse(item.c); } catch(e) { return '<div>Error loading group sort data.</div>'; }
+  const groupNames = Object.keys(groups);
+  let pool = [];
+  groupNames.forEach(g => {
+    groups[g].forEach(raw => {
+      const parsed = gsParseItem(raw);
+      gsState.displayMap[parsed.key] = parsed.display;
+      gsState.revealMap[parsed.key] = parsed.reveal;
+      pool.push(parsed);
+    });
+  });
+  pool = pool.sort(() => Math.random() - 0.5);
+
+  let html = '<div class="grammar-instruction">Sort the words into the correct category:</div>';
+  html += '<div class="grammar-prompt" style="font-size:0.85rem;">' + item.p + '</div>';
+  html += '<div class="gs-groups" id="gs-groups">';
+  groupNames.forEach((g, gi) => {
+    html += '<div class="gs-group" data-group="' + g + '" onclick="gsSelectGroup(\'' + g.replace(/'/g, "\\'") + '\')">';
+    html += '<div class="gs-group-title">' + g + '</div>';
+    html += '<div class="gs-group-items" id="gs-group-' + gi + '"></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="font-size:0.72rem;color:var(--muted);margin:0.5rem 0 0.3rem;text-align:center;">Tap a word, then tap the correct group.</div>';
+  html += '<div class="gs-pool" id="gs-pool">';
+  pool.forEach((p, i) => {
+    html += '<span class="gs-chip" data-key="' + p.key.replace(/"/g, '&quot;') + '" data-idx="' + i + '" onclick="gsSelectChip(this)">' + p.display + '</span>';
+  });
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;margin-top:0.5rem;">';
+  html += '<button class="grammar-hint-btn" onclick="gsReset()" style="flex:0 0 auto;">↺ Reset</button>';
+  html += '<button class="grammar-check-btn" id="gs-check-btn" style="flex:1;margin-top:0;display:none;" onclick="checkGroupSort()">Check</button>';
+  html += '</div>';
+  return html;
+}
+
+function gsSelectChip(el) {
+  if (el.classList.contains('placed')) return;
+  document.querySelectorAll('.gs-chip.gs-selected').forEach(c => c.classList.remove('gs-selected'));
+  el.classList.add('gs-selected');
+  gsState.selected = el;
+  document.querySelectorAll('.gs-group').forEach(g => g.classList.add('gs-target'));
+}
+
+function gsSelectGroup(groupName) {
+  if (!gsState.selected) return;
+  const key = gsState.selected.dataset.key;
+  gsState.placements[key] = groupName;
+  gsState.selected.classList.add('placed');
+  gsState.selected.classList.remove('gs-selected');
+  gsState.selected = null;
+  document.querySelectorAll('.gs-group').forEach(g => g.classList.remove('gs-target'));
+  const displayText = gsState.displayMap[key] || key;
+  const groups = document.querySelectorAll('.gs-group');
+  groups.forEach(g => {
+    if (g.dataset.group === groupName) {
+      const itemsDiv = g.querySelector('.gs-group-items');
+      const chip = document.createElement('div');
+      chip.className = 'gs-item-placed';
+      chip.textContent = displayText;
+      chip.dataset.key = key;
+      chip.onclick = function() { gsRemoveFromGroup(this); };
+      itemsDiv.appendChild(chip);
+    }
+  });
+  const totalChips = document.querySelectorAll('.gs-chip').length;
+  const placedChips = Object.keys(gsState.placements).length;
+  if (placedChips >= totalChips) {
+    document.getElementById('gs-check-btn').style.display = '';
+  }
+}
+
+function gsRemoveFromGroup(el) {
+  const key = el.dataset.key;
+  delete gsState.placements[key];
+  el.remove();
+  document.querySelectorAll('.gs-chip').forEach(c => {
+    if (c.dataset.key === key) { c.classList.remove('placed'); }
+  });
+  document.getElementById('gs-check-btn').style.display = 'none';
+}
+
+function gsReset() {
+  gsState.selected = null;
+  gsState.placements = {};
+  document.querySelectorAll('.gs-chip').forEach(c => { c.classList.remove('placed', 'gs-selected'); });
+  document.querySelectorAll('.gs-group-items').forEach(g => { g.innerHTML = ''; });
+  document.querySelectorAll('.gs-group').forEach(g => g.classList.remove('gs-target'));
+  document.getElementById('gs-check-btn').style.display = 'none';
+}
+
+function checkGroupSort() {
+  const item = grammarSession.items[grammarSession.index];
+  let groups;
+  try { groups = JSON.parse(item.c); } catch(e) { processGrammarAnswer(item, '?', false, false); return; }
+  const correctGroup = {};
+  for (const [groupName, items] of Object.entries(groups)) {
+    items.forEach(raw => { correctGroup[raw] = groupName; });
+  }
+  let correct = 0, total = Object.keys(correctGroup).length;
+  const placedItems = document.querySelectorAll('.gs-item-placed');
+  placedItems.forEach(el => {
+    const key = el.dataset.key;
+    const revealText = gsState.revealMap[key] || key;
+    const placedIn = gsState.placements[key];
+    const isRight = correctGroup[key] === placedIn;
+    if (isRight) {
+      correct++;
+      el.textContent = revealText;
+      el.style.borderColor = 'var(--correct)';
+      el.style.color = 'var(--correct)';
+      el.style.background = 'rgba(34,197,94,0.1)';
+    } else {
+      el.textContent = revealText + ' \u2717';
+      el.style.borderColor = 'var(--wrong)';
+      el.style.color = 'var(--wrong)';
+      el.style.background = 'rgba(239,68,68,0.1)';
+    }
+    el.onclick = null;
+    el.style.cursor = 'default';
+  });
+  document.getElementById('gs-check-btn').style.display = 'none';
+  document.querySelectorAll('.gs-group').forEach(g => { g.onclick = null; g.style.cursor = 'default'; });
+  const isCorrect = correct === total;
+  gsState = { selected: null, placements: {}, displayMap: {}, revealMap: {} };
+  setTimeout(() => {
+    processGrammarAnswer(item, correct + '/' + total + ' correct', isCorrect, false);
+  }, 1200);
+}
+
+// =============================================
+// --- MATCHING PAIRS (Memory Game) ---
+// =============================================
+let mpState = { flipped: [], matched: [], pairs: [], busy: false, attempts: 0 };
+
+function renderMatchingPairs(item) {
+  let pairs;
+  try { pairs = JSON.parse(item.c); } catch(e) { return '<div>Error loading matching pairs data.</div>'; }
+  let cards = [];
+  pairs.forEach((pair, pi) => {
+    cards.push({ text: pair[0], pairId: pi, side: 'a' });
+    cards.push({ text: pair[1], pairId: pi, side: 'b' });
+  });
+  cards = cards.sort(() => Math.random() - 0.5);
+  mpState = { flipped: [], matched: [], pairs: pairs, busy: false, attempts: 0 };
+  const cols = cards.length <= 8 ? 4 : (cards.length <= 12 ? 4 : 4);
+
+  let html = '<div class="grammar-instruction">Flip cards and find the matching pairs:</div>';
+  html += '<div class="grammar-prompt" style="font-size:0.85rem;">' + item.p + '</div>';
+  html += '<div id="mp-status" style="font-size:0.75rem;color:var(--muted);text-align:center;margin-top:0.3rem;">0/' + pairs.length + ' pairs found</div>';
+  html += '<div class="mp-grid" id="mp-grid" style="grid-template-columns:repeat(' + cols + ',1fr);">';
+  cards.forEach((card, ci) => {
+    html += '<div class="mp-card" data-idx="' + ci + '" data-pair="' + card.pairId + '" data-side="' + card.side + '" data-text="' + card.text.replace(/"/g, '&quot;') + '" onclick="mpFlipCard(this)">?</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function mpFlipCard(el) {
+  if (mpState.busy) return;
+  if (el.classList.contains('flipped') || el.classList.contains('matched')) return;
+  el.classList.add('flipped');
+  el.textContent = el.dataset.text;
+  mpState.flipped.push(el);
+
+  if (mpState.flipped.length === 2) {
+    mpState.busy = true;
+    mpState.attempts++;
+    const [c1, c2] = mpState.flipped;
+    if (c1.dataset.pair === c2.dataset.pair && c1.dataset.side !== c2.dataset.side) {
+      setTimeout(() => {
+        c1.classList.add('matched');
+        c2.classList.add('matched');
+        mpState.matched.push(parseInt(c1.dataset.pair));
+        mpState.flipped = [];
+        mpState.busy = false;
+        document.getElementById('mp-status').textContent = mpState.matched.length + '/' + mpState.pairs.length + ' pairs found';
+        if (mpState.matched.length >= mpState.pairs.length) {
+          setTimeout(() => {
+            const item = grammarSession.items[grammarSession.index];
+            processGrammarAnswer(item, mpState.attempts + ' attempts', true, false);
+          }, 400);
+        }
+      }, 300);
+    } else {
+      c1.classList.add('wrong-flash');
+      c2.classList.add('wrong-flash');
+      setTimeout(() => {
+        c1.classList.remove('flipped', 'wrong-flash');
+        c2.classList.remove('flipped', 'wrong-flash');
+        c1.textContent = '?';
+        c2.textContent = '?';
+        mpState.flipped = [];
+        mpState.busy = false;
+      }, 800);
+    }
+  }
+}
+
+// =============================================
+// --- ANAGRAM ---
+// =============================================
+let agSelected = [];
+
+function renderAnagram(item) {
+  agSelected = [];
+  const word = item.c;
+  let letters = word.split('');
+  let scrambled;
+  let attempts = 0;
+  do {
+    scrambled = letters.slice().sort(() => Math.random() - 0.5);
+    attempts++;
+  } while (scrambled.join('') === word && attempts < 20);
+
+  let html = '<div class="grammar-instruction">Unscramble the letters:</div>';
+  html += '<div class="grammar-prompt" style="font-size:0.85rem;">' + item.p + '</div>';
+  html += '<div class="ag-answer" id="ag-answer"><span style="color:var(--muted);font-size:0.8rem;">Tap the letters in the correct order</span></div>';
+  html += '<div class="ag-letters" id="ag-letters">';
+  scrambled.forEach((l, i) => {
+    html += '<div class="ag-letter" data-letter="' + l + '" data-idx="' + i + '" onclick="agAddLetter(this)">' + l + '</div>';
+  });
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;margin-top:0.5rem;">';
+  html += '<button class="grammar-hint-btn" onclick="agReset()" style="flex:0 0 auto;">↺ Reset</button>';
+  html += '<button class="grammar-check-btn" id="ag-check-btn" style="flex:1;margin-top:0;display:none;" onclick="checkAnagram()">Check</button>';
+  html += '</div>';
+  return html;
+}
+
+function agAddLetter(el) {
+  if (el.classList.contains('used')) return;
+  el.classList.add('used');
+  agSelected.push({ letter: el.dataset.letter, idx: el.dataset.idx });
+  agUpdateAnswer();
+  const total = document.querySelectorAll('.ag-letter').length;
+  if (agSelected.length >= total) {
+    document.getElementById('ag-check-btn').style.display = '';
+  }
+}
+
+function agRemoveLetter(pos) {
+  const removed = agSelected[pos];
+  agSelected.splice(pos, 1);
+  const tiles = document.querySelectorAll('.ag-letter');
+  tiles.forEach(t => {
+    if (t.dataset.idx === removed.idx && t.classList.contains('used')) { t.classList.remove('used'); }
+  });
+  agUpdateAnswer();
+  document.getElementById('ag-check-btn').style.display = 'none';
+}
+
+function agUpdateAnswer() {
+  const answerDiv = document.getElementById('ag-answer');
+  if (agSelected.length === 0) {
+    answerDiv.innerHTML = '<span style="color:var(--muted);font-size:0.8rem;">Tap the letters in the correct order</span>';
+  } else {
+    answerDiv.innerHTML = agSelected.map((s, i) => '<div class="ag-answer-letter" onclick="agRemoveLetter(' + i + ')">' + s.letter + '</div>').join('');
+  }
+}
+
+function agReset() {
+  agSelected = [];
+  document.querySelectorAll('.ag-letter').forEach(l => l.classList.remove('used'));
+  agUpdateAnswer();
+  document.getElementById('ag-check-btn').style.display = 'none';
+}
+
+function checkAnagram() {
+  const item = grammarSession.items[grammarSession.index];
+  const answer = agSelected.map(s => s.letter).join('');
+  const normalize = s => s.toLowerCase().trim();
+  const allCorrect = [item.c].concat(item.a || []);
+  const isCorrect = allCorrect.some(a => normalize(a) === normalize(answer));
+  agSelected = [];
+  processGrammarAnswer(item, answer, isCorrect, false);
 }
 
 // --- Sentence Building Helpers ---
@@ -12771,6 +13129,7 @@ function renderCampaignTask(taskIndex) {
   else if (type === 'dialogue-choice')  renderDialogueChoiceTask(task);
   else if (type === 'single-word-fix')  renderSingleWordFixTask(task);
   else if (type === 'swipe-reveal')     renderSwipeRevealTask(task);
+  else if (type === 'chat-sim')         renderChatSimTask(task);
   else                                  renderMCTask(task); // fallback
 }
 
@@ -13668,6 +14027,122 @@ function submitSwipeRevealAnswer(btn) {
   campaignState.taskResults.push({ correct: isCorrect, xp: xp });
 }
 
+// ── Chat Simulation ───────────────────────────────────────────────────────
+
+var chatSimAnswers = [];
+
+function renderChatSimTask(task) {
+  window.scrollTo(0, 0);
+  var items = task.items || [];
+  var itemIdx = campaignState.currentItemIndex;
+  if (itemIdx >= items.length) {
+    chatSimAnswers = [];
+    campaignState.currentTaskIndex++;
+    advanceCampaignTask();
+    return;
+  }
+  var item = items[itemIdx];
+  var area = document.getElementById('campaign-exercise-area');
+  var feedback = document.getElementById('campaign-feedback-area');
+  if (feedback) feedback.innerHTML = '';
+
+  var avatarText = task.chatAvatar || (task.chatTitle ? task.chatTitle.charAt(0) : '?');
+  var chatName = task.chatTitle || 'Chat';
+  var html = '<div class="chat-sim-header">' +
+    '<div class="chat-sim-avatar">' + escapeHtml(avatarText) + '</div>' +
+    '<div class="chat-sim-name">' + escapeHtml(chatName) + '</div>' +
+  '</div>';
+
+  html += '<div class="chat-sim-container" id="chat-sim-container">';
+  for (var i = 0; i < itemIdx; i++) {
+    var pastItem = items[i];
+    if (pastItem.history) {
+      for (var h = 0; h < pastItem.history.length; h++) {
+        html += chatBubbleHtml(pastItem.history[h].sender, pastItem.history[h].text, 'received', chatName);
+      }
+    }
+    if (chatSimAnswers[i]) {
+      var cls = chatSimAnswers[i].correct ? 'correct-answer' : 'wrong-answer';
+      html += '<div class="chat-bubble sent ' + cls + '">' + escapeHtml(chatSimAnswers[i].text) + '</div>';
+    }
+  }
+  if (item.history) {
+    for (var j = 0; j < item.history.length; j++) {
+      html += chatBubbleHtml(item.history[j].sender, item.history[j].text, 'received', chatName);
+    }
+  }
+  html += '</div>';
+
+  html += '<div class="chat-sim-reply-label">Choose your reply:</div>';
+  html += '<div class="chat-sim-options" id="chat-sim-options">';
+  var optsWithIdx = (item.options || []).map(function(o, i) { return { opt: o, origIdx: i }; });
+  var shuffled = shuffleArray(optsWithIdx);
+  shuffled.forEach(function(entry) {
+    html += '<button class="chat-sim-option-btn" data-oidx="' + entry.origIdx +
+      '" onclick="submitChatSimAnswer(this)">' + escapeHtml(entry.opt.text || '') + '</button>';
+  });
+  html += '</div>';
+  html += buildHintButton(itemIdx);
+  area.innerHTML = html;
+  updateCampaignTaskProgress();
+  var container = document.getElementById('chat-sim-container');
+  if (container) container.scrollTop = container.scrollHeight;
+}
+
+function chatBubbleHtml(sender, text, type, chatName) {
+  var senderLabel = '';
+  if (type === 'received' && sender && sender.toLowerCase() !== 'you') {
+    senderLabel = '<div class="chat-bubble-sender">' + escapeHtml(sender) + '</div>';
+  }
+  return '<div class="chat-bubble ' + type + '">' + senderLabel + escapeHtml(text) + '</div>';
+}
+
+function submitChatSimAnswer(btn) {
+  var lv = campaignLevels[campaignState.currentLevel];
+  var task = lv.tasks[campaignState.currentTaskIndex];
+  var item = task.items[campaignState.currentItemIndex];
+  var origIdx = parseInt(btn.getAttribute('data-oidx'));
+  var picked = (item.options || [])[origIdx];
+  if (!picked) return;
+  var isCorrect = !!picked.correct;
+  var correctText = '';
+  for (var i = 0; i < (item.options || []).length; i++) {
+    if (item.options[i].correct) { correctText = item.options[i].text; break; }
+  }
+  chatSimAnswers[campaignState.currentItemIndex] = { text: picked.text, correct: isCorrect };
+  var result = { isCorrect: isCorrect, isClose: false };
+  var xp = isCorrect ? (task.xpEach || 15) : 0;
+  var pool = dialogueChoiceItemPool(item);
+  if (pool === 'vocab') campaignState.vocabXP += xp;
+  else campaignState.grammarXP += xp;
+  campaignState.levelXP += xp;
+  var btns = document.querySelectorAll('.chat-sim-option-btn');
+  btns.forEach(function(b) {
+    b.disabled = true;
+    b.style.pointerEvents = 'none';
+    var bIdx = parseInt(b.getAttribute('data-oidx'));
+    if ((item.options || [])[bIdx] && item.options[bIdx].correct) b.classList.add('correct');
+  });
+  if (!isCorrect) btn.classList.add('wrong');
+  var container = document.getElementById('chat-sim-container');
+  if (container) {
+    var bubble = document.createElement('div');
+    bubble.className = 'chat-bubble sent ' + (isCorrect ? 'correct-answer' : 'wrong-answer');
+    bubble.textContent = picked.text;
+    container.appendChild(bubble);
+    if (!isCorrect && correctText) {
+      var correctBubble = document.createElement('div');
+      correctBubble.className = 'chat-bubble sent correct-answer';
+      correctBubble.style.opacity = '0.6';
+      correctBubble.textContent = '\u2713 ' + correctText;
+      container.appendChild(correctBubble);
+    }
+    container.scrollTop = container.scrollHeight;
+  }
+  showCampaignFeedback(result, correctText, xp);
+  campaignState.taskResults.push({ correct: isCorrect, xp: xp });
+}
+
 // ── 7. Reading Comprehension ───────────────────────────────────────────────
 
 function renderCampaignReading(reading) {
@@ -14138,6 +14613,7 @@ function nextCampaignItem() {
     else if (type === 'dialogue-choice')  renderDialogueChoiceTask(task);
     else if (type === 'single-word-fix')  renderSingleWordFixTask(task);
     else if (type === 'swipe-reveal')     renderSwipeRevealTask(task);
+    else if (type === 'chat-sim')         renderChatSimTask(task);
     else                                  renderMCTask(task);
     // Note: matching and reading handle their own multi-item flow
   }
