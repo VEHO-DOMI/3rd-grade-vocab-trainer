@@ -7018,12 +7018,18 @@ function handleMCClick(btn, correct, word, type, grid) {
     if (state.comboStreak >= 2) SFX.play('combo');
     btn.classList.add('correct');
     state.score++;
+    var prevVocabTier = getComboTier(state.comboStreak);
     state.comboStreak++;
     if (state.comboStreak > state.comboMax) state.comboMax = state.comboStreak;
     state.comboMult = getComboTier(state.comboStreak).mult;
     updateComboBadge();
+    var vocabXP = Math.round((XP_TABLE[state.currentType] || 5) * state.comboMult);
+    showXPBurst(vocabXP);
+    var curVocabTier = getComboTier(state.comboStreak);
+    if (curVocabTier.mult > prevVocabTier.mult && curVocabTier.mult > 1) {
+      setTimeout(function() { showComboTierUp(curVocabTier); }, 300);
+    }
     state.results.push({ word, correct: true, userAnswer: btn.textContent, type: state.currentType, comboMult: state.comboMult });
-    if (state.isSpeedRound) showXPFloat();
     const qcard = document.getElementById('quiz-card');
     if (qcard) { qcard.classList.remove('flash-correct','flash-wrong'); qcard.offsetHeight; qcard.classList.add('flash-correct'); }
     setTimeout(() => { nextWord(); }, state.isSpeedRound ? 400 : 800);
@@ -7466,10 +7472,15 @@ function checkAnswer() {
       if (state.comboStreak >= 3) showComboLost();
       state.comboStreak = 0; state.comboMult = 1; updateComboBadge();
     } else {
+      var prevVT = getComboTier(state.comboStreak);
       state.comboStreak++;
       if (state.comboStreak > state.comboMax) state.comboMax = state.comboStreak;
       state.comboMult = getComboTier(state.comboStreak).mult;
       updateComboBadge();
+      var vXP = Math.round((XP_TABLE[state.currentType] || 5) * state.comboMult);
+      showXPBurst(vXP);
+      var curVT = getComboTier(state.comboStreak);
+      if (curVT.mult > prevVT.mult && curVT.mult > 1) { setTimeout(function() { showComboTierUp(curVT); }, 300); }
     }
     input.className = 'answer-input ' + (isClose ? 'close' : 'correct');
     feedback.className = 'feedback ' + (isClose ? 'close' : 'correct');
