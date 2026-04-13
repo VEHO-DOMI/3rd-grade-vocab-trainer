@@ -3054,7 +3054,7 @@ body.playing .header-container { display: none; }
             <div class="campaign-card-subtitle">Campaign: FOURTEEN</div>
             <div class="campaign-card-progress">
               <div class="campaign-card-bar"><div class="campaign-card-fill" id="campaign-progress-fill" style="width:0%"></div></div>
-              <span class="mode-select-stats" id="mode-campaign-stats">0/15</span>
+              <span class="mode-select-stats" id="mode-campaign-stats"></span>
             </div>
           </div>
         </div>
@@ -10027,11 +10027,12 @@ function showModeSelectScreen() {
     if (typeof campaignLevels !== 'undefined' && campaignLevels.length > 0) {
       campaignCard.style.display = '';
       var cp = d.campaignProgress || {};
+      var totalLevels = campaignLevels.length;
       var cLevels = (cp.levels ? Object.keys(cp.levels).filter(function(k) { return cp.levels[k].completed; }).length : 0);
       var statsEl = document.getElementById('mode-campaign-stats');
-      if (statsEl) statsEl.textContent = cLevels + '/15';
+      if (statsEl) statsEl.textContent = cLevels + '/' + totalLevels;
       var fill = document.getElementById('campaign-progress-fill');
-      if (fill) fill.style.width = Math.round((cLevels / 15) * 100) + '%';
+      if (fill) fill.style.width = Math.round((cLevels / totalLevels) * 100) + '%';
     } else {
       campaignCard.style.display = 'none';
     }
