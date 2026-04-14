@@ -497,6 +497,16 @@ h1 { display: none; }
   display: inline-block; width: 8em; border-bottom: 2.5px solid var(--accent-light);
   vertical-align: baseline; margin-left: 0.05em; opacity: 0.5;
 }
+.quiz-prompt .gap.gap-pattern {
+  letter-spacing: 0.12em; border-bottom: none; background: none; padding: 0.05em 0.3em;
+  color: var(--accent-light); display: inline-block; min-width: 0;
+  font-family: 'Courier New', monospace; font-weight: 800;
+}
+/* Progressive Hint Button (vocab quiz) */
+.vocab-hint-btn { font-size: 0.82rem; padding: 8px 10px; line-height: 1.15; white-space: normal; text-align: center; min-width: 0; }
+.vocab-hint-btn .vhb-label { font-weight: 700; display: block; font-size: 0.8rem; }
+.vocab-hint-btn .vhb-cost { display: inline-block; margin-top: 3px; font-size: 0.62rem; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: rgba(220,60,60,0.12); color: #c23; letter-spacing: 0.03em; }
+.vocab-hint-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .quiz-prompt .german-word {
   font-weight: 700; color: var(--trans-color); font-size: 1.25rem;
   display: block; text-align: center; padding: 0.8rem 0; line-height: 1.3;
@@ -3549,6 +3559,7 @@ body.playing .header-container { display: none; }
     <div class="feedback" id="feedback"></div>
     <div class="quiz-actions" id="quiz-actions">
       <button class="btn btn-secondary" id="skip-btn" onclick="skipWord()">Skip</button>
+      <button class="btn btn-secondary vocab-hint-btn" id="vocab-hint-btn" onclick="useVocabHint()" style="display:none;">💡 Hint</button>
       <button class="btn btn-primary" id="check-btn" onclick="checkAnswer()">Check</button>
     </div>
     <div class="source-tag" id="source-tag"></div>
@@ -4763,7 +4774,9 @@ function initTheme() {
   if (btn) btn.textContent = theme === 'dark' ? '\uD83C\uDF19 Dark' : '\u2600\uFE0F Light';
 }
 
-const XP_TABLE = { 'context': 5, 'context-hard': 8, 'definition': 6, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
+// Unified: no more hard/easy split. Base XP shared; progressive hints deduct at grade time.
+// Legacy 'context-hard' / 'definition-hard' aliases kept for backward compat with saved sessions.
+const XP_TABLE = { 'context': 8, 'context-hard': 8, 'definition': 10, 'definition-hard': 10, 'translation': 7, 'mc-context': 3, 'mc-definition': 4, 'mc-translation': 5 };
 const BADGE_DEFS = [
   { id:'first-session', icon:'\uD83C\uDF1F', name:'First Steps', desc:'Complete your first session', check:(d)=>(d.totalSessions||0)>=1 },
   { id:'ten-sessions', icon:'🔥', name:'On Fire', desc:'Complete 10 sessions', check:(d)=>(d.totalSessions||0)>=10 },
@@ -4781,8 +4794,8 @@ const BADGE_DEFS = [
   { id:'speed-demon', icon:'\uD83D\uDCA8', name:'Speed Demon', desc:'Get 15+ correct in a Speed Round', check:(d)=>(d.bestSpeedRound||0)>=15 },
   { id:'sprinter', icon:'🏃', name:'Sprinter', desc:'Complete 10 sprints', check:(d)=>(d.totalSprints||0)>=10 },
   { id:'sharp-eye', icon:'👁️', name:'Sharp Eye', desc:'Get 20+ correct in Multiple Choice', check:(d)=>(d.bestMCStreak||0)>=20 },
-  { id:'context-ace', icon:'🎯', name:'Context Ace', desc:'Score 90%+ on a context-hard session (min 10 words)', check:(d,m,r)=>r&&r.length>=10&&r.filter(x=>x.type==='context-hard').length>=10&&r.filter(x=>x.type==='context-hard'&&x.correct).length/r.filter(x=>x.type==='context-hard').length>=0.9 },
-  { id:'definition-master', icon:'📖', name:'Definition Master', desc:'Score 90%+ on a definition-hard session (min 10 words)', check:(d,m,r)=>r&&r.length>=10&&r.filter(x=>x.type==='definition-hard').length>=10&&r.filter(x=>x.type==='definition-hard'&&x.correct).length/r.filter(x=>x.type==='definition-hard').length>=0.9 },
+  { id:'context-ace', icon:'🎯', name:'Context Ace', desc:'Score 90%+ on a context session (min 10 words)', check:(d,m,r)=>{ if(!r||r.length<10) return false; const f=r.filter(x=>x.type==='context'||x.type==='context-hard'); return f.length>=10 && f.filter(x=>x.correct).length/f.length>=0.9; }},
+  { id:'definition-master', icon:'📖', name:'Definition Master', desc:'Score 90%+ on a definition session (min 10 words)', check:(d,m,r)=>{ if(!r||r.length<10) return false; const f=r.filter(x=>x.type==='definition'||x.type==='definition-hard'); return f.length>=10 && f.filter(x=>x.correct).length/f.length>=0.9; }},
   { id:'giant-killer', icon:'🗡️', name:'Giant Killer', desc:'Win a battle against someone ranked higher', check:(d)=>(d.giantKills||0)>=1 },
   { id:'variety-pack', icon:'\uD83C\uDFAA', name:'Variety Pack', desc:'Use all 5 exercise types in one day', check:(d)=>(d.dailyVarietyAchieved||0)>=1 },
   { id:'comeback-kid', icon:'🔄', name:'Comeback Kid', desc:'Score 100% on a retry-wrong session', check:(d)=>(d.perfectRetries||0)>=1 },
@@ -4824,7 +4837,7 @@ function getDailyChallengeWords() {
 }
 
 function getDailyChallengeTypes() {
-  const types = ['context', 'context-hard', 'definition', 'definition-hard', 'translation'];
+  const types = ['context', 'definition', 'translation'];
   const rng = seededRandom(dailySeed(getTodayStr(), CLASS_ID) + 999);
   return Array.from({length: 10}, () => types[Math.floor(rng() * types.length)]);
 }
@@ -4835,7 +4848,9 @@ function calculateSessionXP(results) {
     if (r.correct) {
       const base = (XP_TABLE[r.type] || 5) * (r.comboMult || 1);
       const factor = r.isClose ? 0.5 : 1;
-      xp += Math.max(1, Math.round(base * factor));
+      let gained = Math.max(1, Math.round(base * factor));
+      if (r.hintPenalty) gained = Math.max(1, gained - r.hintPenalty);
+      xp += gained;
     }
   }
   if (results.length >= 5 && results.every(r => r.correct && !r.isClose)) xp += 20;
@@ -6337,20 +6352,12 @@ function openPracticeSetup() {
             <span class="type-card-desc">Random mix of all types</span>
           </button>
           <button class="type-card" data-type="context" onclick="selectType(this)">
-            <span class="type-card-name">&#128221; Context (easy)</span>
-            <span class="type-card-desc">Fill the blank &mdash; first letter + letter count shown</span>
-          </button>
-          <button class="type-card" data-type="context-hard" onclick="selectType(this)">
-            <span class="type-card-name">&#128221; Context (hard)</span>
-            <span class="type-card-desc">Fill the blank &mdash; only first letter, no count</span>
+            <span class="type-card-name">&#128221; Context</span>
+            <span class="type-card-desc">Fill the blank &mdash; hints optional (cost XP)</span>
           </button>
           <button class="type-card" data-type="definition" onclick="selectType(this)">
-            <span class="type-card-name">&#128214; Definition (easy)</span>
-            <span class="type-card-desc">Read a definition &mdash; word count + first letters shown</span>
-          </button>
-          <button class="type-card" data-type="definition-hard" onclick="selectType(this)">
-            <span class="type-card-name">&#128214; Definition (hard)</span>
-            <span class="type-card-desc">Read a definition &mdash; no hints</span>
+            <span class="type-card-name">&#128214; Definition</span>
+            <span class="type-card-desc">Read a definition &mdash; hints optional (cost XP)</span>
           </button>
           <button class="type-card" data-type="translation" onclick="selectType(this)">
             <span class="type-card-name">&#127757; Translation</span>
@@ -7249,44 +7256,24 @@ function showWord() {
   label.textContent = isCol ? 'Word Partners' : isMC ? 'Choose the answer' : isContext ? 'Complete the sentence' : isDef ? 'Guess the word' : 'Translate to English';
 
   const prompt = document.getElementById('quiz-prompt');
+  state.vocabHintLevel = 0;
   if (isContext) {
     if (isMC) {
       prompt.innerHTML = word.s.replace('_____', '<span class="gap">_____</span>');
-    } else if (type === 'context') {
-      const contextForm = getContextForm(word);
-      const hint = getFirstLetterHint(contextForm, true);
-      prompt.innerHTML = word.s.replace('_____', `<span class="gap">${hint}</span>`);
     } else {
-      const contextForm = getContextForm(word);
-      const parts = contextForm.trim().split(/(\s+|-)/);
-      const small = new Set(['to','a','an','the','in','on','of','for','at','up','out','by','with','off','down']);
-      const allWords = parts.filter(x => !/^[\s-]+$/.test(x));
-      const firstContent = allWords.find(p => !small.has(p.toLowerCase())) || allWords[0];
-      const letter = firstContent[0];
-      prompt.innerHTML = word.s.replace('_____', `<span class="gap gap-hard">${letter}<span class="gap-line"></span></span>`);
+      prompt.innerHTML = word.s.replace('_____', '<span class="gap" id="vocab-gap">_____</span>');
     }
   } else if (isDef) {
     if (isMC) {
       prompt.innerHTML = `<em>${word.d}</em>`;
-    } else if (type === 'definition') {
-      // Easy mode: show first letter pattern + word count
-      const cleaned = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
-      const answerWords = cleaned.split(' ').filter(w => w.length > 0);
-      const wordCount = answerWords.length;
-      const small = new Set(['a','an','the','in','on','of','for','at','up','out','by','with','off','down','your','my','own','too','many','no']);
-      const hintParts = answerWords.map(w => {
-        if (small.has(w.toLowerCase()) && answerWords.length > 1) return w;
-        return w[0] + '_'.repeat(Math.max(w.length - 1, 1));
-      }).join(' ');
-      const countLabel = wordCount === 1 ? '1 word' : `${wordCount} words`;
-      prompt.innerHTML = `<em>${word.d}</em><div class="def-hint"><span class="def-hint-letter">${hintParts}</span><span class="def-hint-count">${countLabel}</span></div>`;
     } else {
-      // Hard mode: just the definition, no hints
-      prompt.innerHTML = `<em>${word.d}</em>`;
+      prompt.innerHTML = `<em>${word.d}</em><div class="def-hint" id="vocab-def-hint" style="display:none;"><span class="def-hint-letter" id="vocab-def-hint-letter"></span><span class="def-hint-count" id="vocab-def-hint-count"></span></div>`;
     }
   } else if (!isCol) {
     prompt.innerHTML = `<span class="german-word">${word.g}</span>`;
   }
+
+  updateVocabHintBtn();
 
   document.getElementById('source-tag').textContent = word.source;
 
@@ -7311,6 +7298,123 @@ function showWord() {
     document.getElementById('check-btn').textContent = 'Check';
     document.getElementById('check-btn').onclick = checkAnswer;
   }
+}
+
+// ===== Progressive Hint (vocab context/definition) =====
+const VOCAB_HINT_COSTS = [0, 2, 3];
+
+function _vocabHintApplicable() {
+  if (state.answered) return false;
+  const t = state.currentType;
+  if (!t) return false;
+  if (t.startsWith('mc-')) return false;
+  return t === 'context' || t === 'context-hard' || t === 'definition' || t === 'definition-hard';
+}
+
+function _vocabHintWordInfo() {
+  const word = state.words[state.currentIdx];
+  if (!word) return null;
+  const t = state.currentType;
+  const isCtx = t === 'context' || t === 'context-hard';
+  const isDef = t === 'definition' || t === 'definition-hard';
+  let target;
+  if (isCtx) target = getContextForm(word);
+  else if (isDef) target = word.w.replace(/^to\s+/, '').replace(/\(.*?\)/g, '').replace(/\bsth\.?\s*/g, '').replace(/\bsb\.?\s*/g, '').replace(/[.!?]+$/g, '').trim().replace(/\s+/g, ' ');
+  else return null;
+  return { word, target, isCtx, isDef };
+}
+
+function updateVocabHintBtn() {
+  const btn = document.getElementById('vocab-hint-btn');
+  if (!btn) return;
+  if (!_vocabHintApplicable()) { btn.style.display = 'none'; return; }
+  btn.style.display = '';
+  btn.disabled = false;
+  const nextLevel = (state.vocabHintLevel || 0) + 1;
+  if (nextLevel === 1) {
+    btn.innerHTML = '<span class="vhb-label">💡 First letter</span><span class="vhb-cost">−' + VOCAB_HINT_COSTS[1] + ' XP</span>';
+  } else if (nextLevel === 2) {
+    btn.innerHTML = '<span class="vhb-label">💡 Word length</span><span class="vhb-cost">−' + VOCAB_HINT_COSTS[2] + ' XP</span>';
+  } else {
+    btn.innerHTML = '<span class="vhb-label" style="opacity:0.65;">No hints left</span>';
+    btn.disabled = true;
+  }
+}
+
+function _applyVocabHintLevel1() {
+  const info = _vocabHintWordInfo();
+  if (!info) return;
+  if (info.isCtx) {
+    const gap = document.getElementById('vocab-gap');
+    if (gap) {
+      const parts = info.target.trim().split(/(\s+|-)/);
+      const small = new Set(['to','a','an','the','in','on','of','for','at','up','out','by','with','off','down']);
+      const allWords = parts.filter(x => !/^[\s-]+$/.test(x));
+      const firstContent = allWords.find(p => !small.has(p.toLowerCase())) || allWords[0];
+      const letter = firstContent ? firstContent[0] : '_';
+      gap.classList.add('gap-hard');
+      gap.innerHTML = letter + '<span class="gap-line"></span>';
+    }
+  } else if (info.isDef) {
+    const box = document.getElementById('vocab-def-hint');
+    const letterEl = document.getElementById('vocab-def-hint-letter');
+    if (box && letterEl) {
+      const parts = info.target.trim().split(/\s+/).filter(Boolean);
+      const small = new Set(['a','an','the','in','on','of','for','at','up','out','by','with','off','down','your','my']);
+      const allContent = parts.find(p => !small.has(p.toLowerCase())) || parts[0];
+      const letter = allContent ? allContent[0] : '_';
+      letterEl.textContent = letter + ' …';
+      box.style.display = '';
+    }
+  }
+}
+
+function _applyVocabHintLevel2() {
+  const info = _vocabHintWordInfo();
+  if (!info) return;
+  const parts = info.target.trim().split(/\s+/).filter(Boolean);
+  const small = new Set(['to','a','an','the','in','on','of','for','at','up','out','by','with','off','down','your','my']);
+  const pattern = parts.map(p => {
+    if (small.has(p.toLowerCase()) && parts.length > 1) return p;
+    return p[0] + '_'.repeat(Math.max(p.length - 1, 1));
+  }).join(' ');
+  const countLabel = parts.length === 1 ? '1 word' : parts.length + ' words';
+  if (info.isCtx) {
+    const gap = document.getElementById('vocab-gap');
+    if (gap) {
+      gap.classList.remove('gap-hard');
+      gap.classList.add('gap-pattern');
+      gap.textContent = pattern;
+    }
+  } else if (info.isDef) {
+    const box = document.getElementById('vocab-def-hint');
+    const letterEl = document.getElementById('vocab-def-hint-letter');
+    const countEl = document.getElementById('vocab-def-hint-count');
+    if (box && letterEl && countEl) {
+      letterEl.textContent = pattern;
+      countEl.textContent = countLabel;
+      box.style.display = '';
+    }
+  }
+}
+
+function useVocabHint() {
+  if (!_vocabHintApplicable()) return;
+  const level = (state.vocabHintLevel || 0) + 1;
+  if (level > 2) return;
+  const cost = VOCAB_HINT_COSTS[level] || 0;
+  if (level === 1) {
+    if (state.comboStreak >= 3) showComboLost();
+    state.comboStreak = 0;
+    state.comboMult = 1;
+    updateComboBadge();
+  }
+  state.vocabHintXpPenalty = (state.vocabHintXpPenalty || 0) + cost;
+  state.vocabHintLevel = level;
+  if (level === 1) _applyVocabHintLevel1();
+  else if (level === 2) _applyVocabHintLevel2();
+  updateVocabHintBtn();
+  if (typeof SFX !== 'undefined') SFX.play('click');
 }
 
 function normalizeAnswer(str) {
@@ -7565,6 +7669,7 @@ function checkAnswer() {
       state.comboMult = getComboTier(state.comboStreak).mult;
       updateComboBadge();
       var vXP = Math.round((XP_TABLE[state.currentType] || 5) * state.comboMult);
+      if (state.vocabHintXpPenalty) { vXP = Math.max(1, vXP - state.vocabHintXpPenalty); }
       showXPBurst(vXP);
       var curVT = getComboTier(state.comboStreak);
       if (curVT.mult > prevVT.mult && curVT.mult > 1) { setTimeout(function() { showComboTierUp(curVT); }, 300); }
@@ -7604,12 +7709,15 @@ function checkAnswer() {
     }
   }
 
-  state.results.push({ word, correct, isClose, userAnswer, type: state.currentType, comboMult: state.comboMult });
+  state.results.push({ word, correct, isClose, userAnswer, type: state.currentType, comboMult: state.comboMult, hintPenalty: state.vocabHintXpPenalty || 0 });
+  state.vocabHintXpPenalty = 0;
 
   input.disabled = true;
   document.getElementById('check-btn').textContent = 'Next';
   document.getElementById('check-btn').onclick = nextWord;
   document.getElementById('skip-btn').style.display = 'none';
+  const hintBtn2 = document.getElementById('vocab-hint-btn');
+  if (hintBtn2) hintBtn2.style.display = 'none';
 }
 
 function spellVariants(s) {
