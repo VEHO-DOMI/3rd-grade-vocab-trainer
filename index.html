@@ -3805,6 +3805,10 @@ body.playing .header-container { display: none; }
         <div><span class="mm-stat-label">Moves:</span><span id="mm-moves">0</span></div>
       </div>
     </div>
+    <div class="wh-prompt-card" id="mm-title-card" style="display:none;">
+      <div class="wh-prompt-label" id="mm-title-label">Topic</div>
+      <div class="wh-prompt-text" id="mm-title-text"></div>
+    </div>
     <div id="mm-grid" class="mm-grid"></div>
     <div id="mm-done" class="mm-done" style="display:none;">
       <h2 id="mm-done-title">🎉 Perfect!</h2>
@@ -4528,6 +4532,637 @@ const vocabData = {
 {w:"to whisper",g:"flüstern",d:"To speak very quietly so only one person can hear",s:"She _____ the test answer very quietly to me behind her hand so the strict teacher at the front of the room wouldn't hear us.",cf:"whispered",a:["whisper","whispered"],mc:["to shout loudly","to sing","to announce"]},
 {w:"crash",g:"Unfall, Zusammenstoß",d:"An accident when a vehicle hits something hard",s:"There was a terrible car _____ with two damaged vehicles on the busy motorway this morning and the police had to close the road.",a:["crashes"],mc:["smooth ride","safe journey","holiday trip"]},
 ],
+};
+
+const VOCAB_TASKS = {
+  "Unit 1": {
+    mm: [
+      { t:{en:"Music & Performance", de:"Musik & Auftritt"}, pairs: [
+        ["singer","Sänger/Sängerin"],
+        ["flute","Flöte"],
+        ["lyrics","Liedtext"],
+        ["tune","Melodie"],
+        ["record","(Schall-)Platte"],
+        ["audition","Vorsprechen, Vorsingen"],
+        ["critic","Kritiker/Kritikerin"]
+      ]},
+      { t:{en:"Making It Happen", de:"Es schaffen"}, pairs: [
+        ["to give sth. a try","etw. versuchen"],
+        ["to give up","aufgeben"],
+        ["to make it","es schaffen"],
+        ["to get back to sb.","sich bei jdm. melden"],
+        ["to come along","mitkommen"],
+        ["to take place","stattfinden"],
+        ["to agree","zustimmen"]
+      ]},
+      { t:{en:"Feelings & Opinions", de:"Gefühle & Meinungen"}, pairs: [
+        ["to sing along","mitsingen"],
+        ["to make up","erfinden, sich ausdenken"],
+        ["to get tired of sth.","etw. satt haben"],
+        ["to feel","sich fühlen"],
+        ["to celebrate","feiern"],
+        ["to waste","verschwenden"],
+        ["unhappy","unglücklich"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find the music words", de:"Finde die Musikwörter"},
+        correct:["singer","flute","lyrics","tune","record","audition"],
+        distractors:["suit","critic"] },
+      { t:{en:"Find positive traits", de:"Finde positive Eigenschaften"},
+        correct:["talented","successful","brave"],
+        distractors:["unhappy","to waste","to give up","whole"] },
+      { t:{en:"Find the feeling verbs", de:"Finde die Gefühls-Verben"},
+        correct:["to feel","to celebrate","to agree","to seem"],
+        distractors:["to spill","to waste","suit","record"] }
+    ],
+    sb: ["audition","talented","successful","critic","lyrics","whole","brave","to spill","to waste","extremely","afterwards","unhappy","tune","flute","to celebrate"]
+  },
+
+  "Unit 2": {
+    mm: [
+      { t:{en:"Shopping Actions", de:"Einkaufs-Aktivitäten"}, pairs: [
+        ["to buy sth.","etw. kaufen"],
+        ["to listen to music","Musik hören"],
+        ["to try on sunglasses","Sonnenbrillen anprobieren"],
+        ["to pay the bill","die Rechnung bezahlen"],
+        ["to look at sth.","etw. ansehen"],
+        ["to talk on the mobile","am Handy telefonieren"],
+        ["to return","zurückgeben; zurückkehren"]
+      ]},
+      { t:{en:"Titanic Words", de:"Titanic-Wörter"}, pairs: [
+        ["passenger","Passagier/Passagierin"],
+        ["to sink","sinken"],
+        ["to survive","überleben"],
+        ["North Pole","Nordpol"],
+        ["South Pole","Südpol"],
+        ["author","Autor/Autorin"],
+        ["coincidence","Zufall"]
+      ]},
+      { t:{en:"On Stage", de:"Auf der Bühne"}, pairs: [
+        ["speech","Rede, Ansprache"],
+        ["stage","Bühne"],
+        ["to achieve (a goal)","(ein Ziel) erreichen"],
+        ["to wave","winken"],
+        ["laugh","Lacher"],
+        ["to try out","ausprobieren"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find shopping verbs", de:"Finde Einkaufs-Verben"},
+        correct:["to buy sth.","to pay the bill","to try on sunglasses","to return"],
+        distractors:["to sink","to survive","to wave"] },
+      { t:{en:"Find Titanic words", de:"Finde Titanic-Wörter"},
+        correct:["passenger","to sink","to survive","author"],
+        distractors:["thief (pl thieves)","queue","stage"] },
+      { t:{en:"Find crime & trouble words", de:"Finde Verbrechen & Ärger"},
+        correct:["thief (pl thieves)","to steal","careless","awful"],
+        distractors:["similar","entrance","laugh"] }
+    ],
+    sb: ["coincidence","passenger","author","thief (pl thieves)","queue","speech","awful","careless","to survive","similar","married","to achieve (a goal)","entrance","to wave","per cent"]
+  },
+
+  "Unit 3": {
+    mm: [
+      { t:{en:"At the Airport", de:"Am Flughafen"}, pairs: [
+        ["to take off","abheben, starten"],
+        ["to land","landen"],
+        ["to get on (a plane)","in (ein Flugzeug) einsteigen"],
+        ["to get off (the plane)","aus (dem Flugzeug) aussteigen"],
+        ["to fly (back)","(zurück-)fliegen"],
+        ["departure","Abflug; Abfahrt"],
+        ["flight","Flug"]
+      ]},
+      { t:{en:"On the Road", de:"Unterwegs"}, pairs: [
+        ["to rent (a car)","(ein Auto) mieten"],
+        ["to get into (a car)","in (ein Auto) einsteigen"],
+        ["to get out of (the car)","aus (dem Auto) aussteigen"],
+        ["to drive (home)","(nach Hause) fahren"],
+        ["to set off (for work)","(zur Arbeit) aufbrechen"],
+        ["journey","Reise"],
+        ["on foot","zu Fuß"]
+      ]},
+      { t:{en:"Exploring Nature", de:"Natur erkunden"}, pairs: [
+        ["to explore","erkunden, erforschen"],
+        ["explorer","Entdecker/Entdeckerin"],
+        ["wilderness","Wildnis"],
+        ["to sleep in a tent","in einem Zelt schlafen"],
+        ["to cross (a river)","(einen Fluss) überqueren"],
+        ["to sail","segeln"],
+        ["hut","Hütte"],
+        ["traveller","Reisender/Reisende"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find airport/flight verbs", de:"Finde Flughafen-Verben"},
+        correct:["to take off","to land","to get on (a plane)","to get off (the plane)","to fly (back)"],
+        distractors:["to rent (a car)","to drive (home)","to sail"] },
+      { t:{en:"Find travel adjectives", de:"Finde Reise-Adjektive"},
+        correct:["curious","painful","lonely","thirsty","awake"],
+        distractors:["impossible","unfortunately","recently"] },
+      { t:{en:"Find exploration words", de:"Finde Entdecker-Wörter"},
+        correct:["explorer","wilderness","journey","traveller","experience"],
+        distractors:["departure","flight","decision"] }
+    ],
+    sb: ["wilderness","explorer","journey","curious","painful","departure","experience","to criticise","to recommend","impossible","unfortunately","to promise","thirsty","traveller","to suffer from altitude sickness"]
+  },
+
+  "Unit 4": {
+    mm: [
+      { t:{en:"Animal Adjectives", de:"Tier-Adjektive"}, pairs: [
+        ["poisonous","giftig"],
+        ["aggressive","aggressiv"],
+        ["dangerous","gefährlich"],
+        ["deadly","tödlich"],
+        ["cute","niedlich, süß"],
+        ["cuddly","kuschelig"],
+        ["furry","pelzig, flauschig"],
+        ["adorable","bezaubernd, liebenswert"]
+      ]},
+      { t:{en:"Dangerous Animals", de:"Gefährliche Tiere"}, pairs: [
+        ["polar bear","Eisbär"],
+        ["swan","Schwan"],
+        ["seal","Robbe"],
+        ["lizard","Eidechse"],
+        ["cub","(Bären-)Junges"],
+        ["rabies","Tollwut"],
+        ["poison","Gift"],
+        ["bite","Biss"]
+      ]},
+      { t:{en:"Attack & Defend", de:"Angriff & Verteidigung"}, pairs: [
+        ["to bite (off)","(ab-)beißen"],
+        ["to chase away","verjagen"],
+        ["to defend","verteidigen"],
+        ["to bleed","bluten"],
+        ["injury","Verletzung"],
+        ["victim","Opfer"],
+        ["scuba diver","Sporttaucher/Sporttaucherin"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find dangerous adjectives", de:"Finde gefährliche Adjektive"},
+        correct:["poisonous","aggressive","dangerous","deadly"],
+        distractors:["cute","cuddly","adorable","furry"] },
+      { t:{en:"Find cute adjectives", de:"Finde niedliche Adjektive"},
+        correct:["cute","cuddly","adorable","furry","elegant","stunning"],
+        distractors:["poisonous","deadly"] },
+      { t:{en:"Find animals", de:"Finde Tiere"},
+        correct:["polar bear","swan","seal","lizard","cub"],
+        distractors:["scuba diver","politician","audience"] }
+    ],
+    sb: ["poisonous","aggressive","dangerous","deadly","adorable","rabies","scuba diver","injury","to defend","to bleed","victim","immediately","environment","politician","audience"]
+  },
+
+  "Unit 5": {
+    mm: [
+      { t:{en:"Luck & Wishes", de:"Glück & Wünsche"}, pairs: [
+        ["to be unlucky","Pech haben"],
+        ["to make a wish","sich etwas wünschen"],
+        ["to wish for sth.","sich etw. wünschen"],
+        ["to come true","wahr werden"],
+        ["to bring (good/bad) luck","(Glück/Pech) bringen"],
+        ["to have (good/bad) luck","(Glück/Pech) haben"],
+        ["lucky charm","Glücksbringer"]
+      ]},
+      { t:{en:"Spooky Superstitions", de:"Gruseliger Aberglaube"}, pairs: [
+        ["spooky","unheimlich, gruselig"],
+        ["superstition","Aberglaube"],
+        ["superstitious","abergläubisch"],
+        ["evil","böse"],
+        ["spirit","Geist"],
+        ["to believe in superstitions","an Aberglauben glauben"],
+        ["cuckoo","Kuckuck"]
+      ]},
+      { t:{en:"Everyday Objects", de:"Alltagsgegenstände"}, pairs: [
+        ["alarm clock","Wecker"],
+        ["sleeping bag","Schlafsack"],
+        ["toothbrush","Zahnbürste"],
+        ["salt","Salz"],
+        ["pavement","Gehsteig"],
+        ["haircut","Haarschnitt"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find luck words", de:"Finde Glücks-Wörter"},
+        correct:["lucky charm","to make a wish","to come true","to be unlucky"],
+        distractors:["spooky","evil","to scream"] },
+      { t:{en:"Find spooky words", de:"Finde gruselige Wörter"},
+        correct:["spooky","evil","spirit","superstition","superstitious","to scream"],
+        distractors:["satisfied","traditional"] },
+      { t:{en:"Find everyday objects", de:"Finde Alltagsgegenstände"},
+        correct:["alarm clock","sleeping bag","toothbrush","salt","cuckoo"],
+        distractors:["spirit","haircut","pavement"] }
+    ],
+    sb: ["superstition","superstitious","spooky","cuckoo","lucky charm","pavement","toothbrush","alarm clock","evil","to whistle","to ignore","satisfied","obvious","traditional","seriously"]
+  },
+
+  "Unit 6": {
+    mm: [
+      { t:{en:"London Sights", de:"Londoner Sehenswürdigkeiten"}, pairs: [
+        ["bridge","Brücke"],
+        ["river","Fluss"],
+        ["art gallery","Kunstgalerie"],
+        ["tower","Turm"],
+        ["the Houses of Parliament","das Parlament (von Großbritannien)"],
+        ["tourist attraction","Sehenswürdigkeit"],
+        ["raven","Rabe"]
+      ]},
+      { t:{en:"In the City", de:"In der Stadt"}, pairs: [
+        ["square","Platz"],
+        ["park","Park"],
+        ["district","Bezirk, Viertel"],
+        ["building","Gebäude"],
+        ["street","Straße"],
+        ["shop","Geschäft"],
+        ["shopping centre","Einkaufszentrum"],
+        ["stadium","Stadion"]
+      ]},
+      { t:{en:"Describing a Visit", de:"Einen Besuch beschreiben"}, pairs: [
+        ["spectacular","spektakulär"],
+        ["thrilling","aufregend"],
+        ["multicultural","multikulturell"],
+        ["to experience","erleben, erfahren"],
+        ["view","Ausblick, Aussicht"],
+        ["visitor","Besucher/Besucherin"],
+        ["in advance","im Voraus"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find London sights", de:"Finde London-Sehenswürdigkeiten"},
+        correct:["bridge","tower","art gallery","the Houses of Parliament","raven"],
+        distractors:["prison","government","traffic"] },
+      { t:{en:"Find city places", de:"Finde Orte in der Stadt"},
+        correct:["square","park","building","street","shop","stadium"],
+        distractors:["raven","play"] },
+      { t:{en:"Find positive adjectives", de:"Finde positive Adjektive"},
+        correct:["spectacular","thrilling","multicultural"],
+        distractors:["cruel","empty"] }
+    ],
+    sb: ["the Houses of Parliament","tourist attraction","spectacular","multicultural","approximately","raven","art gallery","shopping centre","thrilling","government","cruel","to burn down","to photograph","visitor","collection"]
+  },
+
+  "Unit 7": {
+    mm: [
+      { t:{en:"Friendship Ups & Downs", de:"Freundschaft Höhen & Tiefen"}, pairs: [
+        ["to fall out with sb.","sich mit jdm. zerstreiten"],
+        ["to make up with sb.","sich mit jdm. versöhnen"],
+        ["to get on well with sb.","sich gut mit jdm. verstehen"],
+        ["to break up with sb.","mit jdm. Schluss machen"],
+        ["to laugh at sb.","jdn. auslachen"],
+        ["to make fun of sb.","sich über jdn. lustig machen"],
+        ["to storm out of","wütend hinausstürmen"]
+      ]},
+      { t:{en:"Feelings & Conflict", de:"Gefühle & Konflikte"}, pairs: [
+        ["jealous","eifersüchtig"],
+        ["honest","ehrlich"],
+        ["clumsy","ungeschickt"],
+        ["beloved","geliebt"],
+        ["to admit","zugeben"],
+        ["to blackmail","erpressen"],
+        ["to lie to sb.","jdn. anlügen"],
+        ["to struggle","kämpfen, sich abmühen"]
+      ]},
+      { t:{en:"Little Things", de:"Kleine Dinge"}, pairs: [
+        ["soft toy","Stofftier"],
+        ["earring","Ohrring"],
+        ["questionnaire","Fragebogen"],
+        ["script","Drehbuch"],
+        ["rash","Hautausschlag"],
+        ["childhood (no pl)","Kindheit"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find friendship verbs", de:"Finde Freundschafts-Verben"},
+        correct:["to fall out with sb.","to make up with sb.","to get on well with sb.","to break up with sb."],
+        distractors:["to blackmail","to lie to sb.","to admit"] },
+      { t:{en:"Find feelings & traits", de:"Finde Gefühle & Eigenschaften"},
+        correct:["jealous","honest","clumsy","beloved","unwell"],
+        distractors:["nowhere","a pile of"] },
+      { t:{en:"Find negative actions", de:"Finde negative Aktionen"},
+        correct:["to blackmail","to lie to sb.","to laugh at sb.","to make fun of sb.","to tell sb. off"],
+        distractors:["to solve","to own","to admit"] }
+    ],
+    sb: ["jealous","to blackmail","beloved","questionnaire","childhood (no pl)","clumsy","honest","to admit","relationship","to struggle","to solve","earring","script","rash","unwell"]
+  },
+
+  "Unit 8": {
+    mm: [
+      { t:{en:"Inventing & Discovering", de:"Erfinden & Entdecken"}, pairs: [
+        ["to invent","erfinden"],
+        ["to experiment","experimentieren"],
+        ["to improve","verbessern"],
+        ["to discover","entdecken"],
+        ["to work sth. out","etw. herausfinden"],
+        ["to design","entwerfen, gestalten"],
+        ["to produce","produzieren, herstellen"],
+        ["invention","Erfindung"]
+      ]},
+      { t:{en:"Inventors & Tech", de:"Erfinder & Technik"}, pairs: [
+        ["inventor","Erfinder/Erfinderin"],
+        ["engineer","Techniker/Technikerin"],
+        ["device","Gerät"],
+        ["product","Produkt"],
+        ["current","(elektrischer) Strom"],
+        ["energy","Energie; Strom"],
+        ["electric (motor)","elektrisch; (Elektro)motor"]
+      ]},
+      { t:{en:"Helping People", de:"Menschen helfen"}, pairs: [
+        ["wheelchair","Rollstuhl"],
+        ["crutches","Krücken"],
+        ["ramp","Rampe"],
+        ["illness","Krankheit"],
+        ["to adapt","anpassen"],
+        ["to support","unterstützen"],
+        ["to repair","reparieren"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find invention verbs", de:"Finde Erfindungs-Verben"},
+        correct:["to invent","to experiment","to discover","to design","to produce","to develop"],
+        distractors:["to shoot","to decorate"] },
+      { t:{en:"Find tech nouns", de:"Finde Technik-Nomen"},
+        correct:["inventor","engineer","device","product","invention","current"],
+        distractors:["crowd","soap"] },
+      { t:{en:"Find mobility helpers", de:"Finde Mobilitätshilfen"},
+        correct:["wheelchair","crutches","ramp"],
+        distractors:["glove","collar","fat","bacon"] }
+    ],
+    sb: ["to invent","invention","inventor","engineer","wheelchair","crutches","to experiment","to discover","electric (motor)","remarkable","confident","computer science","to adapt","device","illness"]
+  },
+
+  "Unit 9": {
+    mm: [
+      { t:{en:"Teen Freedoms", de:"Teenager-Freiheiten"}, pairs: [
+        ["to dye your hair","deine Haare färben"],
+        ["to get a tattoo","sich tätowieren lassen"],
+        ["to get a nose stud","sich einen Nasenstecker stechen lassen"],
+        ["to wear earrings","Ohrringe tragen"],
+        ["to have a party at home","zu Hause eine Party machen"],
+        ["to go to the disco","in die Disco gehen"],
+        ["to stay up","aufbleiben"]
+      ]},
+      { t:{en:"Screen Time & Fun", de:"Bildschirmzeit & Spaß"}, pairs: [
+        ["to scroll through your phone","durch dein Handy scrollen"],
+        ["to play video games all day","den ganzen Tag Videospiele spielen"],
+        ["to watch TV after 10 o'clock","nach 22 Uhr fernsehen"],
+        ["to turn your music up loud","deine Musik laut aufdrehen"],
+        ["to come home after ten","nach zehn Uhr nach Hause kommen"],
+        ["to buy your own clothes","deine eigene Kleidung kaufen"],
+        ["to eat too many sweets","zu viele Süßigkeiten essen"]
+      ]},
+      { t:{en:"Parenting Style", de:"Erziehungsstil"}, pairs: [
+        ["strict","streng"],
+        ["conservative","konservativ"],
+        ["to punish","bestrafen"],
+        ["to be allowed to do sth.","etw. tun dürfen"],
+        ["community","Gemeinschaft, Gemeinde"],
+        ["modern technology","moderne Technologie"],
+        ["rude","unhöflich, unverschämt"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find teen freedom actions", de:"Finde Teenager-Freiheiten"},
+        correct:["to dye your hair","to get a tattoo","to get a nose stud","to wear earrings","to have a party at home"],
+        distractors:["to pray","to punish","to freeze"] },
+      { t:{en:"Find screen & evening activities", de:"Finde Bildschirm- & Abendaktivitäten"},
+        correct:["to scroll through your phone","to play video games all day","to watch TV after 10 o'clock","to turn your music up loud","to stay up"],
+        distractors:["litter-picking","to sort out","to lend"] },
+      { t:{en:"Find parenting adjectives", de:"Finde Erziehungs-Adjektive"},
+        correct:["strict","conservative","rude","unbelievable"],
+        distractors:["plenty","for a change","It's a pity."] }
+    ],
+    sb: ["conservative","strict","community","journalist","litter-picking","unbelievable","modern technology","to punish","to pray","to freeze","to remind sb.","to dye your hair","to get a tattoo","to scroll through your phone","to adopt"]
+  },
+
+  "Unit 10": {
+    mm: [
+      { t:{en:"Take Action!", de:"Aktiv werden!"}, pairs: [
+        ["to hand out leaflets","Flugblätter verteilen"],
+        ["to sign a petition","eine Petition unterschreiben"],
+        ["to go on a protest march","auf einen Protestmarsch gehen"],
+        ["to organise a meeting","ein Treffen organisieren"],
+        ["to send out emails","E-Mails versenden"],
+        ["to take action","etw. unternehmen, aktiv werden"],
+        ["to protest","protestieren"]
+      ]},
+      { t:{en:"Save the Planet", de:"Rette den Planeten"}, pairs: [
+        ["to recycle paper, glass, plastic and cans","Papier, Glas, Plastik und Dosen recyceln"],
+        ["to save water and energy","Wasser und Energie sparen"],
+        ["to buy locally produced food","lokal produzierte Lebensmittel kaufen"],
+        ["Don't drop litter.","Wirf keinen Müll weg."],
+        ["Don't drive short distances.","Fahr keine kurzen Strecken."],
+        ["cloth bag","Stofftasche"],
+        ["wrapping","Verpackung"]
+      ]},
+      { t:{en:"Rights & Suffrage", de:"Rechte & Wahlrecht"}, pairs: [
+        ["suffrage","Wahlrecht"],
+        ["suffragette","Frauenrechtlerin"],
+        ["to vote","wählen"],
+        ["to be equal","gleichberechtigt sein"],
+        ["law","Gesetz"],
+        ["non-violent","gewaltlos"],
+        ["to refuse","(ver-)weigern"],
+        ["right(s)","Recht(e)"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find activism verbs", de:"Finde Aktivismus-Verben"},
+        correct:["to hand out leaflets","to sign a petition","to go on a protest march","to organise a meeting","to send out emails","to protest"],
+        distractors:["to exist","to attend"] },
+      { t:{en:"Find eco actions", de:"Finde Öko-Aktionen"},
+        correct:["to recycle paper, glass, plastic and cans","to save water and energy","to buy locally produced food","Don't drop litter.","Don't drive short distances."],
+        distractors:["to close down","hardly ever","lazy"] },
+      { t:{en:"Find rights words", de:"Finde Rechte-Wörter"},
+        correct:["suffrage","suffragette","to vote","law","right(s)","non-violent"],
+        distractors:["cottage","cloth bag","wrapping"] }
+    ],
+    sb: ["suffrage","suffragette","non-violent","to sign a petition","compromise","majority","organisation","to recycle paper, glass, plastic and cans","businessman (pl businessmen)","to vote","law","concern","debate","ability","headteacher"]
+  },
+
+  "Unit 11": {
+    mm: [
+      { t:{en:"Canyon Landscape", de:"Canyon-Landschaft"}, pairs: [
+        ["canyon","Schlucht, Canyon"],
+        ["ridge","Bergrücken, Grat"],
+        ["dirt road","unbefestigte Straße"],
+        ["mountain range","Bergkette"],
+        ["steep","steil"],
+        ["height","Höhe"],
+        ["shade (no pl)","Schatten"],
+        ["to be situated","liegen, sich befinden"]
+      ]},
+      { t:{en:"Travel Logistics", de:"Reise-Logistik"}, pairs: [
+        ["backpack","Rucksack"],
+        ["ferry","Fähre"],
+        ["railway","Zug, Eisenbahn"],
+        ["information office","Informationsbüro, Auskunftsbüro"],
+        ["to catch (the train)","(den Zug) erwischen"],
+        ["guided","geführt, geleitet"],
+        ["to take over","übernehmen"],
+        ["cyclist","Radfahrer/Radfahrerin"]
+      ]},
+      { t:{en:"Gold & Work", de:"Gold & Arbeit"}, pairs: [
+        ["gold digger","Goldgräber/Goldgräberin"],
+        ["gold rush","Goldrausch"],
+        ["programmer","Programmierer/Programmiererin"],
+        ["headquarters (pl)","Hauptquartier"],
+        ["capital","Hauptstadt"],
+        ["state","Staat"],
+        ["to commute","pendeln"],
+        ["connection","Verbindung"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find landscape words", de:"Finde Landschafts-Wörter"},
+        correct:["canyon","ridge","dirt road","mountain range","shade (no pl)"],
+        distractors:["backpack","ferry","railway"] },
+      { t:{en:"Find travel words", de:"Finde Reise-Wörter"},
+        correct:["backpack","ferry","railway","cyclist","information office"],
+        distractors:["programmer","criminal","lip"] },
+      { t:{en:"Find descriptive adjectives", de:"Finde beschreibende Adjektive"},
+        correct:["steep","fabulous","familiar","guided","independent"],
+        distractors:["totally","to crack","thirst"] }
+    ],
+    sb: ["canyon","ridge","headquarters (pl)","programmer","fabulous","mountain range","four-wheel drive","gold digger","gold rush","independent","innovation","to commute","criminal","information office","familiar"]
+  },
+
+  "Unit 12": {
+    mm: [
+      { t:{en:"Natural Disasters", de:"Naturkatastrophen"}, pairs: [
+        ["drought","Dürre"],
+        ["earthquake","Erdbeben"],
+        ["hurricane","Hurrikan"],
+        ["volcanic eruption","Vulkanausbruch"],
+        ["mudslide","Schlammlawine"],
+        ["avalanche","Lawine"],
+        ["forest fire","Waldbrand"],
+        ["tsunami","Tsunami"]
+      ]},
+      { t:{en:"Emergency Safety", de:"Notfall-Sicherheit"}, pairs: [
+        ["fire drill","Feueralarm-Übung"],
+        ["escape route","Fluchtweg"],
+        ["smoke detector","Rauchmelder"],
+        ["meeting place","Treffpunkt"],
+        ["to check doors","Türen überprüfen"],
+        ["to crawl low","niedrig kriechen"],
+        ["to stop, drop & roll","stoppen, fallen und rollen"],
+        ["to evacuate","evakuieren"]
+      ]},
+      { t:{en:"Castaway Survival", de:"Schiffbrüchigen-Überleben"}, pairs: [
+        ["castaway","Schiffbrüchiger/Schiffbrüchige"],
+        ["raft","Floß"],
+        ["shelter","Unterschlupf, Unterkunft"],
+        ["desert island","einsame Insel"],
+        ["survival","Überleben"],
+        ["lighter","Feuerzeug"],
+        ["to be trapped","gefangen sein, festsitzen"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find natural disasters", de:"Finde Naturkatastrophen"},
+        correct:["drought","earthquake","hurricane","volcanic eruption","avalanche","forest fire","tsunami","flood"],
+        distractors:["shelter"] },
+      { t:{en:"Find emergency safety", de:"Finde Notfall-Sicherheit"},
+        correct:["fire drill","escape route","smoke detector","meeting place","to evacuate"],
+        distractors:["joy","hometown","miracle"] },
+      { t:{en:"Find survival words", de:"Finde Überlebens-Wörter"},
+        correct:["castaway","raft","shelter","desert island","survival","lighter"],
+        distractors:["parcel","ash","flame"] }
+    ],
+    sb: ["earthquake","hurricane","volcanic eruption","avalanche","tsunami","castaway","survival","to evacuate","smoke detector","escape route","desert island","miracle","pleasure (no pl)","to collapse","delivery company"]
+  },
+
+  "Unit 13": {
+    mm: [
+      { t:{en:"Making Decisions", de:"Entscheidungen treffen"}, pairs: [
+        ["to make up your mind","sich entscheiden"],
+        ["to sleep on it","eine Nacht darüber schlafen"],
+        ["to reach a decision","eine Entscheidung treffen"],
+        ["to be at a loss","ratlos sein"],
+        ["to be in two minds about sth.","bei etw. unentschlossen sein"],
+        ["to have second thoughts about sth.","etw. noch einmal überdenken"],
+        ["to find a way out of a dilemma","einen Ausweg aus einem Dilemma finden"],
+        ["dilemma","Dilemma, Zwangslage"]
+      ]},
+      { t:{en:"Disappointment", de:"Enttäuschung"}, pairs: [
+        ["to cancel","absagen"],
+        ["disappointment","Enttäuschung"],
+        ["to move","(sich) bewegen; umziehen; hier: verschieben"],
+        ["to kick sb. off","rausschmeißen"],
+        ["to rethink","überdenken"],
+        ["to deserve","verdienen"],
+        ["It's a shame.","Das ist schade."],
+        ["granddad","Opa"]
+      ]},
+      { t:{en:"School Trouble", de:"Schulärger"}, pairs: [
+        ["alibi","Alibi"],
+        ["ID (=identification)","Personalausweis"],
+        ["to keep quiet","still sein, schweigen"],
+        ["to tell on sb.","jdn. verpetzen"],
+        ["detention","Nachsitzen"],
+        ["to ask sb. out","jdn. nach einem Date fragen"],
+        ["to argue","streiten, diskutieren"],
+        ["to pretend","vortäuschen, so tun, als ob"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find decision phrases", de:"Finde Entscheidungs-Phrasen"},
+        correct:["to make up your mind","to sleep on it","to reach a decision","to be at a loss","dilemma"],
+        distractors:["to cancel","to deserve","to argue"] },
+      { t:{en:"Find trouble verbs", de:"Finde Ärger-Verben"},
+        correct:["to keep quiet","to tell on sb.","to argue","to pretend","to reject","to cancel"],
+        distractors:["to wrap","to put up"] },
+      { t:{en:"Find things you might give", de:"Finde Dinge zum Schenken"},
+        correct:["voucher","homemade","to wrap"],
+        distractors:["alibi","detention","lift","granddad"] }
+    ],
+    sb: ["dilemma","disappointment","detention","alibi","to deserve","to pretend","voucher","accidentally","homemade","to rethink","to reject","neither of","to make up your mind","to have second thoughts about sth.","to be in two minds about sth."]
+  },
+
+  "Unit 14": {
+    mm: [
+      { t:{en:"Trip Planning", de:"Reiseplanung"}, pairs: [
+        ["to plan a trip","eine Reise planen"],
+        ["to book a holiday","einen Urlaub buchen"],
+        ["to make a hotel reservation","eine Hotelreservierung vornehmen"],
+        ["to hire a car","ein Auto mieten"],
+        ["to check the area out online","die Gegend online erkunden"],
+        ["to buy a dictionary","ein Wörterbuch kaufen"],
+        ["to find out about good restaurants","gute Restaurants herausfinden"]
+      ]},
+      { t:{en:"Research Your Destination", de:"Reiseziel recherchieren"}, pairs: [
+        ["to find information about the best beaches","Informationen über die besten Strände finden"],
+        ["to look at a map of the area","sich eine Karte der Gegend ansehen"],
+        ["to find out what to do there","herausfinden, was man dort machen kann"],
+        ["official language","Amtssprache"],
+        ["wetland","Sumpfgebiet"],
+        ["wild animal","Wildtier"],
+        ["wildlife","wilde Tierwelt"]
+      ]},
+      { t:{en:"Car Trouble", de:"Autoärger"}, pairs: [
+        ["to drive off","wegfahren"],
+        ["engine","Motor"],
+        ["front seat","Vordersitz"],
+        ["to turn over","(sich) überschlagen"],
+        ["crash","Unfall, Zusammenstoß"],
+        ["cut","Schnitt(-wunde)"],
+        ["sunburn","Sonnenbrand"],
+        ["park ranger","Parkwächter/Parkwächterin"]
+      ]}
+    ],
+    wh: [
+      { t:{en:"Find planning verbs", de:"Finde Planungs-Verben"},
+        correct:["to plan a trip","to book a holiday","to make a hotel reservation","to hire a car","to buy a dictionary"],
+        distractors:["to dig","to whisper","to drive off"] },
+      { t:{en:"Find nature words", de:"Finde Natur-Wörter"},
+        correct:["wild animal","wildlife","wetland","bush","branch","bug"],
+        distractors:["balcony","front seat"] },
+      { t:{en:"Find car crash words", de:"Finde Unfall-Wörter"},
+        correct:["crash","engine","front seat","to drive off","to turn over","cut","sunburn"],
+        distractors:["park ranger","wetland"] }
+    ],
+    sb: ["official language","wildlife","wetland","park ranger","sunburn","to whisper","impolite","shocked","stuffed","otherwise","to prefer","to make a hotel reservation","to find out about good restaurants","to turn over","by the way"]
+  }
 };
 
 // ===== AVATAR SYSTEM =====
@@ -7170,33 +7805,66 @@ function awardVocabXP(n, label) {
 // =========================================================
 let mmState = { pairs: [], cards: [], first: null, second: null, moves: 0, matched: 0, startTime: 0, busy: false, poolSize: 10 };
 
+function collectVocabTasks(kind) {
+  const out = [];
+  (state.selectedSources || []).forEach(src => {
+    if (typeof VOCAB_TASKS !== 'undefined' && VOCAB_TASKS[src] && VOCAB_TASKS[src][kind]) {
+      VOCAB_TASKS[src][kind].forEach(task => out.push(Object.assign({}, task, { source: src })));
+    }
+  });
+  return out;
+}
+
+function findVocabWord(src, enText) {
+  const arr = vocabData[src];
+  if (!arr) return null;
+  return arr.find(w => w.w === enText) || null;
+}
+
 function startMemoryMatch() {
-  const pool = collectVocabFromSelectedUnits();
-  if (pool.length < 10) {
-    alert('Too few words — pick more units (need at least 10).');
+  const tasks = collectVocabTasks('mm');
+  if (tasks.length === 0) {
+    alert('No Memory Match tasks for selected units.');
     return;
   }
-  mmState.poolSize = Math.min(10, pool.length);
-  mmState._pool = pool;
+  shuffle(tasks);
+  mmState._queue = tasks;
+  mmState._queueIdx = 0;
   document.body.classList.add('playing');
   showScreen('memory-match-screen');
   startMemoryMatchRound();
 }
 
 function startMemoryMatchRound() {
-  const pool = mmState._pool || collectVocabFromSelectedUnits();
-  shuffle(pool);
-  const picks = pool.slice(0, mmState.poolSize);
+  let q = mmState._queue;
+  if (!q || !q.length) {
+    q = collectVocabTasks('mm');
+    if (!q.length) { endMemoryMatch(); return; }
+    shuffle(q); mmState._queue = q; mmState._queueIdx = 0;
+  }
+  const task = q[mmState._queueIdx % q.length];
+  mmState._queueIdx++;
+  const pairs = [...task.pairs];
+  shuffle(pairs);
+  const picks = pairs.slice(0, Math.min(8, pairs.length));
   const cards = [];
-  picks.forEach((w, i) => {
-    cards.push({ pairId: i, kind: 'en', text: w.w, word: w });
-    cards.push({ pairId: i, kind: 'de', text: w.g.split(',')[0].trim(), word: w });
+  picks.forEach((p, i) => {
+    cards.push({ pairId: i, kind: 'en', text: p[0] });
+    cards.push({ pairId: i, kind: 'de', text: p[1] });
   });
   shuffle(cards);
   mmState.pairs = picks;
   mmState.cards = cards;
   mmState.first = null; mmState.second = null; mmState.moves = 0; mmState.matched = 0;
   mmState.startTime = Date.now(); mmState.busy = false;
+  const titleCard = document.getElementById('mm-title-card');
+  const titleText = document.getElementById('mm-title-text');
+  const titleLabel = document.getElementById('mm-title-label');
+  if (titleCard && titleText) {
+    titleLabel.textContent = 'Topic';
+    titleText.textContent = task.t.en + ' — ' + task.source;
+    titleCard.style.display = '';
+  }
   renderMemoryMatch();
   document.getElementById('mm-done').style.display = 'none';
   document.getElementById('mm-grid').style.display = '';
@@ -7302,14 +7970,22 @@ function sbNormaliseTarget(w) {
 }
 
 function startSpellingBee() {
-  const pool = collectVocabFromSelectedUnits().filter(w => {
-    const t = sbNormaliseTarget(w);
-    // G3: accept phrases up to 28 chars (vs 20 in G1/G2) to cover idioms like "to hand out leaflets"
-    return t.length >= 3 && t.length <= 28 && /[a-zA-Z]/.test(t);
+  const seen = new Set();
+  const pool = [];
+  (state.selectedSources || []).forEach(src => {
+    if (!(typeof VOCAB_TASKS !== 'undefined' && VOCAB_TASKS[src] && VOCAB_TASKS[src].sb)) return;
+    VOCAB_TASKS[src].sb.forEach(en => {
+      const key = src + '::' + en;
+      if (seen.has(key)) return;
+      seen.add(key);
+      const w = findVocabWord(src, en);
+      if (!w) return;
+      const t = sbNormaliseTarget(w);
+      if (t.length >= 3 && t.length <= 28) pool.push(w);
+    });
   });
   if (pool.length < 5) { alert('Too few spellable words — pick more units.'); return; }
   shuffle(pool);
-  // G3: 15 words per session (vs 12) — longer practice block
   sbState.deck = pool.slice(0, Math.min(15, pool.length));
   sbState.idx = 0; sbState.correct = 0; sbState.wrong = 0;
   document.body.classList.add('playing');
@@ -7495,49 +8171,21 @@ function endSpellingBee() {
 }
 
 // =========================================================
-// ===== WORD HUNT (G3: A2/A2+ categories, 7 rounds) =======
+// ===== WORD HUNT (curated per-unit tasks) =================
 // =========================================================
-// G3 category set — rebuilt around MORE! 3 themes (music, travel, disasters,
-// environment, science, feelings). Keyword lists are intentionally broad so a
-// round fires whenever 3+ pool words hit a category.
-function _whMatch(w, kws) {
-  const base = (w.w || '').toLowerCase().replace(/^(to|a|an|the)\s+/, '').trim();
-  if (!base) return false;
-  const tokens = base.split(/[\s-]+/);
-  for (const kw of kws) {
-    if (base === kw) return true;
-    if (tokens.includes(kw)) return true;
-    // Multi-word keyword match (e.g. "ice cream") — check substring at word boundary
-    if (kw.includes(' ') && base.includes(kw)) return true;
-  }
-  return false;
-}
-
-const WH_CATEGORIES = [
-  { id: 'travel',   name: 'Travel & Transport',    kws: ['airport','plane','train','bus','coach','taxi','cab','flight','ticket','passport','luggage','suitcase','journey','trip','holiday','vacation','tourist','tour','map','destination','gate','board','boarding','fly','flew','drive','driver','lane','motorway','highway','road','station','traffic','passenger','aeroplane','airplane','jet','cruise','ferry','harbour','harbor','platform','departure','arrival','check-in','hire','rent','book','hotel','hostel'] },
-  { id: 'nature',   name: 'Nature & Landscape',    kws: ['mountain','valley','canyon','river','lake','ocean','sea','forest','jungle','desert','waterfall','cliff','coast','beach','hill','field','cave','island','wildlife','countryside','landscape','volcano','glacier','rainforest','wood','woods','pond','stream','shore','meadow','rock','stone','sand','dune','reef'] },
-  { id: 'disaster', name: 'Disasters & Weather',   kws: ['earthquake','flood','tsunami','hurricane','storm','tornado','volcano','eruption','drought','fire','wildfire','wind','rain','snow','lightning','thunder','evacuate','rescue','emergency','damage','danger','disaster','avalanche','blizzard','heatwave','cyclone','typhoon','smoke','ash','escape','survive','shelter'] },
-  { id: 'science',  name: 'Science & Invention',   kws: ['invent','invention','inventor','experiment','discover','discovery','improve','improvement','energy','electric','electricity','engineer','scientist','laboratory','research','technology','machine','robot','computer','internet','email','program','programmer','device','gadget','battery','engine','screen','software','data','digital','online','network'] },
-  { id: 'env',      name: 'Environment & Activism',kws: ['recycle','recycling','pollution','pollute','climate','environment','protest','petition','leaflet','plastic','waste','rubbish','garbage','litter','green','eco','sustainable','sustainability','activist','campaign','volunteer','donate','charity','rights','global','warming','carbon','emission','organic','reuse','reduce','planet'] },
-  { id: 'arts',     name: 'Arts & Performance',    kws: ['audition','band','singer','musician','music','song','tune','lyrics','lyric','flute','guitar','drums','piano','violin','stage','theatre','theater','concert','gallery','artist','painter','painting','dancer','dance','actor','actress','rehearsal','perform','performance','play','show','orchestra','choir','film','movie','director','script','audience','applause'] },
-  { id: 'jobs',     name: 'People & Jobs',         kws: ['engineer','programmer','photographer','journalist','author','writer','teacher','doctor','nurse','firefighter','ranger','waiter','waitress','guide','pilot','captain','chef','cook','builder','scientist','dentist','vet','lawyer','lawyer','police','officer','reporter','editor','designer','architect','electrician','plumber','mechanic','farmer','secretary','manager','president','leader','coach','trainer'] },
-  { id: 'feelings', name: 'Feelings & Emotions',   kws: ['happy','sad','scared','afraid','angry','worried','nervous','excited','lucky','unlucky','disappointed','satisfied','annoyed','bored','proud','shy','confident','jealous','surprised','shocked','calm','relaxed','stressed','lonely','embarrassed','ashamed','curious','amazed','grateful','thankful','tired','exhausted','furious','glad','upset','anxious','terrified','delighted','pleased'] },
-  { id: 'animal',   name: 'Animals',               kws: ['animal','animals','dog','cat','mouse','bird','horse','cow','sheep','pig','fish','rabbit','duck','chicken','goat','lion','tiger','bear','monkey','frog','snake','spider','insect','bee','butterfly','fly','elephant','zebra','giraffe','kangaroo','panda','parrot','hamster','goldfish','rat','pony','wolf','fox','squirrel','shark','dolphin','whale','crocodile','swan','seal','eagle','owl','bat','penguin','polar','polar bear'] },
-  { id: 'action',   name: 'Actions (Verbs)',       match: w => /^to\s/i.test(w.w||'') }
-];
-WH_CATEGORIES.forEach(c => { if (c.kws && !c.match) c.match = w => _whMatch(w, c.kws); });
-
-let whState = { round: 0, totalRounds: 7, score: 0, target: null, tiles: [], picked: new Set(), correctSet: new Set(), answered: false, usedCats: new Set() };
+let whState = { round: 0, totalRounds: 7, score: 0, target: null, tiles: [], picked: new Set(), correctSet: new Set(), answered: false };
 
 function startWordHunt() {
-  const pool = collectVocabFromSelectedUnits();
-  if (pool.length < 15) {
-    alert('Too few words — pick more units (need at least 15).');
+  const tasks = collectVocabTasks('wh');
+  if (tasks.length === 0) {
+    alert('No Word Hunt tasks for selected units.');
     return;
   }
-  whState.pool = pool;
-  whState.round = 0; whState.score = 0; whState.totalRounds = 7;
-  whState.usedCats = new Set();
+  shuffle(tasks);
+  whState._queue = tasks;
+  whState._queueIdx = 0;
+  whState.round = 0; whState.score = 0;
+  whState.totalRounds = Math.min(tasks.length, 7);
   document.body.classList.add('playing');
   showScreen('word-hunt-screen');
   wordHuntNextRound();
@@ -7545,35 +8193,21 @@ function startWordHunt() {
 
 function wordHuntNextRound() {
   if (whState.round >= whState.totalRounds) { finishWordHunt(); return; }
-  // Prefer categories we haven't used yet this session; avoid repeats until all used.
-  const candidates = [...WH_CATEGORIES].filter(c => !whState.usedCats.has(c.id));
-  const pool = candidates.length ? candidates : [...WH_CATEGORIES];
-  shuffle(pool);
-  let target = null, matched = [];
-  for (const cat of pool) {
-    const hits = whState.pool.filter(w => cat.match(w));
-    if (hits.length >= 3) { target = cat; matched = hits; break; }
-  }
-  if (!target) {
-    // Fallback: try ALL categories (including used) if the non-used subset ran dry
-    for (const cat of WH_CATEGORIES) {
-      const hits = whState.pool.filter(w => cat.match(w));
-      if (hits.length >= 3) { target = cat; matched = hits; break; }
-    }
-  }
-  if (!target) { finishWordHunt(); return; }
-  whState.usedCats.add(target.id);
-  whState.target = target;
+  const task = whState._queue[whState._queueIdx % whState._queue.length];
+  whState._queueIdx++;
+  whState.target = task;
   whState.round++;
   whState.answered = false;
   whState.picked = new Set();
-  shuffle(matched);
-  const numCorrect = Math.min(4, matched.length);
-  const correctPicks = matched.slice(0, numCorrect).map(w => w.w);
-  const nonMatching = whState.pool.filter(w => !target.match(w));
-  shuffle(nonMatching);
-  const fillers = nonMatching.slice(0, 9 - numCorrect).map(w => w.w);
-  const tiles = [...correctPicks, ...fillers];
+  const correct = [...task.correct];
+  const distractors = [...(task.distractors || [])];
+  shuffle(correct); shuffle(distractors);
+  const maxTiles = 9;
+  let cap = Math.min(correct.length, maxTiles - Math.min(distractors.length, 2));
+  cap = Math.max(cap, 3);
+  const correctPicks = correct.slice(0, Math.min(correct.length, cap));
+  const distractorPicks = distractors.slice(0, maxTiles - correctPicks.length);
+  const tiles = [...correctPicks, ...distractorPicks];
   shuffle(tiles);
   whState.tiles = tiles;
   whState.correctSet = new Set(correctPicks);
@@ -7583,7 +8217,8 @@ function wordHuntNextRound() {
 function renderWordHunt() {
   document.getElementById('wh-round').textContent = whState.round + '/' + whState.totalRounds;
   document.getElementById('wh-score').textContent = whState.score;
-  document.getElementById('wh-prompt-text').innerHTML = 'Which are <span class="wh-prompt-target">' + whState.target.name + '</span>?';
+  const catName = whState.target && whState.target.t ? whState.target.t.en : '';
+  document.getElementById('wh-prompt-text').innerHTML = 'Which are <span class="wh-prompt-target">' + catName + '</span>?';
   const grid = document.getElementById('wh-grid');
   grid.innerHTML = '';
   whState.tiles.forEach(word => {
