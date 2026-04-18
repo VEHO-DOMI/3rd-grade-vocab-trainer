@@ -12992,6 +12992,22 @@ function checkGrammarTyped() {
   if (!answer) return;
   input.disabled = true;
   const item = grammarSession.items[grammarSession.index];
+  const ecSelected = document.querySelector('.ec-word.ec-selected');
+  if (item.t === 'error-correction' && ecSelected) {
+    const normWord = s => s.toLowerCase().replace(/[.!?,;:'"()]/g, '');
+    const tokenize = s => s.trim().split(/\s+/).map(normWord).filter(Boolean);
+    const promptSentence = item.p.replace(/^Find and fix the mistake:\s*/i, '').trim();
+    const promptSet = new Set(tokenize(promptSentence));
+    const targetWords = new Set();
+    [item.c, ...(item.a || [])].forEach(a => {
+      tokenize(a).forEach(w => { if (!promptSet.has(w)) targetWords.add(w); });
+    });
+    if (targetWords.size > 0) {
+      const matched = targetWords.has(normWord(answer));
+      processGrammarAnswer(item, answer, matched, false);
+      return;
+    }
+  }
   const profile = item.strict ? ANSWER_PROFILES.strict : ANSWER_PROFILES.grammar;
   const grade = gradeAnswer(answer, item.c, profile, item.a || []);
   let isCorrect = grade.status === 'correct';
