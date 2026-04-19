@@ -3382,7 +3382,7 @@ body.playing .header-container { display: none; }
   <div class="home-section">
     <button class="btn btn-primary btn-start-practice" onclick="openPracticeSetup()">
       <span id="practice-btn-label">🎯 Start Practice</span>
-      <span class="practice-btn-sub" id="practice-subtitle">Choose units and exercise type</span>
+      <span class="practice-btn-sub" id="practice-subtitle">Choose units and exercise types</span>
     </button>
     <div id="smart-review-hint" class="home-smart-review-hint" style="display:none;" onclick="startSmartReview()">
       <span>📝</span>
@@ -7429,9 +7429,12 @@ function startSpeedRound() {
 
 function resetSpeedTimer() {
   if (state.speedTimer) { clearInterval(state.speedTimer); state.speedTimer = null; }
-  document.getElementById('speed-timer-wrap').classList.remove('active');
-  document.getElementById('speed-timer-text').classList.remove('urgent');
-  document.getElementById('skip-btn').style.display = '';
+  const wrap = document.getElementById('speed-timer-wrap');
+  if (wrap) wrap.classList.remove('active');
+  const txt = document.getElementById('speed-timer-text');
+  if (txt) txt.classList.remove('urgent');
+  const skip = document.getElementById('skip-btn');
+  if (skip) skip.style.display = '';
 }
 
 function endSpeedRound() {
@@ -12090,7 +12093,7 @@ function launchTaskPractice(type, structureIds) {
   if (items.length === 0) { alert('No exercises available.'); return; }
   const maxItems = structureIds ? 25 : 10;
   const shuffled = items.sort(() => Math.random() - 0.5).slice(0, maxItems);
-  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_type_' + type, practiceType: type };
+  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, answered: false, structureId: '_type_' + type, practiceType: type };
   document.body.classList.add('playing');
   renderGrammarItem();
 }
@@ -12099,7 +12102,7 @@ function startGrammarPracticeMore(type) {
   const items = grammarItems.filter(i => i.t === type);
   if (items.length === 0) return;
   const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 5);
-  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_type_' + type, practiceType: type, bonusRound: true };
+  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, answered: false, structureId: '_type_' + type, practiceType: type, bonusRound: true };
   document.body.classList.add('playing');
   renderGrammarItem();
 }
@@ -12187,7 +12190,7 @@ function startUnit1Review() {
   });
   if (reviewItems.length === 0) { alert('No review items available.'); return; }
   var shuffled = reviewItems.sort(function() { return Math.random() - 0.5; }).slice(0, 15);
-  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_unit1_review' };
+  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, answered: false, structureId: '_unit1_review' };
   document.body.classList.add('playing');
   renderGrammarItem();
 }
@@ -12222,7 +12225,7 @@ function showGrammarTopics(unit) {
 }
 
 // --- Grammar Exercise Engine ---
-let grammarSession = { items: [], index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: null };
+let grammarSession = { items: [], index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, answered: false, structureId: null };
 
 // Track where practice was launched from for back-navigation
 var grammarPracticeReturnTo = null;
@@ -12234,7 +12237,7 @@ function startGrammarExercise(structureId, filterTypes) {
   }
   if (items.length === 0) { alert('No exercises available for this topic yet.'); return; }
   const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 25);
-  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: structureId };
+  grammarSession = { items: shuffled, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, answered: false, structureId: structureId };
   document.body.classList.add('playing');
   renderGrammarItem();
 }
@@ -12345,7 +12348,7 @@ function startGrammarSmartReview(weakStructures) {
   });
   allItems = allItems.sort(() => Math.random() - 0.5).slice(0, 10);
   if (allItems.length === 0) { alert('No items for review.'); return; }
-  grammarSession = { items: allItems, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, structureId: '_review' };
+  grammarSession = { items: allItems, index: 0, results: [], combo: 0, xpEarned: 0, hintUsed: false, answered: false, structureId: '_review' };
   document.body.classList.add('playing');
   renderGrammarItem();
 }
@@ -12497,7 +12500,7 @@ function renderSentenceBuilding(item) {
   html += '</div>';
   html += '<div style="display:flex;gap:8px;margin-top:0.5rem;">';
   html += '<button class="grammar-hint-btn" onclick="resetSbChips()" style="flex:0 0 auto;">\u21BA Reset</button>';
-  html += '<button class="grammar-check-btn" style="flex:1;margin-top:0;" onclick="checkSentenceBuilding()">Check Answer</button>';
+  html += '<button class="grammar-check-btn" id="sb-check-btn" style="flex:1;margin-top:0;" onclick="checkSentenceBuilding()">Check Answer</button>';
   html += '</div>';
   return html;
 }
@@ -12960,11 +12963,20 @@ function resetSbChips() {
 }
 
 function checkSentenceBuilding() {
+  if (grammarSession.answered) return;
   const item = grammarSession.items[grammarSession.index];
   const answer = sbSelected.join(' ');
   // Normalize both for comparison
   const normalize = s => s.replace(/[.!?,;:]/g, '').toLowerCase().trim();
   const isCorrect = item.a.some(a => normalize(a) === normalize(answer)) || normalize(item.c) === normalize(answer);
+  document.querySelectorAll('.sb-result-chip').forEach(c => {
+    c.style.pointerEvents = 'none';
+    if (isCorrect) { c.style.background = 'rgba(34,197,94,0.15)'; c.style.borderColor = 'var(--correct,#22c55e)'; c.style.color = 'var(--correct,#22c55e)'; }
+    else { c.style.background = 'rgba(239,68,68,0.12)'; c.style.borderColor = 'var(--wrong,#ef4444)'; c.style.color = 'var(--wrong,#ef4444)'; }
+  });
+  document.querySelectorAll('.sb-chip').forEach(c => { c.style.pointerEvents = 'none'; });
+  const sbBtn = document.getElementById('sb-check-btn');
+  if (sbBtn) sbBtn.style.display = 'none';
   processGrammarAnswer(item, answer, isCorrect);
 }
 
@@ -12992,22 +13004,6 @@ function checkGrammarTyped() {
   if (!answer) return;
   input.disabled = true;
   const item = grammarSession.items[grammarSession.index];
-  const ecSelected = document.querySelector('.ec-word.ec-selected');
-  if (item.t === 'error-correction' && ecSelected) {
-    const normWord = s => s.toLowerCase().replace(/[.!?,;:'"()]/g, '');
-    const tokenize = s => s.trim().split(/\s+/).map(normWord).filter(Boolean);
-    const promptSentence = item.p.replace(/^Find and fix the mistake:\s*/i, '').trim();
-    const promptSet = new Set(tokenize(promptSentence));
-    const targetWords = new Set();
-    [item.c, ...(item.a || [])].forEach(a => {
-      tokenize(a).forEach(w => { if (!promptSet.has(w)) targetWords.add(w); });
-    });
-    if (targetWords.size > 0) {
-      const matched = targetWords.has(normWord(answer));
-      processGrammarAnswer(item, answer, matched, false);
-      return;
-    }
-  }
   const profile = item.strict ? ANSWER_PROFILES.strict : ANSWER_PROFILES.grammar;
   const grade = gradeAnswer(answer, item.c, profile, item.a || []);
   let isCorrect = grade.status === 'correct';
@@ -13039,6 +13035,8 @@ function levenshtein(a, b) {
 }
 
 function processGrammarAnswer(item, answer, isCorrect, isClose) {
+  if (grammarSession.answered) return;
+  grammarSession.answered = true;
   const feedbackArea = document.getElementById('grammar-feedback-area');
   const hintBtn = document.getElementById('grammar-hint-btn');
   if (hintBtn) hintBtn.style.display = 'none';
@@ -13148,6 +13146,7 @@ function showGrammarHint() {
 
 function nextGrammarItem() {
   grammarSession.index++;
+  grammarSession.answered = false;
   if (grammarSession.index >= grammarSession.items.length) {
     showGrammarResults();
   } else {
@@ -13374,7 +13373,7 @@ function startGrammarDailyChallenge() {
   grammarPracticeReturnTo = null;
   grammarSession = {
     items: items, index: 0, results: [], combo: 0,
-    xpEarned: 0, hintUsed: false,
+    xpEarned: 0, hintUsed: false, answered: false,
     structureId: '_daily_grammar',
     isDailyChallenge: true
   };
