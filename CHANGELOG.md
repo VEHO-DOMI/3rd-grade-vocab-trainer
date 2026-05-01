@@ -2,6 +2,13 @@
 
 Reverse-chronological release history. Going forward, update on each substantive change. Earlier history (pre-2026-04-11) lives only in `git log`.
 
+## 2026-05-01 — Phase 0 polish (cross-grade)
+- Fix stray "60" timer always visible at top of practice modes (`speed-timer-wrap` now properly hidden when not in Speed Round).
+- Fix XP-for-zero-correct exploit: ending a session with no correct answers now awards 0 XP instead of streak-bonus + perfect-round bonuses.
+- Results page: friendly placeholder for sessions with no attempted words instead of blank `RESULTS` box.
+- Word Hunt failure UX softened: 2 mistakes allowed per round (was 1), with "1 try left" feedback after the first miss.
+- Identical fix-set applied across G1 (already shipped), G2, G3, G4.
+
 ## 2026-04-19 — Bugfix sweep
 - Fix Spelling Bee auto-click XP exploit
 - Fix results-page navigation
