@@ -16,6 +16,10 @@ Single-file SPA. G3 was the original "canonical template" for newer trainers; it
 ├── index.html         ← entire app (HTML + inline CSS + inline JS + vocabData)
 ├── avatars/           ← 50 PNG avatars
 ├── campaign/          ← story-mode assets (chapter scenes, character art)
+├── activity/          ← Activity Game sibling app (Draw / Show / Explain)
+│   ├── index.html     ← standalone group game; no login, no Firebase, no XP
+│   └── data/
+│       └── activity-words.js  ← auto-generated; rebuild via TOOLS/activity-audit-g3/
 └── README.md, CLAUDE.md, CHANGELOG.md
 ```
 
@@ -32,6 +36,8 @@ Single-file SPA. G3 was the original "canonical template" for newer trainers; it
 **Grammar arcade:** chat-sim campaign renderer, group-sort / matching-pairs / anagram task types. Campaign card has gradient style + progress bar (G3 was the design template for G1/G2).
 
 **Live multiplayer:** Battle Arena, Class Quiz.
+
+**Activity Game (sibling app at `activity/`):** teacher-orchestrated group game — Draw / Show / Explain (multi-select), 30/60/90 s rounds, 3/5/8/∞ rounds-per-group, multi-select 14-unit picker, group scoring with tie-break, optional time bonus. No login. Words come from `activity/data/activity-words.js` (single primary category per word, 599 entries categorized through an A2 lens). Regenerate via `TOOLS/activity-audit-g3/build-activity-words.js` after editing `teacher-overrides.csv`.
 
 ## Firebase
 

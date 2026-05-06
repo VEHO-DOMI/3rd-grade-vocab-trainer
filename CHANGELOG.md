@@ -2,6 +2,16 @@
 
 Reverse-chronological release history. Going forward, update on each substantive change. Earlier history (pre-2026-04-11) lives only in `git log`.
 
+## 2026-05-06 — Activity Game mode
+- New sibling app at `activity/` — teacher-orchestrated group game for 3A: **Draw It** ✏️ / **Show It** 🎭 / **Explain It** 💬, plus mix-mode with per-word category cue.
+- Setup: ≥2 group names, time-per-round picker (30 / 60 / 90 s), 3/5/8/∞ rounds-per-group, multi-select modes (≥1 required), multi-select 14-unit grid with quick-chips (All / None / U1–4 / U5–7 / U8–11 / U12–14), live "words available" counter, optional time-bonus toggle (+1 if a group clears all words before time).
+- Group scoring with two-stage tie-break (correct-total then skip-total) and 🤝 Tie badge.
+- 599 MORE 3 vocab entries categorized **from scratch** through an A2 12–13 yo lens — every word reviewed individually with a written justification (327 high-confidence calls, 272 medium-confidence). Distribution: 127 Draw / 199 Show / 273 Explain. Tooling at `TOOLS/activity-audit-g3/` (extract-vocab.js, extract-docx.js, coverage-diff.js, build-activity-words.js); per-word reasoning in `reports/g3-categorizations.csv`; review guide in `TEACHER_REVIEW.md`. The master `Full Vocabulary List MORE 3 Units 1-14.docx` was used for cross-reference (clean — every vocabData entry appears in the master).
+- Mobile-friendly: dark theme with G3 orange accent, prevent-pull-to-refresh, audio context unlock, ARIA-live timer.
+- Rich SFX: ascending arpeggio for Correct, descending whoosh for Skip, double-tick countdown beep, klaxon time-up buzzer, 5-note bonus fanfare, round-start chime, game-over chord.
+- Big 84-px Correct + Skip buttons side-by-side, Undo demoted to its own row to prevent accidental taps.
+- Home-screen card "🎯 Activity Game" links to `activity/`. No login / Firebase / XP — pure classroom group game with `localStorage` history (last 20 games).
+
 ## 2026-05-01 — Phase 0 polish (cross-grade)
 - Fix stray "60" timer always visible at top of practice modes (`speed-timer-wrap` now properly hidden when not in Speed Round).
 - Fix XP-for-zero-correct exploit: ending a session with no correct answers now awards 0 XP instead of streak-bonus + perfect-round bonuses.
